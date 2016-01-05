@@ -1,4 +1,10 @@
+# intermediate files
 bin/
 lib/
+
+# external libraries
+include/Eigen/
+
+# QtCreator files
 CMakeLists.txt.user
 
