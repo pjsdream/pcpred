@@ -1,0 +1,18 @@
+<package>
+  <description brief="pcpred">
+
+     pcpred
+
+  </description>
+  <author>Jae Sung Park</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/pcpred</url>
+  <depend package="roscpp"/>
+
+  <!-- eigen -->
+  <depend package="eigen"/>
+
+</package>
+
+
