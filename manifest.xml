@@ -10,9 +10,6 @@
   <url>http://ros.org/wiki/pcpred</url>
   <depend package="roscpp"/>
 
-  <!-- eigen -->
-  <depend package="eigen"/>
-
 </package>
 
 
