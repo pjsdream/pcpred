@@ -11,11 +11,13 @@ PointObstacleKalmanFilter::PointObstacleKalmanFilter()
 {
     A_ = Eigen::Matrix<double, 6, 6>::Identity();
     B_ = Eigen::Matrix<double, 6, 3>::Zero();
+    B_.block(3, 0, 3, 3) = Eigen::Matrix3d::Identity();
     C_ = Eigen::Matrix<double, 6, 6>::Identity();
     d_sigma_ = Eigen::Matrix<double, 6, 6>::Zero();
 
     setTimestep(0.1);
     setSensorDiagonalCovariance(0.01);
+    setAccelerationInferenceWindowSize(2);
 }
 
 void PointObstacleKalmanFilter::setTimestep(double timestep)
@@ -23,15 +25,12 @@ void PointObstacleKalmanFilter::setTimestep(double timestep)
     timestep_ = timestep;
 
     A_.block(0, 3, 3, 3) = Eigen::Matrix3d::Identity() * timestep;
-
-    B_.block(0, 0, 3, 3) = Eigen::Matrix3d::Zero();
-    B_.block(3, 0, 3, 3) = Eigen::Matrix3d::Identity() * timestep;
 }
 
 void PointObstacleKalmanFilter::setSensorDiagonalCovariance(double v)
 {
     d_sigma_.block(0, 0, 3, 3) = Eigen::Matrix3d::Identity() * v;
-    d_sigma_.block(3, 3, 3, 3) = Eigen::Matrix3d::Identity() * (2 * v / timestep_);
+    d_sigma_.block(3, 3, 3, 3) = Eigen::Matrix3d::Identity() * (2 * v / (timestep_ * timestep_));
 }
 
 void PointObstacleKalmanFilter::clearStateHistory()
@@ -90,19 +89,21 @@ void PointObstacleKalmanFilter::computeAccelerationAndVariance()
 
     else
     {
-        Eigen::Vector3d mu1 = (x_mu_history_[history_count - 1].block(3, 0, 3, 1) - x_mu_history_[history_count - 2].block(3, 0, 3, 1)) / timestep_;
-        Eigen::Matrix3d sigma1 = (x_sigma_history_[history_count - 1].block(3, 3, 3, 3) + x_sigma_history_[history_count - 2].block(3, 3, 3, 3)) / (timestep_ * timestep_);
+        Eigen::Vector3d mu1 = x_mu_history_[history_count - 1].block(3, 0, 3, 1) - x_mu_history_[history_count - 2].block(3, 0, 3, 1);
+        Eigen::Matrix3d sigma1 = x_sigma_history_[history_count - 1].block(3, 3, 3, 3) + x_sigma_history_[history_count - 2].block(3, 3, 3, 3);
 
         const int window_size = std::min((int)history_count, window_size_);
         int weight = 1;
         for (int i=1; i<window_size - 1; i++)
         {
-            Eigen::Vector3d mu2 = (x_mu_history_[history_count - 1 - i].block(3, 0, 3, 1) - x_mu_history_[history_count - 2 - i].block(3, 0, 3, 1)) / timestep_;
-            Eigen::Matrix3d sigma2 = (x_sigma_history_[history_count - 1 - i].block(3, 3, 3, 3) + x_sigma_history_[history_count - 2 - i].block(3, 3, 3, 3)) / (timestep_ * timestep_);
+            Eigen::Vector3d mu2 = x_mu_history_[history_count - 1 - i].block(3, 0, 3, 1) - x_mu_history_[history_count - 2 - i].block(3, 0, 3, 1);
+            Eigen::Matrix3d sigma2 = x_sigma_history_[history_count - 1 - i].block(3, 3, 3, 3) + x_sigma_history_[history_count - 2 - i].block(3, 3, 3, 3);
 
             const double t = 1.0 / (weight + 1);
             sigma1 = (1-t) * sigma1 + t * sigma2 + t * (1-t) * (mu1 - mu2) * (mu1 - mu2).transpose();
             mu1 = (1-t) * mu1 + t * mu2;
+
+            weight++;
         }
 
         u_ = mu1;

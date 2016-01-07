@@ -38,11 +38,19 @@ rosbuild_add_library(pcpred
 src/prediction/point_predictor.cpp
 src/prediction/pointcloud_predictor.cpp
 src/kalman_filter/point_obstacle_kf.cpp
+src/visualization/visualizer.cpp
+src/import/gvv_data_importer.cpp
 ${HEADER_FILES}
 )
 
-# test application
-rosbuild_add_executable(app
-src/app.cpp
+# test application for prediction
+rosbuild_add_executable(test_prediction
+src/test_prediction.cpp
 )
-target_link_libraries(app pcpred)
+target_link_libraries(test_prediction pcpred)
+
+# test application for point cloud data import
+rosbuild_add_executable(test_gvvdata_import
+src/test_gvvdata_import.cpp
+)
+target_link_libraries(test_gvvdata_import pcpred)

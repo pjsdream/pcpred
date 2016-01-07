@@ -9,6 +9,7 @@
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/pcpred</url>
   <depend package="roscpp"/>
+  <depend package="tf"/>
 
 </package>
 
