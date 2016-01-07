@@ -7,7 +7,15 @@
 #include <stdio.h>
 #include <iostream>
 
+#include <pcl_ros/point_cloud.h>
+#include <pcl/point_types.h>
+
+#include <string>
+
 using namespace pcpred;
+
+
+typedef pcl::PointCloud<pcl::PointXYZ> PointCloud;
 
 
 std::map<double, double> Visualizer::gaussian_distribution_radius_table_;
@@ -35,7 +43,8 @@ Visualizer::Visualizer(const char* topic)
     }
 
     ros::NodeHandle n;
-    publisher_ = n.advertise<visualization_msgs::Marker>(topic, 1000);
+    marker_publisher_ = n.advertise<visualization_msgs::Marker>(topic, 1000);
+    pointcloud_publisher_ = n.advertise<PointCloud>(std::string(topic) + "_pointcloud", 1000);
 
     ros::Rate rate(1);
     rate.sleep();
@@ -44,13 +53,13 @@ Visualizer::Visualizer(const char* topic)
 
 void Visualizer::publish(const visualization_msgs::Marker& marker)
 {
-    if (publisher_.getNumSubscribers() < 1)
+    if (marker_publisher_.getNumSubscribers() < 1)
     {
         if (!ros::ok())
             return;
         ROS_WARN_ONCE("Please create a subscriber to the marker");
     }
-    publisher_.publish(marker);
+    marker_publisher_.publish(marker);
 }
 
 
@@ -145,6 +154,21 @@ void Visualizer::drawGaussianDistribution(const char* ns, const Eigen::Vector3d&
     publish(marker);
 
     count_[ns]++;
+}
+
+void Visualizer::drawPointCloud(const std::vector<Eigen::Vector3d>& pointcloud)
+{
+    PointCloud msg;
+    msg.header.frame_id = "/world";
+    pcl_conversions::toPCL(ros::Time::now(), msg.header.stamp);
+
+    msg.width = pointcloud.size();
+    msg.height = 1;
+
+    for (int i=0; i<pointcloud.size(); i++)
+        msg.points.push_back(pcl::PointXYZ(pointcloud[i](0), pointcloud[i](1), pointcloud[i](2)));
+
+    pointcloud_publisher_.publish(msg);
 }
 
 void Visualizer::clear(const char* ns)

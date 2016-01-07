@@ -9,7 +9,11 @@
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/pcpred</url>
   <depend package="roscpp"/>
-  <depend package="tf"/>
+
+  <!-- pcl -->
+  <depend package="pcl_conversions"/>
+  <depend package="pcl_ros"/>
+  <depend package="sensor_msgs"/>
 
 </package>
 

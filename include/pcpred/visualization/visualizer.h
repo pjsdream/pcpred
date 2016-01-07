@@ -32,12 +32,14 @@ public:
 
     void drawSphere(const char* ns, const Eigen::Vector3d& center, double radius);
     void drawGaussianDistribution(const char* ns, const Eigen::Vector3d& mu, const Eigen::Matrix3d& sigma, double probability, double offset = 0.0);
+    void drawPointCloud(const std::vector<Eigen::Vector3d>& pointcloud);
 
 private:
 
     void publish(const visualization_msgs::Marker& marker);
 
-    ros::Publisher publisher_;
+    ros::Publisher marker_publisher_;
+    ros::Publisher pointcloud_publisher_;
 
     std::map<std::string, int> count_;
 };
