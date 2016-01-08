@@ -14,7 +14,7 @@ class GVVDataImporter
 {
 public:
 
-    bool import(int sequence, int frame);
+    bool import(int sequence, int frame, bool median_filter);
 
     void printFrameInfo();
 
@@ -23,9 +23,8 @@ public:
 private:
 
     void loadDepthFrameFromFile(const char* filename);
-    void get3DPointCloudFromDepthFrame();
-
-    void repmat();
+    void get3DPointCloudFromDepthFrame(bool median_filter);
+    bool existFile(const char* filename);
 
     int sequence_;
     int frame_;

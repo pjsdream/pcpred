@@ -8,7 +8,6 @@ Panels:
         - /Status1
         - /Grid1
         - /Axes1
-        - /PointCloud22
       Splitter Ratio: 0.520134
     Tree Height: 565
   - Class: rviz/Selection
@@ -69,8 +68,8 @@ Visualization Manager:
     - Alpha: 1
       Autocompute Intensity Bounds: true
       Autocompute Value Bounds:
-        Max Value: -0.394134
-        Min Value: -0.872225
+        Max Value: -0.287543
+        Min Value: -0.772777
         Value: true
       Axis: X
       Channel Name: intensity
@@ -107,7 +106,7 @@ Visualization Manager:
       Color: 255; 255; 255
       Color Transformer: FlatColor
       Decay Time: 0
-      Enabled: true
+      Enabled: false
       Invert Rainbow: false
       Max Color: 255; 255; 255
       Max Intensity: 4096
@@ -123,7 +122,7 @@ Visualization Manager:
       Topic: /gvvdata_cluster
       Use Fixed Frame: true
       Use rainbow: true
-      Value: true
+      Value: false
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -148,7 +147,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 2.14824
+      Distance: 1.99795
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.06
         Stereo Focal Distance: 1
@@ -160,10 +159,10 @@ Visualization Manager:
         Z: 1.25733
       Name: Current View
       Near Clip Distance: 0.01
-      Pitch: 0.0202039
+      Pitch: -0.194796
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 6.27689
+      Yaw: 0.77372
     Saved: ~
 Window Geometry:
   Displays:

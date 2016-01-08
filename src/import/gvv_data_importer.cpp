@@ -5,6 +5,9 @@
 #include <stdio.h>
 #include <iostream>
 
+#include <vector>
+#include <algorithm>
+
 #include <ros/console.h>
 
 using namespace pcpred;
@@ -29,19 +32,26 @@ const std::vector<Eigen::Vector3d>& GVVDataImporter::pointcloud()
 }
 
 
-bool GVVDataImporter::import(int sequence, int frame)
+bool GVVDataImporter::existFile(const char* filename)
 {
-    char filename[128];
-    sprintf(filename, "../data/D%d/depth%04d.bin", sequence, frame);
-
-    // file existance check
     FILE* fp = fopen(filename, "rb");
     if (fp == 0)
         return false;
     fclose(fp);
+    return true;
+}
+
+bool GVVDataImporter::import(int sequence, int frame, bool median_filter)
+{
+    char filename[128];
+    sprintf(filename, "../data/D%d/depth%04d.bin", sequence, frame);
+    if (!existFile(filename))
+        return false;
 
     loadDepthFrameFromFile(filename);
-    get3DPointCloudFromDepthFrame();
+    get3DPointCloudFromDepthFrame(median_filter);
+
+    return true;
 }
 
 void GVVDataImporter::loadDepthFrameFromFile(const char* filename)
@@ -89,12 +99,48 @@ void GVVDataImporter::loadDepthFrameFromFile(const char* filename)
     fclose(fp);
 }
 
-void GVVDataImporter::get3DPointCloudFromDepthFrame()
+void GVVDataImporter::get3DPointCloudFromDepthFrame(bool median_filter)
 {
     pointcloud_.clear();
 
     const int V = data_.rows();
     const int U = data_.cols();
+
+    // median filtering
+    if (median_filter)
+    {
+        int neighbor[9][2] = {
+            {-1, -1}, {-1,  0}, {-1,  1},
+            { 0, -1}, { 0,  0}, { 0,  1},
+            { 1, -1}, { 1,  0}, { 1,  1}
+        };
+
+        for (int i=0; i<V; i++)
+        {
+            for (int j=0; j<U; j++)
+            {
+                if (data_(i, j) != 65535)
+                {
+                    std::vector<double> values;
+                    for (int k=0; k<8; k++)
+                    {
+                        const int x = i + neighbor[k][0];
+                        const int y = j + neighbor[k][1];
+
+                        if (0<=x && x<V && 0<=y && y<U && data_(x, y) != 65535)
+                            values.push_back(data_(x, y));
+                    }
+
+                    std::sort(values.begin(), values.end());
+                    const int size = values.size();
+                    if (size % 2 == 0)
+                        data_(i, j) = (values[size/2 - 1] + values[size/2]) / 2.0;
+                    else
+                        data_(i, j) = values[size/2];
+                }
+            }
+        }
+    }
 
     // ignore background
     int cols = 0;

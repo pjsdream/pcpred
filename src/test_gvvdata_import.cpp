@@ -28,7 +28,7 @@ int main(int argc, char** argv)
     ros::Rate rate(33);
 
     int frame = 0;
-    while (importer.import(sequence_number, frame))
+    while (importer.import(sequence_number, frame, true))
     {
         printf("frame %4d", frame);
         fflush(stdout);
