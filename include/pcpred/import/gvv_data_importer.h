@@ -14,7 +14,7 @@ class GVVDataImporter
 {
 public:
 
-    void import(int sequence, int frame);
+    bool import(int sequence, int frame);
 
     void printFrameInfo();
 

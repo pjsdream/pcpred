@@ -14,14 +14,16 @@ class Pointcloud
 {
 public:
 
-    explicit Pointcloud(const std::vector<Eigen::Vector3d>& pointcloud_list);
+    Pointcloud();
+    Pointcloud(const std::vector<Eigen::Vector3d>& pointcloud_list);
 
     inline int size() const { return pointcloud_.size(); }
     inline const Eigen::Vector3d& point(int i) const { return pointcloud_[i]; }
 
+    void push_back(const Eigen::Vector3d& point);
     void rotate(double angle, const Eigen::Vector3d& axis);
 
-    void cluster(double voxel_resolution, double seed_resolution);
+    Pointcloud cluster(double voxel_resolution, double seed_resolution);
 
 private:
 

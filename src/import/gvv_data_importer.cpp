@@ -29,10 +29,17 @@ const std::vector<Eigen::Vector3d>& GVVDataImporter::pointcloud()
 }
 
 
-void GVVDataImporter::import(int sequence, int frame)
+bool GVVDataImporter::import(int sequence, int frame)
 {
     char filename[128];
     sprintf(filename, "../data/D%d/depth%04d.bin", sequence, frame);
+
+    // file existance check
+    FILE* fp = fopen(filename, "rb");
+    if (fp == 0)
+        return false;
+    fclose(fp);
+
     loadDepthFrameFromFile(filename);
     get3DPointCloudFromDepthFrame();
 }
