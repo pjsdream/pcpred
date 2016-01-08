@@ -59,7 +59,7 @@ int main(int argc, char** argv)
     predictor.setSensorDiagonalCovariance(sensor_error * sensor_error); // variance is proportional to square of sensing error
     predictor.setAccelerationInferenceWindowSize(acceleration_inference_window_size);
 
-    Visualizer visualizer("prediction");
+    MarkerVisualizer visualizer("prediction_test");
     visualizer.clearUptoCapacity("path");
     visualizer.clearUptoCapacity("prediction");
 
@@ -71,9 +71,9 @@ int main(int argc, char** argv)
     // sine path
     Path path = produceObstaclePathSine(frame_count, timestep, speed);
 
-    for (int i=0; i<path.size(); i++)
-        visualizer.drawSphere("path", path[i], radius);
-    rate.sleep();
+    ros::Duration(3.0).sleep();
+    for (int j=0; j<path.size(); j++)
+        visualizer.drawSphere("path", path[j], radius);
 
     for (int i=0; i<path.size(); i++)
     {

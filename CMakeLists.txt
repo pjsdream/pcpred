@@ -8,8 +8,14 @@ include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
 #  RelWithDebInfo : w/ debug symbols, w/ optimization
 #  MinSizeRel     : w/o debug symbols, w/ optimization, stripped binaries
 #set(ROS_BUILD_TYPE RelWithDebInfo)
-set(ROS_BUILD_TYPE Debug)
-#set(ROS_BUILD_TYPE Release)
+#set(ROS_BUILD_TYPE Debug)
+set(ROS_BUILD_TYPE Release)
+
+#pcl library
+find_package(PCL 1.7 REQUIRED)
+include_directories(${PCL_INCLUDE_DIRS})
+link_directories(${PCL_LIBRARY_DIRS})
+add_definitions(${PCL_DEFINITIONS})
 
 rosbuild_init()
 
@@ -38,7 +44,10 @@ rosbuild_add_library(pcpred
 src/prediction/point_predictor.cpp
 src/prediction/pointcloud_predictor.cpp
 src/kalman_filter/point_obstacle_kf.cpp
+src/pointcloud/pointcloud.cpp
 src/visualization/visualizer.cpp
+src/visualization/marker_visualizer.cpp
+src/visualization/pointcloud_visualizer.cpp
 src/import/gvv_data_importer.cpp
 ${HEADER_FILES}
 )
@@ -54,3 +63,4 @@ rosbuild_add_executable(test_gvvdata_import
 src/test_gvvdata_import.cpp
 )
 target_link_libraries(test_gvvdata_import pcpred)
+target_link_libraries(test_gvvdata_import ${PCL_LIBRARIES})

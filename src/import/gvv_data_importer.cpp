@@ -84,20 +84,37 @@ void GVVDataImporter::loadDepthFrameFromFile(const char* filename)
 
 void GVVDataImporter::get3DPointCloudFromDepthFrame()
 {
+    pointcloud_.clear();
+
     const int V = data_.rows();
     const int U = data_.cols();
 
-    Eigen::Matrix4Xd B(4, U*V);
+    // ignore background
+    int cols = 0;
     for (int i=0; i<U*V; i++)
     {
-        B(0, i) = i / V + 1;
-        B(1, i) = i % V + 1;
-        B(2, i) = data_(i%V, i/V) / (float)((1<<16) - 1);
-        B(3, i) = 1.f;
+        if (data_(i%V, i/V) != 65535)
+            cols++;
+    }
+    if (cols == 0)
+        return;
+
+    Eigen::Matrix4Xd B(4, cols);
+    int col = 0;
+    for (int i=0; i<U*V; i++)
+    {
+        if (data_(i%V, i/V) != 65535)
+        {
+            B(0, col) = i / V + 1;
+            B(1, col) = i % V + 1;
+            B(2, col) = data_(i%V, i/V) / (float)((1<<16) - 1);
+            B(3, col) = 1.f;
+            col++;
+        }
     }
 
     Eigen::MatrixXd CP = intrinsics_.colPivHouseholderQr().solve(B);
-    for (int i=0; i<U*V; i++)
+    for (int i=0; i<cols; i++)
     {
         for (int j=0; j<4; j++)
             CP(j,i) /= CP(3,i);
@@ -105,10 +122,6 @@ void GVVDataImporter::get3DPointCloudFromDepthFrame()
 
     Eigen::MatrixXd GP = extrinsics_.colPivHouseholderQr().solve(CP);
 
-    pointcloud_.clear();
-    for (int i=0; i<U*V; i++)
-    {
-        if (data_(i%V, i/V) != 65535)
-            pointcloud_.push_back(GP.col(i).block(0, 0, 3, 1));
-    }
+    for (int i=0; i<cols; i++)
+        pointcloud_.push_back(GP.col(i).block(0, 0, 3, 1));
 }

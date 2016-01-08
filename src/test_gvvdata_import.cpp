@@ -15,17 +15,24 @@ int main(int argc, char** argv)
     ROS_INFO("test_gvvdata_import");
 
     GVVDataImporter importer;
-    Visualizer visualizer("gvvdata");
+    PointcloudVisualizer visualizer("gvvdata_test");
 
     ros::Rate rate(33);
 
     for (int i=0; i<1438; i++)
     {
-        printf("frame %d\n", i);
+        printf("frame %4d", i);
         fflush(stdout);
 
         importer.import(1, i);
-        visualizer.drawPointCloud(importer.pointcloud());
+        Pointcloud pointcloud( importer.pointcloud() );
+        pointcloud.rotate(M_PI / 2.0, Eigen::Vector3d(1, 0, 0));
+        visualizer.drawPointcloud(pointcloud);
+
+        printf("  #points = %d\n", pointcloud.size());
+        fflush(stdout);
+
+        pointcloud.cluster(0.01, 0.1);
 
         rate.sleep();
     }
