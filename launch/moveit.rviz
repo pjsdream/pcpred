@@ -8,6 +8,7 @@ Panels:
         - /Status1
         - /Grid1
         - /Axes1
+        - /Marker2
       Splitter Ratio: 0.520134
     Tree Height: 565
   - Class: rviz/Selection
@@ -65,6 +66,66 @@ Visualization Manager:
         {}
       Queue Size: 100
       Value: false
+    - Class: rviz/Marker
+      Enabled: true
+      Marker Topic: /bvh_test
+      Name: Marker
+      Namespaces:
+        Head: true
+        Hips: true
+        LeftArm: true
+        LeftFoot: true
+        LeftForeArm: true
+        LeftHand: true
+        LeftHandIndex1: true
+        LeftHandIndex2: true
+        LeftHandIndex3: true
+        LeftHandMiddle1: true
+        LeftHandMiddle2: true
+        LeftHandMiddle3: true
+        LeftHandPinky1: true
+        LeftHandPinky2: true
+        LeftHandPinky3: true
+        LeftHandRing1: true
+        LeftHandRing2: true
+        LeftHandRing3: true
+        LeftHandThumb1: true
+        LeftHandThumb2: true
+        LeftHandThumb3: true
+        LeftLeg: true
+        LeftShoulder: true
+        LeftToeBase: true
+        LeftUpLeg: true
+        Neck: true
+        Neck1: true
+        RightArm: true
+        RightFoot: true
+        RightForeArm: true
+        RightHand: true
+        RightHandIndex1: true
+        RightHandIndex2: true
+        RightHandIndex3: true
+        RightHandMiddle1: true
+        RightHandMiddle2: true
+        RightHandMiddle3: true
+        RightHandPinky1: true
+        RightHandPinky2: true
+        RightHandPinky3: true
+        RightHandRing1: true
+        RightHandRing2: true
+        RightHandRing3: true
+        RightHandThumb1: true
+        RightHandThumb2: true
+        RightHandThumb3: true
+        RightLeg: true
+        RightShoulder: true
+        RightToeBase: true
+        RightUpLeg: true
+        Spine: true
+        Spine1: true
+        Spine2: true
+      Queue Size: 100
+      Value: true
     - Alpha: 1
       Autocompute Intensity Bounds: true
       Autocompute Value Bounds:
@@ -147,22 +208,22 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 4.00192
+      Distance: 5.5115
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.06
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: -0.679249
-        Y: -0.259906
-        Z: 0.895443
+        X: -0.531931
+        Y: -2.22167
+        Z: 0.606363
       Name: Current View
       Near Clip Distance: 0.01
-      Pitch: -0.0247964
+      Pitch: 0.180203
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 0.0268521
+      Yaw: 6.21001
     Saved: ~
 Window Geometry:
   Displays:

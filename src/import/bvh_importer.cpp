@@ -6,6 +6,9 @@
 using namespace pcpred;
 
 
+const double BvhImporter::DEGREES_TO_RADIANS = M_PI / 180.;
+
+
 bool BvhImporter::import(const char* filename)
 {
     FILE* fp = fopen(filename, "r");
@@ -59,6 +62,10 @@ void BvhImporter::readHierarchyJoint(FILE*& fp, int parent_index)
     joint_names_.push_back(buffer);
     joint_name_to_index_map_[buffer] = index;
     parents_.push_back(parent_index);
+    children_.push_back(std::vector<int>(0));
+
+    if (parent_index != -1)
+        children_[parent_index].push_back(index);
 
     while (true)
     {
@@ -71,7 +78,7 @@ void BvhImporter::readHierarchyJoint(FILE*& fp, int parent_index)
             offsets_.push_back(Eigen::Vector3d(x, y, z));
         }
 
-        else if (strcmp(buffer, "CHANNELS"))
+        else if (strcmp(buffer, "CHANNELS") == 0)
         {
             int num_channels;
             fscanf(fp, "%d", &num_channels);
@@ -81,29 +88,29 @@ void BvhImporter::readHierarchyJoint(FILE*& fp, int parent_index)
             {
                 fscanf(fp, "%s", buffer);
 
-                if (strcmp(buffer, "Xposition")) channels.push_back(JointChannelXposition);
-                else if (strcmp(buffer, "Yposition")) channels.push_back(JointChannelYposition);
-                else if (strcmp(buffer, "Zposition")) channels.push_back(JointChannelZposition);
-                else if (strcmp(buffer, "Xrotation")) channels.push_back(JointChannelXrotation);
-                else if (strcmp(buffer, "Yrotation")) channels.push_back(JointChannelYrotation);
-                else if (strcmp(buffer, "Zrotation")) channels.push_back(JointChannelZrotation);
+                if (strcmp(buffer, "Xposition") == 0) channels.push_back(JointChannelXposition);
+                else if (strcmp(buffer, "Yposition") == 0) channels.push_back(JointChannelYposition);
+                else if (strcmp(buffer, "Zposition") == 0) channels.push_back(JointChannelZposition);
+                else if (strcmp(buffer, "Xrotation") == 0) channels.push_back(JointChannelXrotation);
+                else if (strcmp(buffer, "Yrotation") == 0) channels.push_back(JointChannelYrotation);
+                else if (strcmp(buffer, "Zrotation") == 0) channels.push_back(JointChannelZrotation);
             }
             joint_channels_.push_back(channels);
         }
 
-        else if (strcmp(buffer, "JOINTS"))
+        else if (strcmp(buffer, "JOINT") == 0)
         {
-            fseek(fp, -6, SEEK_CUR);
+            fseek(fp, -5, SEEK_CUR);
             readHierarchyJoint(fp, index);
         }
 
-        else if (strcmp(buffer, "End"))
+        else if (strcmp(buffer, "End") == 0)
         {
             // currently ignoring end sites
             fscanf(fp, "%*s%*s%*s%*s%*s%*s%*s");
         }
 
-        else if (strcmp(buffer, "}"))
+        else if (strcmp(buffer, "}") == 0)
         {
             break;
         }
@@ -128,6 +135,7 @@ void BvhImporter::readMotion(FILE*& fp)
         for (int j=0; j<joint_names_.size(); j++)
         {
             Eigen::Affine3d m = j == 0 ? Eigen::Affine3d::Identity() : transformations_[i][ parents_[j] ];
+            m.translate(offsets_[j]);
 
             for (int k=0; k<joint_channels_[j].size(); k++)
             {
@@ -146,19 +154,42 @@ void BvhImporter::readMotion(FILE*& fp)
                     m.translate(Eigen::Vector3d(0.0, 0.0, value));
                     break;
                 case JointChannelXrotation:
-                    m.rotate(Eigen::AngleAxisd(value, Eigen::Vector3d(1.0, 0.0, 0.0)));
+                    m.rotate(Eigen::AngleAxisd(value * DEGREES_TO_RADIANS, Eigen::Vector3d(1.0, 0.0, 0.0)));
                     break;
                 case JointChannelYrotation:
-                    m.rotate(Eigen::AngleAxisd(value, Eigen::Vector3d(0.0, 1.0, 0.0)));
+                    m.rotate(Eigen::AngleAxisd(value * DEGREES_TO_RADIANS, Eigen::Vector3d(0.0, 1.0, 0.0)));
                     break;
                 case JointChannelZrotation:
-                    m.rotate(Eigen::AngleAxisd(value, Eigen::Vector3d(0.0, 0.0, 1.0)));
+                    m.rotate(Eigen::AngleAxisd(value * DEGREES_TO_RADIANS, Eigen::Vector3d(0.0, 0.0, 1.0)));
                     break;
                 }
             }
 
             transformations_[i].push_back(m);
         }
+    }
+}
+
+void BvhImporter::scale(double s)
+{
+    for (int i=0; i<joint_names_.size(); i++)
+        offsets_[i] *= s;
+
+    for (int i=0; i<num_frames_; i++)
+    {
+        for (int j=0; j<joint_names_.size(); j++)
+            transformations_[i][j].translation() *= s;
+    }
+}
+
+void BvhImporter::rotate(double angle, const Eigen::Vector3d& axis)
+{
+    Eigen::AngleAxisd rotation(angle, axis);
+
+    for (int i=0; i<num_frames_; i++)
+    {
+        for (int j=0; j<joint_names_.size(); j++)
+            transformations_[i][j].prerotate(rotation);
     }
 }
 

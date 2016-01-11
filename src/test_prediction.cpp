@@ -73,14 +73,12 @@ int main(int argc, char** argv)
 
     ros::Duration(3.0).sleep();
     for (int j=0; j<path.size(); j++)
-        visualizer.drawSphere("path", path[j], radius);
+        visualizer.drawSphere("path", j, path[j], radius);
 
     for (int i=0; i<path.size(); i++)
     {
         predictor.observe(path[i]);
         predictor.predict(predict_frame_count);
-
-        visualizer.clear("prediction");
 
         for (int j=0; j<predict_frame_count; j++)
         {
@@ -88,7 +86,7 @@ int main(int argc, char** argv)
             Eigen::Matrix3d sigma;
 
             predictor.getPredictionResult(j, mu, sigma);
-            visualizer.drawGaussianDistribution("prediction", mu, sigma, 0.95, radius);
+            visualizer.drawGaussianDistribution("prediction", j, mu, sigma, 0.95, radius);
 
             std::cout << "Prediction at time " << i << " of time " << i+j << std::endl;
             std::cout << "observation = " << path[i].transpose() << std::endl;

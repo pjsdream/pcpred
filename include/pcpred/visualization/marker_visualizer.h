@@ -28,17 +28,15 @@ public:
 
     explicit MarkerVisualizer(const char* topic = "visualization_marker");
 
-    void clear(const char* ns);
+    void clear(const char* ns, int id);
     void clearUptoCapacity(const char* ns);
 
-    void drawSphere(const char* ns, const Eigen::Vector3d& center, double radius);
-    void drawGaussianDistribution(const char* ns, const Eigen::Vector3d& mu, const Eigen::Matrix3d& sigma, double probability, double offset = 0.0);
+    void drawSphere(const char* ns, int id, const Eigen::Vector3d& center, double radius);
+    void drawGaussianDistribution(const char* ns, int id, const Eigen::Vector3d& mu, const Eigen::Matrix3d& sigma, double probability, double offset = 0.0);
 
 private:
 
     void publish(const visualization_msgs::Marker& marker);
-
-    std::map<std::string, int> count_;
 };
 
 }

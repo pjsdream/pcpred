@@ -17,6 +17,8 @@ class BvhImporter
 {
 private:
 
+    static const double DEGREES_TO_RADIANS;
+
     enum JointChannelType
     {
         JointChannelXposition= 0,
@@ -34,6 +36,11 @@ public:
     inline int numJoints() { return joint_names_.size(); }
     inline int numFrames() { return num_frames_; }
     inline std::string jointName(int index) { return joint_names_[index]; }
+    inline double frameTime() { return frame_time_; }
+    inline double rate() { return 1. / frame_time_; }
+
+    void scale(double s);
+    void rotate(double angle, const Eigen::Vector3d& axis);
 
     Eigen::Affine3d jointTransformation(int frame_index, int joint_index);
     Eigen::Affine3d jointTransformation(int frame_index, const std::string& joint_name);

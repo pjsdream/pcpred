@@ -38,7 +38,7 @@ MarkerVisualizer::MarkerVisualizer(const char* topic)
     }
 
     ros::NodeHandle n;
-    publisher_ = n.advertise<visualization_msgs::Marker>(topic, 1000);
+    publisher_ = n.advertise<visualization_msgs::Marker>(topic, 100);
 }
 
 
@@ -54,7 +54,7 @@ void MarkerVisualizer::publish(const visualization_msgs::Marker& marker)
 }
 
 
-void MarkerVisualizer::drawSphere(const char* ns, const Eigen::Vector3d& center, double radius)
+void MarkerVisualizer::drawSphere(const char* ns, int id, const Eigen::Vector3d& center, double radius)
 {
     visualization_msgs::Marker marker;
 
@@ -62,7 +62,7 @@ void MarkerVisualizer::drawSphere(const char* ns, const Eigen::Vector3d& center,
     marker.header.stamp = ros::Time::now();
 
     marker.ns = ns;
-    marker.id = count_[ns];
+    marker.id = id;
     marker.type = visualization_msgs::Marker::SPHERE;
     marker.action = visualization_msgs::Marker::ADD;
 
@@ -86,11 +86,9 @@ void MarkerVisualizer::drawSphere(const char* ns, const Eigen::Vector3d& center,
     marker.lifetime = ros::Duration();
 
     publish(marker);
-
-    count_[ns]++;
 }
 
-void MarkerVisualizer::drawGaussianDistribution(const char* ns, const Eigen::Vector3d& mu, const Eigen::Matrix3d& sigma, double probability, double offset)
+void MarkerVisualizer::drawGaussianDistribution(const char* ns, int id, const Eigen::Vector3d& mu, const Eigen::Matrix3d& sigma, double probability, double offset)
 {
     if (gaussian_distribution_radius_table_.find(probability) == gaussian_distribution_radius_table_.end())
     {
@@ -105,7 +103,7 @@ void MarkerVisualizer::drawGaussianDistribution(const char* ns, const Eigen::Vec
     marker.header.stamp = ros::Time::now();
 
     marker.ns = ns;
-    marker.id = count_[ns];
+    marker.id = id;
     marker.type = visualization_msgs::Marker::SPHERE;
     marker.action = visualization_msgs::Marker::ADD;
 
@@ -143,11 +141,9 @@ void MarkerVisualizer::drawGaussianDistribution(const char* ns, const Eigen::Vec
     marker.lifetime = ros::Duration();
 
     publish(marker);
-
-    count_[ns]++;
 }
 
-void MarkerVisualizer::clear(const char* ns)
+void MarkerVisualizer::clear(const char* ns, int id)
 {
     visualization_msgs::Marker marker;
 
@@ -155,15 +151,10 @@ void MarkerVisualizer::clear(const char* ns)
     marker.header.stamp = ros::Time::now();
 
     marker.ns = ns;
+    marker.id = id;
     marker.action = visualization_msgs::Marker::DELETE;
 
-    for (int i=0; i<count_[ns]; i++)
-    {
-        marker.id = i;
-        publish(marker);
-    }
-
-    count_.erase(ns);
+    publish(marker);
 }
 
 void MarkerVisualizer::clearUptoCapacity(const char* ns)
@@ -181,6 +172,4 @@ void MarkerVisualizer::clearUptoCapacity(const char* ns)
         marker.id = i;
         publish(marker);
     }
-
-    count_.erase(ns);
 }
