@@ -2,9 +2,6 @@
 bin/
 lib/
 
-# data
-data/
-
 # external libraries
 include/Eigen/
 

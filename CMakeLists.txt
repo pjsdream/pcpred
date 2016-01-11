@@ -49,6 +49,7 @@ src/pointcloud/pointcloud.cpp
 src/visualization/visualizer.cpp
 src/visualization/marker_visualizer.cpp
 src/visualization/pointcloud_visualizer.cpp
+src/import/bvh_importer.cpp
 src/import/gvv_data_importer.cpp
 ${HEADER_FILES}
 )
@@ -65,3 +66,9 @@ src/test_gvvdata_import.cpp
 )
 target_link_libraries(test_gvvdata_import pcpred)
 target_link_libraries(test_gvvdata_import ${PCL_LIBRARIES})
+
+# test application for bvh data import
+rosbuild_add_executable(test_bvh_import
+src/test_bvh_import.cpp
+)
+target_link_libraries(test_bvh_import pcpred)
