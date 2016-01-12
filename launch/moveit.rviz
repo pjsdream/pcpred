@@ -8,7 +8,7 @@ Panels:
         - /Status1
         - /Grid1
         - /Axes1
-        - /Marker2
+        - /Marker3/Namespaces1
       Splitter Ratio: 0.520134
     Tree Height: 565
   - Class: rviz/Selection
@@ -29,7 +29,7 @@ Panels:
     Experimental: false
     Name: Time
     SyncMode: 0
-    SyncSource: PointCloud2
+    SyncSource: ""
 Visualization Manager:
   Class: ""
   Displays:
@@ -67,64 +67,21 @@ Visualization Manager:
       Queue Size: 100
       Value: false
     - Class: rviz/Marker
-      Enabled: true
+      Enabled: false
       Marker Topic: /bvh_test
       Name: Marker
       Namespaces:
-        Head: true
-        Hips: true
-        LeftArm: true
-        LeftFoot: true
-        LeftForeArm: true
-        LeftHand: true
-        LeftHandIndex1: true
-        LeftHandIndex2: true
-        LeftHandIndex3: true
-        LeftHandMiddle1: true
-        LeftHandMiddle2: true
-        LeftHandMiddle3: true
-        LeftHandPinky1: true
-        LeftHandPinky2: true
-        LeftHandPinky3: true
-        LeftHandRing1: true
-        LeftHandRing2: true
-        LeftHandRing3: true
-        LeftHandThumb1: true
-        LeftHandThumb2: true
-        LeftHandThumb3: true
-        LeftLeg: true
-        LeftShoulder: true
-        LeftToeBase: true
-        LeftUpLeg: true
-        Neck: true
-        Neck1: true
-        RightArm: true
-        RightFoot: true
-        RightForeArm: true
-        RightHand: true
-        RightHandIndex1: true
-        RightHandIndex2: true
-        RightHandIndex3: true
-        RightHandMiddle1: true
-        RightHandMiddle2: true
-        RightHandMiddle3: true
-        RightHandPinky1: true
-        RightHandPinky2: true
-        RightHandPinky3: true
-        RightHandRing1: true
-        RightHandRing2: true
-        RightHandRing3: true
-        RightHandThumb1: true
-        RightHandThumb2: true
-        RightHandThumb3: true
-        RightLeg: true
-        RightShoulder: true
-        RightToeBase: true
-        RightUpLeg: true
-        Spine: true
-        Spine1: true
-        Spine2: true
+        {}
       Queue Size: 100
+      Value: false
+    - Class: rviz/Marker
+      Enabled: true
+      Marker Topic: /bvh_prediction_test
+      Name: Marker
+      Namespaces:
+        prediction: true
+        robot: true
+      Queue Size: 1000
       Value: true
     - Alpha: 1
       Autocompute Intensity Bounds: true
@@ -208,22 +165,22 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 5.5115
+      Distance: 3.83888
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.06
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: -0.531931
-        Y: -2.22167
-        Z: 0.606363
+        X: 0.0115264
+        Y: 0.217039
+        Z: 1.12709
       Name: Current View
       Near Clip Distance: 0.01
-      Pitch: 0.180203
+      Pitch: 0.250205
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 6.21001
+      Yaw: 4.62321
     Saved: ~
 Window Geometry:
   Displays:
@@ -242,4 +199,4 @@ Window Geometry:
     collapsed: false
   Width: 1509
   X: 55
-  Y: 30
+  Y: 20

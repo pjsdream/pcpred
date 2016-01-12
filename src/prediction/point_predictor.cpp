@@ -5,6 +5,7 @@ using namespace pcpred;
 
 PointPredictor::PointPredictor()
 {
+    first_ = true;
 }
 
 void PointPredictor::setTimestep(double timestep)
@@ -26,11 +27,9 @@ void PointPredictor::setAccelerationInferenceWindowSize(int window_size)
 
 void PointPredictor::observe(const Eigen::Vector3d& p)
 {
-    static bool first = true;
-
-    if (first)
+    if (first_)
     {
-        first = false;
+        first_ = false;
 
         Eigen::VectorXd z(6);
         z << p, 0, 0, 0;

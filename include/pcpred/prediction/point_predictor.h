@@ -28,6 +28,8 @@ public:
 
 private:
 
+    bool first_;
+
     PointObstacleKalmanFilter kalman_filter_;
     double timestep_;
     Eigen::VectorXd last_observation_;

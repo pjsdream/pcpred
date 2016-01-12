@@ -43,7 +43,9 @@ file(GLOB_RECURSE HEADER_FILES RELATIVE ${PROJECT_SOURCE_DIR} *.h)
 # pcpred library
 rosbuild_add_library(pcpred
 src/prediction/point_predictor.cpp
-src/prediction/pointcloud_predictor.cpp
+src/prediction/points_predictor.cpp
+src/prediction/pointcloud_human_predictor.cpp
+src/shape/human.cpp
 src/kalman_filter/point_obstacle_kf.cpp
 src/pointcloud/pointcloud.cpp
 src/visualization/visualizer.cpp
@@ -54,11 +56,23 @@ src/import/gvv_data_importer.cpp
 ${HEADER_FILES}
 )
 
-# test application for prediction
-rosbuild_add_executable(test_prediction
-src/test_prediction.cpp
+# test application for point prediction
+rosbuild_add_executable(test_point_prediction
+src/test_point_prediction.cpp
 )
-target_link_libraries(test_prediction pcpred)
+target_link_libraries(test_point_prediction pcpred)
+
+# test application for points prediction using bvh data
+rosbuild_add_executable(test_bvh_prediction
+src/test_bvh_prediction.cpp
+)
+target_link_libraries(test_bvh_prediction pcpred)
+
+# test application for pointcloud human prediction
+rosbuild_add_executable(test_pointcloud_prediction
+src/test_pointcloud_prediction.cpp
+)
+target_link_libraries(test_pointcloud_prediction pcpred)
 
 # test application for point cloud data import
 rosbuild_add_executable(test_gvvdata_import

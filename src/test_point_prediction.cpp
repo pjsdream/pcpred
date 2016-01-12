@@ -39,9 +39,9 @@ Path produceObstaclePathSine(int frame_count, double timestep, double speed)
 
 int main(int argc, char** argv)
 {
-    ros::init(argc, argv, "test_prediction");
+    ros::init(argc, argv, "test_point_prediction");
 
-    ROS_INFO("test_prediction");
+    ROS_INFO("test_point_prediction");
 
     const double fps = 10;
     const double timestep = 1. / fps;

@@ -38,7 +38,7 @@ MarkerVisualizer::MarkerVisualizer(const char* topic)
     }
 
     ros::NodeHandle n;
-    publisher_ = n.advertise<visualization_msgs::Marker>(topic, 100);
+    publisher_ = n.advertise<visualization_msgs::Marker>(topic, CAPACITY);
 }
 
 
