@@ -22,7 +22,7 @@ int main(int argc, char** argv)
     ROS_INFO("test_gvvdata_import");
 
     GVVDataImporter importer;
-    PointcloudVisualizer poitncloud_visualizer("gvvdata_test");
+    PointcloudVisualizer pointcloud_visualizer("gvvdata_test");
     PointcloudVisualizer cluster_visualizer("gvvdata_cluster");
 
     ros::Rate rate(33);
@@ -35,7 +35,7 @@ int main(int argc, char** argv)
 
         Pointcloud pointcloud( importer.pointcloud() );
         pointcloud.rotate(M_PI / 2.0, Eigen::Vector3d(1, 0, 0));
-        poitncloud_visualizer.drawPointcloud(pointcloud);
+        pointcloud_visualizer.drawPointcloud(pointcloud);
 
         Pointcloud clusters = pointcloud.cluster(0.1, 0.2);
         cluster_visualizer.drawPointcloud(clusters);
