@@ -88,6 +88,51 @@ void MarkerVisualizer::drawSphere(const char* ns, int id, const Eigen::Vector3d&
     publish(marker);
 }
 
+void MarkerVisualizer::drawEllipsoid(const char* ns, int id, const Eigen::Vector3d& center, const Eigen::Matrix3d& A)
+{
+    visualization_msgs::Marker marker;
+
+    marker.header.frame_id = "/world";
+    marker.header.stamp = ros::Time::now();
+
+    marker.ns = ns;
+    marker.id = id;
+    marker.type = visualization_msgs::Marker::SPHERE;
+    marker.action = visualization_msgs::Marker::ADD;
+
+    // axis: eigenvectors
+    // radius: eigenvalues
+    Eigen::JacobiSVD<Eigen::MatrixXd> svd(A, Eigen::ComputeThinU | Eigen::ComputeThinV);
+    const Eigen::VectorXd& r = svd.singularValues();
+    Eigen::Matrix3d Q = svd.matrixU();
+
+    // to make determinant 1
+    if (Q.determinant() < 0)
+        Q.col(2) *= -1.;
+    const Eigen::Quaterniond q(Q);
+
+    marker.pose.position.x = center(0);
+    marker.pose.position.y = center(1);
+    marker.pose.position.z = center(2);
+    marker.pose.orientation.x = q.x();
+    marker.pose.orientation.y = q.y();
+    marker.pose.orientation.z = q.z();
+    marker.pose.orientation.w = q.w();
+
+    marker.scale.x = r(0);
+    marker.scale.y = r(1);
+    marker.scale.z = r(2);
+
+    marker.color.r = 0.0f;
+    marker.color.g = 1.0f;
+    marker.color.b = 0.0f;
+    marker.color.a = 0.5;
+
+    marker.lifetime = ros::Duration();
+
+    publish(marker);
+}
+
 void MarkerVisualizer::drawGaussianDistribution(const char* ns, int id, const Eigen::Vector3d& mu, const Eigen::Matrix3d& sigma, double probability, double offset)
 {
     if (gaussian_distribution_radius_table_.find(probability) == gaussian_distribution_radius_table_.end())
@@ -116,7 +161,6 @@ void MarkerVisualizer::drawGaussianDistribution(const char* ns, int id, const Ei
     // to make determinant 1
     if (Q.determinant() < 0)
         Q.col(2) *= -1.;
-
     const Eigen::Quaterniond q(Q);
 
     const double probability_radius = gaussian_distribution_radius_table_[probability];

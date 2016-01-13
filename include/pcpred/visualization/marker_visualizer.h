@@ -32,6 +32,7 @@ public:
     void clearUptoCapacity(const char* ns);
 
     void drawSphere(const char* ns, int id, const Eigen::Vector3d& center, double radius);
+    void drawEllipsoid(const char* ns, int id, const Eigen::Vector3d& center, const Eigen::Matrix3d& A);
     void drawGaussianDistribution(const char* ns, int id, const Eigen::Vector3d& mu, const Eigen::Matrix3d& sigma, double probability, double offset = 0.0);
 
 private:

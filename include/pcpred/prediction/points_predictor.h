@@ -16,6 +16,8 @@ public:
 
     explicit PointsPredictor(int num_spheres);
 
+    inline int numSpheres() { return num_spheres_; }
+
     void setTimestep(double timestep);
     void setSensorDiagonalCovariance(double v);
     void setAccelerationInferenceWindowSize(int window_size);

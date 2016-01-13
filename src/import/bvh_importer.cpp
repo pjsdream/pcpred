@@ -193,6 +193,15 @@ void BvhImporter::rotate(double angle, const Eigen::Vector3d& axis)
     }
 }
 
+void BvhImporter::translate(const Eigen::Vector3d& t)
+{
+    for (int i=0; i<num_frames_; i++)
+    {
+        for (int j=0; j<joint_names_.size(); j++)
+            transformations_[i][j].pretranslate(t);
+    }
+}
+
 Eigen::Affine3d BvhImporter::jointTransformation(int frame_index, int joint_index)
 {
     return transformations_[frame_index][joint_index];
@@ -201,6 +210,37 @@ Eigen::Affine3d BvhImporter::jointTransformation(int frame_index, int joint_inde
 Eigen::Affine3d BvhImporter::jointTransformation(int frame_index, const std::string& joint_name)
 {
     return transformations_[frame_index][ joint_name_to_index_map_[joint_name] ];
+}
+
+Eigen::Affine3d BvhImporter::jointTransformation(double time, int joint_index)
+{
+    const int frame_index0 = time / frame_time_;
+    const int frame_index1 = frame_index0 + 1;
+    const double t = time / frame_time_ - frame_index0;
+
+    if (frame_index1 < num_frames_)
+    {
+        const Eigen::Affine3d m0 = transformations_[frame_index0][joint_index];
+        const Eigen::Affine3d m1 = transformations_[frame_index1][joint_index];
+
+        const Eigen::Quaterniond q0(m0.linear());
+        const Eigen::Quaterniond q1(m1.linear());
+        const Eigen::Quaterniond q = q0.slerp(t, q1);
+
+        const Eigen::Vector3d p = (1.-t) * m0.translation() + t * m1.translation();
+
+        Eigen::Affine3d m = Eigen::Affine3d::Identity();
+        m.translate(p).rotate(q);
+        return m;
+    }
+
+    else
+        return transformations_[num_frames_ - 1][joint_index];
+}
+
+Eigen::Affine3d BvhImporter::jointTransformation(double time, const std::string& joint_name)
+{
+    return jointTransformation(time, joint_name_to_index_map_[joint_name]);
 }
 
 std::vector<Eigen::Vector3d> BvhImporter::childrenOffsets(int joint_index)

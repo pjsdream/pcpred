@@ -8,8 +8,8 @@ include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
 #  RelWithDebInfo : w/ debug symbols, w/ optimization
 #  MinSizeRel     : w/o debug symbols, w/ optimization, stripped binaries
 #set(ROS_BUILD_TYPE RelWithDebInfo)
-set(ROS_BUILD_TYPE Debug)
-#set(ROS_BUILD_TYPE Release)
+#set(ROS_BUILD_TYPE Debug)
+set(ROS_BUILD_TYPE Release)
 
 rosbuild_init()
 
@@ -45,11 +45,13 @@ rosbuild_add_library(pcpred
 src/prediction/point_predictor.cpp
 src/prediction/points_predictor.cpp
 src/prediction/pointcloud_human_predictor.cpp
+src/prediction/bvh_predictor.cpp
 src/shape/human.cpp
 src/kalman_filter/point_obstacle_kf.cpp
 src/pointcloud/pointcloud.cpp
 src/visualization/visualizer.cpp
 src/visualization/marker_visualizer.cpp
+src/visualization/marker_array_visualizer.cpp
 src/visualization/pointcloud_visualizer.cpp
 src/import/bvh_importer.cpp
 src/import/gvv_data_importer.cpp

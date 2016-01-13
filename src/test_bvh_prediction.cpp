@@ -1,11 +1,9 @@
 #include <ros/ros.h>
-
 #include <stdio.h>
-#include <pcpred/pcpred.h>
-
-#include <Eigen/Dense>
-
 #include <string>
+
+
+#include <pcpred/prediction/bvh_predictor.h>
 
 using namespace pcpred;
 
@@ -17,73 +15,74 @@ int main(int argc, char** argv)
         filename = argv[1];
 
     ros::init(argc, argv, "test_bvh_prediction");
-
     ROS_INFO("test_bvh_prediction");
 
-    BvhImporter importer;
-    MarkerVisualizer visualizer("bvh_prediction_test");
+    ros::NodeHandle n;
 
-    if (!importer.import(filename.c_str()))
+
+
+    /*
+    const double timestep = 0.01;               // 0.01 s
+    const double sensor_error = 0.001;          // 1 mm
+    const double collision_probability = 0.95;  // 95%
+    const int acceleration_inference_window_size = 25;
+    const int prediction_frames = 15;
+    */
+
+    const double timestep = 0.05;               // 0.05 s
+    const double sensor_error = 0.001;          // 1 mm
+    const double collision_probability = 0.95;  // 95%
+    const int acceleration_inference_window_size = 5;
+    const int prediction_frames = 3;
+
+
+
+    ros::Rate rate(1. / timestep);
+
+
+
+    // initialize predictor
+    BvhPredictor predictor(filename.c_str());  // load bvh file
+    predictor.setTimestep(timestep);
+    predictor.setSensorDiagonalCovariance(sensor_error * sensor_error);   // variance is proportional to square of sensing error
+    predictor.setCollisionProbability(collision_probability);
+    predictor.setAccelerationInferenceWindowSize(acceleration_inference_window_size);
+    predictor.setVisualizerTopic("bvh_prediction_test");
+
+    // input sequence transformation
+    // for example:
+    //   predictor.rotate(M_PI / 2.0, Eigen::Vector3d(0.0, 0.0, 1.0));
+    //   predictor.translate(Eigen::Vector3d(-1.0, 0.0, 0.0));
+
+
+    while(true)
     {
-        ROS_ERROR("bvh file does not exist [%s]", filename.c_str());
-        return 0;
-    }
+        predictor.moveToNextFrame();
+        predictor.predict(prediction_frames);
 
-    // centimeters to meters
-    importer.scale(0.01);
+        printf("time = %8.4lf s\n", predictor.time());
 
-    // rotate from Y-up to Z-up
-    importer.rotate(M_PI / 2.0, Eigen::Vector3d(1.0, 0.0, 0.0));
-
-    const int num_frames = importer.numFrames();
-    const int num_joints = importer.numJoints();
-    ros::Rate rate(importer.rate());
-
-    for (int joint_index = 0; joint_index < num_joints; joint_index++)
-        visualizer.clearUptoCapacity(importer.jointName(joint_index).c_str());
-
-    const double fps = importer.rate();
-    const double timestep = 1. / fps;
-    const double sensor_error = 0.001;
-
-    const int acceleration_inference_window_size = 15;
-    const double radius = 0.1;
-    const int prediction_frames = 5;
-
-    while (true)
-    {
-        PointsPredictor predictor(num_joints);
-        predictor.setTimestep(timestep);
-        predictor.setSensorDiagonalCovariance(sensor_error * sensor_error); // variance is proportional to square of sensing error
-        predictor.setAccelerationInferenceWindowSize(acceleration_inference_window_size);
-
-        for (int frame_index = 0; frame_index < num_frames; frame_index++)
+        for (int future_frame_index = 0; future_frame_index < prediction_frames; future_frame_index++)
         {
-            std::vector<Eigen::Vector3d> points;
-            for (int joint_index = 0; joint_index < num_joints; joint_index++)
+            std::vector<Eigen::Vector3d> centers;
+            std::vector<Eigen::Matrix3d> A;
+
+            predictor.getPredictedEllipsoids(future_frame_index, centers, A);
+
+            for (int j=0; j<centers.size(); j++)
             {
-                const Eigen::Affine3d transformation = importer.jointTransformation(frame_index, joint_index);
-                visualizer.drawSphere("robot", joint_index, transformation.translation(), radius);
-                points.push_back(transformation.translation());
+                // an ellipsoid is defined by
+                //   (x - centers[j])^T A[j] (x - centers[j]) = 1
             }
-
-            predictor.observe(points);
-            predictor.predict(prediction_frames);
-
-            for (int prediction_index = 0; prediction_index < prediction_frames; prediction_index++)
-            {
-                for (int joint_index = 0; joint_index < num_joints; joint_index++)
-                {
-                    Eigen::Vector3d mu;
-                    Eigen::Matrix3d sigma;
-
-                    predictor.getPredictionResult(prediction_index, joint_index, mu, sigma);
-                    visualizer.drawGaussianDistribution("prediction", prediction_index * num_joints + joint_index, mu, sigma, 0.95, radius);
-                }
-            }
-
-            rate.sleep();
         }
+
+
+        predictor.visualizeHuman();
+        predictor.visualizePredictionUpto(prediction_frames);
+
+
+        fflush(stdout);
+        rate.sleep();
     }
 
     return 0;

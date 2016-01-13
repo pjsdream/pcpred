@@ -41,9 +41,12 @@ public:
 
     void scale(double s);
     void rotate(double angle, const Eigen::Vector3d& axis);
+    void translate(const Eigen::Vector3d& t);
 
     Eigen::Affine3d jointTransformation(int frame_index, int joint_index);
     Eigen::Affine3d jointTransformation(int frame_index, const std::string& joint_name);
+    Eigen::Affine3d jointTransformation(double time, int joint_index);
+    Eigen::Affine3d jointTransformation(double time, const std::string& joint_name);
     std::vector<Eigen::Vector3d> childrenOffsets(int joint_index);
 
 private:
