@@ -8,7 +8,9 @@ Panels:
         - /Status1
         - /Grid1
         - /Axes1
+        - /Marker3
         - /Marker3/Namespaces1
+        - /PointCloud22
       Splitter Ratio: 0.520134
     Tree Height: 565
   - Class: rviz/Selection
@@ -29,7 +31,7 @@ Panels:
     Experimental: false
     Name: Time
     SyncMode: 0
-    SyncSource: ""
+    SyncSource: PointCloud2
 Visualization Manager:
   Class: ""
   Displays:
@@ -79,17 +81,45 @@ Visualization Manager:
       Marker Topic: /bvh_prediction_test
       Name: Marker
       Namespaces:
-        prediction: true
-        robot: true
+        {}
       Queue Size: 1000
       Value: true
     - Alpha: 1
       Autocompute Intensity Bounds: true
       Autocompute Value Bounds:
-        Max Value: -0.253863
-        Min Value: -0.757252
+        Max Value: -0.270688
+        Min Value: -0.725586
         Value: true
       Axis: X
+      Channel Name: intensity
+      Class: rviz/PointCloud2
+      Color: 255; 255; 255
+      Color Transformer: AxisColor
+      Decay Time: 0
+      Enabled: false
+      Invert Rainbow: false
+      Max Color: 255; 255; 255
+      Max Intensity: 4096
+      Min Color: 0; 0; 0
+      Min Intensity: 0
+      Name: PointCloud2
+      Position Transformer: XYZ
+      Queue Size: 10
+      Selectable: true
+      Size (Pixels): 3
+      Size (m): 0.005
+      Style: Spheres
+      Topic: /gvvdata_test
+      Use Fixed Frame: true
+      Use rainbow: true
+      Value: false
+    - Alpha: 1
+      Autocompute Intensity Bounds: true
+      Autocompute Value Bounds:
+        Max Value: 1.85491
+        Min Value: -0.0487506
+        Value: true
+      Axis: Z
       Channel Name: intensity
       Class: rviz/PointCloud2
       Color: 255; 255; 255
@@ -108,7 +138,7 @@ Visualization Manager:
       Size (Pixels): 3
       Size (m): 0.005
       Style: Spheres
-      Topic: /gvvdata_test
+      Topic: /pointcloud_test
       Use Fixed Frame: true
       Use rainbow: true
       Value: true
@@ -165,22 +195,22 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 3.83888
+      Distance: 0.826489
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.06
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 0.0115264
-        Y: 0.217039
-        Z: 1.12709
+        X: -0.630422
+        Y: -0.161355
+        Z: 1.01701
       Name: Current View
       Near Clip Distance: 0.01
-      Pitch: 0.250205
+      Pitch: 0.0752052
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 4.62321
+      Yaw: 0.14006
     Saved: ~
 Window Geometry:
   Displays:
@@ -199,4 +229,4 @@ Window Geometry:
     collapsed: false
   Width: 1509
   X: 55
-  Y: 20
+  Y: 14

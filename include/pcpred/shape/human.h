@@ -30,21 +30,26 @@ private:
 
 public:
 
+    Human();
+
     inline int numJoints() { return joints_.size(); }
+    inline int numCapsules() { return capsules_.size(); }
     inline Eigen::Vector3d jointPosition(int joint_index) { return joints_[joint_index].position; }
 
     inline void setIterativeProjectionMaximumIteration(int iteration) { iterative_projection_max_iteration_ = iteration; }
     inline void setIterativeProjectionAlpha(double alpha) { iterative_projection_alpha_ = alpha; }
+    inline void setLengthConstraintEpsilon(double epsilon) { length_constraint_epsilon_ = epsilon; }
 
     void loadHumanShapeFromFile(const char* filename);
 
     void addJoint(const char* joint_name, const Eigen::Vector3d& center, double radius);
     void addCapsule(const char* joint_name1, const char* joint_name2);
+    void jointPositionMove(int joint_index, const Eigen::Vector3d& displacement);
 
     int closestCapsuleIndex(const Eigen::Vector3d& point);
     void bestPullingClosestCapsule(const Eigen::Vector3d& point, int capsule_index,
                                    int joint_indices[2], Eigen::Vector3d joint_displacements[2]);
-    void projectToJointLengthConstraint();
+    void projectToJointLengthConstraintedDomain();
 
 private:
 
@@ -54,6 +59,7 @@ private:
 
     int iterative_projection_max_iteration_;
     double iterative_projection_alpha_;
+    double length_constraint_epsilon_;
 };
 
 }
