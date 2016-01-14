@@ -23,6 +23,14 @@ private:
     static bool gaussian_distribution_radius_table_initialized_;
     static std::map<double, double> gaussian_distribution_radius_table_;
 
+    // sphere position in joint's local coordinate system
+    struct JointBoundSphere
+    {
+        int joint_index;
+        Eigen::Vector3d position;
+        double radius;
+    };
+
 public:
 
     explicit BvhPredictor(const char* filename);
@@ -43,7 +51,10 @@ public:
     // prediction of next few frames beginning from current time
     void predict(int frame_count);
 
-    // predictino result at a specific future frame as a list of ellipsoids (x-c)^T A (x-c) = 1
+    // predictino result at a specific future frame as a list of ellipsoids
+    //   the center:                centers[i]
+    //   the principal axes:        the eigenvectors of A[i]
+    //   the length principal axes: the eigenvalues of A[i]
     void getPredictedEllipsoids(int frame_number, std::vector<Eigen::Vector3d>& c, std::vector<Eigen::Matrix3d>& A);
 
     // visualize functions
@@ -59,7 +70,7 @@ private:
     PointsPredictor* points_predictor_;
 
     // sphere obstacle size
-    std::vector<double> sphere_sizes_;
+    std::vector<JointBoundSphere> spheres_;
 
     double timestep_;
     double time_;

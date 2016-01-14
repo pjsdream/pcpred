@@ -72,7 +72,9 @@ int main(int argc, char** argv)
             for (int j=0; j<centers.size(); j++)
             {
                 // an ellipsoid is defined by
-                //   (x - centers[j])^T A[j] (x - centers[j]) = 1
+                //   the center:                centers[j]
+                //   the principal axes:        the eigenvectors of A[j]
+                //   the length principal axes: the eigenvalues of A[j]
             }
         }
 

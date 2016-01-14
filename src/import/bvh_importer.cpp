@@ -55,12 +55,15 @@ void BvhImporter::readHierarchyJoint(FILE*& fp, int parent_index)
 {
     char buffer[1024];
 
-    const int index = joint_names_.size();
 
     // JOINT (name) {
     fscanf(fp, "%*s%s%*s", buffer);
-    joint_names_.push_back(buffer);
-    joint_name_to_index_map_[buffer] = index;
+
+    const int index = joint_names_.size();
+    const std::string joint_name = buffer;
+
+    joint_names_.push_back(joint_name);
+    joint_name_to_index_map_[joint_name] = index;
     parents_.push_back(parent_index);
     children_.push_back(std::vector<int>(0));
 
@@ -106,8 +109,22 @@ void BvhImporter::readHierarchyJoint(FILE*& fp, int parent_index)
 
         else if (strcmp(buffer, "End") == 0)
         {
-            // currently ignoring end sites
-            fscanf(fp, "%*s%*s%*s%*s%*s%*s%*s");
+            // Site { OFFSET %lf %lf %lf }
+            double x, y, z;
+            fscanf(fp, "%*s%*s%*s%lf%lf%lf%*s", &x, &y, &z);
+
+            const std::string endsite_name = joint_name + "EndSite";
+            const int endsite_index = joint_names_.size();
+
+            joint_names_.push_back(endsite_name);
+            joint_name_to_index_map_[endsite_name] = endsite_index;
+            parents_.push_back(index);
+            children_.push_back(std::vector<int>(0));
+
+            children_[index].push_back(endsite_index);
+
+            offsets_.push_back(Eigen::Vector3d(x, y, z));
+            joint_channels_.push_back(std::vector<JointChannelType>(0));
         }
 
         else if (strcmp(buffer, "}") == 0)
