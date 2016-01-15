@@ -24,7 +24,7 @@ void MarkerArrayVisualizer::publish(const visualization_msgs::MarkerArray& marke
     {
         if (!ros::ok())
             return;
-        ROS_WARN_ONCE("Please create a subscriber to the marker");
+        ROS_WARN_ONCE("Please create a subscriber to the marker array");
     }
     publisher_.publish(marker);
 }

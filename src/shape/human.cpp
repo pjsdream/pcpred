@@ -15,6 +15,17 @@ Human::Human()
     setLengthConstraintEpsilon(0.1);  // 10% allowed length change
 }
 
+void Human::getCapsule(int capsule_index, Eigen::Vector3d centers[2], double radius[2])
+{
+    const int joint_index0 = capsules_[capsule_index].joint_ids[0];
+    const int joint_index1 = capsules_[capsule_index].joint_ids[1];
+
+    centers[0] = joints_[joint_index0].position;
+    centers[1] = joints_[joint_index1].position;
+    radius[0] = joints_[joint_index0].radius;
+    radius[1] = joints_[joint_index1].radius;
+}
+
 void Human::loadHumanShapeFromFile(const char* filename)
 {
     joint_name_to_index_map_.clear();

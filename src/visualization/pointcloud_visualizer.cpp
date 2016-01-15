@@ -11,6 +11,9 @@ PointcloudVisualizer::PointcloudVisualizer(const char* topic)
 {
     ros::NodeHandle n;
     publisher_ = n.advertise<PointCloud>(topic, 1000);
+
+    ros::Rate delay(1.0);
+    delay.sleep();
 }
 
 
@@ -20,7 +23,7 @@ void PointcloudVisualizer::publish(const PointCloud& marker)
     {
         if (!ros::ok())
             return;
-        ROS_WARN_ONCE("Please create a subscriber to the marker");
+        ROS_WARN_ONCE("Please create a subscriber to the pointcloud");
     }
     publisher_.publish(marker);
 }

@@ -33,8 +33,6 @@ BvhPredictor::BvhPredictor(const char* filename)
     // import bvh file
     bvh_importer_.import(filename);
 
-    // remove fingers
-
     // centimeters to meters
     bvh_importer_.scale(0.01);
 

@@ -6,6 +6,7 @@ using namespace pcpred;
 PointcloudHumanPredictor::PointcloudHumanPredictor()
 {
     predictor_ = 0;
+    visualizer_ = 0;
 
     // set up default parameters
     // parameters for human shape length constraint optimization are set up by its constructor
@@ -16,10 +17,15 @@ PointcloudHumanPredictor::PointcloudHumanPredictor()
     setCapsuleDivisor(4);
 }
 
+void PointcloudHumanPredictor::setHumanShapeLengthConstraintEpsilon(double epsilon)
+{
+    human_shape_.setLengthConstraintEpsilon(epsilon);
+}
+
 
 int PointcloudHumanPredictor::numSpheres()
 {
-    return human_shape_.numCapsules() * capsule_divisor_;
+    return human_shape_.numJoints() + human_shape_.numCapsules() * capsule_divisor_;
 }
 
 void PointcloudHumanPredictor::loadHumanShapeFromFile(const char* filename)
@@ -103,4 +109,41 @@ void PointcloudHumanPredictor::optimizeHumanShape(const std::vector<Eigen::Vecto
 
         iteration++;
     }
+}
+
+
+void PointcloudHumanPredictor::setVisualizerTopic(const char* topic)
+{
+    if (visualizer_ != 0)
+        delete visualizer_;
+
+    visualizer_ = new MarkerArrayVisualizer(topic);
+}
+
+void PointcloudHumanPredictor::visualizeHuman()
+{
+    std::vector<Eigen::Vector3d> centers;
+    std::vector<double> radius;
+    for (int i=0; i<human_shape_.numJoints(); i++)
+    {
+        centers.push_back(human_shape_.jointPosition(i));
+        radius.push_back(human_shape_.jointRadius(i));
+    }
+    for (int i=0; i<human_shape_.numCapsules(); i++)
+    {
+        Eigen::Vector3d capsule_centers[2];
+        double capsule_radius[2];
+
+        human_shape_.getCapsule(i, capsule_centers, capsule_radius);
+
+        for (int j=1; j<=capsule_divisor_; j++)
+        {
+            const double t = (double)j / (capsule_divisor_ + 1);
+
+            centers.push_back( (1.-t) * capsule_centers[0] + t * capsule_centers[1] );
+            radius.push_back( (1.-t) * capsule_radius[0] + t * capsule_radius[1] );
+        }
+    }
+
+    visualizer_->drawSpheres("human", centers, radius);
 }

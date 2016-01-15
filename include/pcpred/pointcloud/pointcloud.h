@@ -22,6 +22,7 @@ public:
 
     void push_back(const Eigen::Vector3d& point);
     void rotate(double angle, const Eigen::Vector3d& axis);
+    void translate(const Eigen::Vector3d& t);
 
     Pointcloud cluster(double voxel_resolution, double seed_resolution);
 

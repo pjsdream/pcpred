@@ -32,6 +32,13 @@ void Pointcloud::rotate(double angle, const Eigen::Vector3d& axis)
         pointcloud_[i] = aa * pointcloud_[i];
 }
 
+void Pointcloud::translate(const Eigen::Vector3d& t)
+{
+    for (int i=0; i<pointcloud_.size(); i++)
+        pointcloud_[i] += t;
+}
+
+
 Pointcloud Pointcloud::cluster(double voxel_resolution, double seed_resolution)
 {
     Pointcloud result;

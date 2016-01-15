@@ -39,6 +39,9 @@ MarkerVisualizer::MarkerVisualizer(const char* topic)
 
     ros::NodeHandle n;
     publisher_ = n.advertise<visualization_msgs::Marker>(topic, CAPACITY);
+
+    ros::Rate delay(1.0);
+    delay.sleep();
 }
 
 

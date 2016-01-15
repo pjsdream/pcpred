@@ -101,6 +101,8 @@ void GVVDataImporter::loadDepthFrameFromFile(const char* filename)
 
 void GVVDataImporter::get3DPointCloudFromDepthFrame(bool median_filter)
 {
+    const int background_intensity = 65535;
+
     pointcloud_.clear();
 
     const int V = data_.rows();
@@ -119,7 +121,7 @@ void GVVDataImporter::get3DPointCloudFromDepthFrame(bool median_filter)
         {
             for (int j=0; j<U; j++)
             {
-                if (data_(i, j) != 65535)
+                if (data_(i, j) != background_intensity)
                 {
                     std::vector<double> values;
                     for (int k=0; k<8; k++)
@@ -127,7 +129,7 @@ void GVVDataImporter::get3DPointCloudFromDepthFrame(bool median_filter)
                         const int x = i + neighbor[k][0];
                         const int y = j + neighbor[k][1];
 
-                        if (0<=x && x<V && 0<=y && y<U && data_(x, y) != 65535)
+                        if (0<=x && x<V && 0<=y && y<U && data_(x, y) != background_intensity)
                             values.push_back(data_(x, y));
                     }
 
@@ -146,7 +148,7 @@ void GVVDataImporter::get3DPointCloudFromDepthFrame(bool median_filter)
     int cols = 0;
     for (int i=0; i<U*V; i++)
     {
-        if (data_(i%V, i/V) != 65535)
+        if (data_(i%V, i/V) != background_intensity)
             cols++;
     }
     if (cols == 0)
@@ -156,7 +158,7 @@ void GVVDataImporter::get3DPointCloudFromDepthFrame(bool median_filter)
     int col = 0;
     for (int i=0; i<U*V; i++)
     {
-        if (data_(i%V, i/V) != 65535)
+        if (data_(i%V, i/V) != background_intensity)
         {
             B(0, col) = i / V + 1;
             B(1, col) = i % V + 1;
@@ -177,4 +179,58 @@ void GVVDataImporter::get3DPointCloudFromDepthFrame(bool median_filter)
 
     for (int i=0; i<cols; i++)
         pointcloud_.push_back(GP.col(i).block(0, 0, 3, 1));
+
+
+    /* extract human shape */
+    /*
+    Eigen::MatrixXd HBT(20, 4);
+    HBT << -0.15,  1.05, 0, 1,
+           -0.15,  0.80, 0, 1,
+            0.20,  0.60, 0, 1,
+            0.35,  0.30, 0, 1,
+            0.50,  0.00, 0, 1,
+            0.50, -0.10, 0, 1,
+           -0.40,  0.60, 0, 1,
+           -0.60,  0.30, 0, 1,
+           -0.60,  0.00, 0, 1,
+           -0.60, -0.10, 0, 1,
+            0.00,  0.20, 0, 1,
+            0.00,  0.00, 0, 1,
+            0.30, -0.10, 0, 1,
+            0.20, -0.70, 0, 1,
+            0.25, -0.80, 0, 1,
+           -0.25,  0.20, 0, 1,
+           -0.25,  0.00, 0, 1,
+           -0.25, -0.60, 0, 1,
+           -0.20, -1.20, 0, 1,
+           -0.25, -1.25, 0, 1;
+    Eigen::MatrixXd HB = HBT.transpose();
+
+    const double h0 = -CP(0,0);
+    const double h1 = -CP(1,0);
+    for (int i=0; i<HB.cols(); i++)
+    {
+        HB(0,i) = (HB(0,i) / h0) * U/2 + U/2;
+        HB(1,i) = (HB(1,i) / h1) * V/2 + V/2;
+        HB(2,i) = data_((int)HB(1,i), (int)HB(0,i)) / (float)((1<<16) - 1);
+    }
+    //std::cout << HB << std::endl << std::endl;
+
+    Eigen::MatrixXd HCP = intrinsics_.colPivHouseholderQr().solve(HB);
+    for (int i=0; i<HCP.cols(); i++)
+    {
+        for (int j=0; j<4; j++)
+            HCP(j,i) /= HCP(3,i);
+    }
+    Eigen::MatrixXd HGP = extrinsics_.colPivHouseholderQr().solve(HCP);
+
+    Eigen::MatrixXd RGP = HGP;
+    for (int i=0; i<20; i++)
+    {
+        RGP(1,i) = -HGP(2,i);
+        RGP(2,i) =  HGP(1,i);
+    }
+
+    std::cout << RGP.transpose() << std::endl;
+    */
 }

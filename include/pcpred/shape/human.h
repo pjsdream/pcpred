@@ -35,6 +35,9 @@ public:
     inline int numJoints() { return joints_.size(); }
     inline int numCapsules() { return capsules_.size(); }
     inline Eigen::Vector3d jointPosition(int joint_index) { return joints_[joint_index].position; }
+    inline double jointRadius(int joint_index) { return joints_[joint_index].radius; }
+
+    void getCapsule(int capsule_index, Eigen::Vector3d centers[2], double radius[2]);
 
     inline void setIterativeProjectionMaximumIteration(int iteration) { iterative_projection_max_iteration_ = iteration; }
     inline void setIterativeProjectionAlpha(double alpha) { iterative_projection_alpha_ = alpha; }
