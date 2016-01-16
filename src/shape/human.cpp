@@ -171,7 +171,7 @@ void Human::bestPullingClosestCapsule(const Eigen::Vector3d& point, int capsule_
     {
         const double capsule_distance = (p1 - point).norm() - r1;
         joint_indices[0] = i1;
-        joint_displacements[0] = (capsule_distance >= 0.0 ? 1.0 : -1.0) * (point - p1);
+        joint_displacements[0] = (point - p1).normalized() * capsule_distance;
     }
 
     else
@@ -188,20 +188,20 @@ void Human::bestPullingClosestCapsule(const Eigen::Vector3d& point, int capsule_
         {
             const double capsule_distance = (p0 - point).norm() - r0;
             joint_indices[0] = i0;
-            joint_displacements[0] = (capsule_distance >= 0.0 ? 1.0 : -1.0) * (point - p0);
+            joint_displacements[0] = (point - p0).normalized() * capsule_distance;
         }
 
         else if (t >= 1.0)
         {
             const double capsule_distance = (p1 - point).norm() - r1;
             joint_indices[0] = i1;
-            joint_displacements[0] = (capsule_distance >= 0.0 ? 1.0 : -1.0) * (point - p1);
+            joint_displacements[0] = (point - p1).normalized() * capsule_distance;
         }
 
         else
         {
             const double capsule_distance = (cross.norm() / d / cos_alpha) - ((1. - t) * r0 + t * r1);
-            const Eigen::Vector3d direction = (capsule_distance >= 0.0 ? 1.0 : -1.0) * (point - (1. - t) * p0 - t * p1);
+            const Eigen::Vector3d direction = (point - (1. - t) * p0 - t * p1).normalized() * capsule_distance;
             joint_indices[0] = i0;
             joint_displacements[0] = direction;
             joint_indices[1] = i1;

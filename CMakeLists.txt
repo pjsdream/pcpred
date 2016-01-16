@@ -42,6 +42,7 @@ file(GLOB_RECURSE HEADER_FILES RELATIVE ${PROJECT_SOURCE_DIR} *.h)
 
 # pcpred library
 rosbuild_add_library(pcpred
+src/detection/depth_frame_human_detector.cpp
 src/prediction/point_predictor.cpp
 src/prediction/points_predictor.cpp
 src/prediction/pointcloud_human_predictor.cpp
@@ -75,6 +76,12 @@ rosbuild_add_executable(test_pointcloud_prediction
 src/test_pointcloud_prediction.cpp
 )
 target_link_libraries(test_pointcloud_prediction pcpred)
+
+# test application for pointcloud human detection
+rosbuild_add_executable(test_pointcloud_detection
+src/test_pointcloud_detection.cpp
+)
+target_link_libraries(test_pointcloud_detection pcpred)
 
 # test application for point cloud data import
 rosbuild_add_executable(test_gvvdata_import

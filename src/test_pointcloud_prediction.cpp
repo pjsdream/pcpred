@@ -25,9 +25,10 @@ int main(int argc, char** argv)
     PointcloudVisualizer pointcloud_visualizer("pointcloud_test");
 
     PointcloudHumanPredictor predictor;
-    predictor.loadHumanShapeFromFile("../data/human/D1.txt");
+    predictor.loadHumanShapeFromFile("../data/human/S1.txt");
+    predictor.setMaximumIterations(10);
     predictor.setGradientDescentMaximumIterations(10);
-    predictor.setGradientDescentAlpha(1.0);
+    predictor.setGradientDescentAlpha(0.0001);
     predictor.setHumanShapeLengthConstraintEpsilon(0.01);
     predictor.setCapsuleDivisor(4);
     predictor.setVisualizerTopic("pointcloud_human_test");
@@ -43,9 +44,10 @@ int main(int argc, char** argv)
 
         Pointcloud pointcloud( importer.pointcloud() );
         pointcloud.rotate(M_PI / 2.0, Eigen::Vector3d(1, 0, 0));
-        pointcloud_visualizer.drawPointcloud(pointcloud);
 
         predictor.observe(pointcloud);
+
+        pointcloud_visualizer.drawPointcloud(pointcloud);
         predictor.visualizeHuman();
 
         printf("  #points = %5d", pointcloud.size());
@@ -54,8 +56,6 @@ int main(int argc, char** argv)
         rate.sleep();
 
         frame++;
-
-        //break;
     }
 
     return 0;

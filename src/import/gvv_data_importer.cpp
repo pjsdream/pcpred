@@ -168,6 +168,7 @@ void GVVDataImporter::get3DPointCloudFromDepthFrame(bool median_filter)
         }
     }
 
+    // perspective
     Eigen::MatrixXd CP = intrinsics_.colPivHouseholderQr().solve(B);
     for (int i=0; i<cols; i++)
     {

@@ -90,19 +90,22 @@ void PointcloudHumanPredictor::optimizeHumanShape(const std::vector<Eigen::Vecto
         int result_joint_indices[2];
         Eigen::Vector3d result_joint_displacements[2];
 
-        for (int i=0; i<num_joints; i++)
-            joint_displacements[i] = Eigen::Vector3d(0., 0., 0.);
-
-        for (int i=0; i<pointcloud.size(); i++)
+        for (int gradient_iteration = 0; gradient_iteration < gradient_descent_max_iteration_; gradient_iteration++)
         {
-            human_shape_.bestPullingClosestCapsule(pointcloud[i], corresponding_capsules[i], result_joint_indices, result_joint_displacements);
-            joint_displacements[ result_joint_indices[0] ] += result_joint_displacements[0] / pointcloud.size();
-            joint_displacements[ result_joint_indices[1] ] += result_joint_displacements[1] / pointcloud.size();
-        }
+            for (int i=0; i<num_joints; i++)
+                joint_displacements[i] = Eigen::Vector3d(0., 0., 0.);
 
-        // gradient descent step
-        for (int i=0; i<num_joints; i++)
-            human_shape_.jointPositionMove(i, joint_displacements[i] * gradient_descent_alpha_);
+            for (int i=0; i<pointcloud.size(); i++)
+            {
+                human_shape_.bestPullingClosestCapsule(pointcloud[i], corresponding_capsules[i], result_joint_indices, result_joint_displacements);
+                joint_displacements[ result_joint_indices[0] ] += result_joint_displacements[0];
+                joint_displacements[ result_joint_indices[1] ] += result_joint_displacements[1];
+            }
+
+            // gradient descent step
+            for (int i=0; i<num_joints; i++)
+                human_shape_.jointPositionMove(i, joint_displacements[i] * gradient_descent_alpha_);
+        }
 
         // length constraint adjustment
         human_shape_.projectToJointLengthConstraintedDomain();
