@@ -55,24 +55,24 @@ void PointcloudHumanPredictor::getPredictionResults(int frame_number, std::vecto
 }
 
 
-void PointcloudHumanPredictor::observe(const Pointcloud& pointcloud)
+void PointcloudHumanPredictor::observe(const Eigen::Vector3d& camera_position, const Pointcloud& pointcloud)
 {
     std::vector<Eigen::Vector3d> points;
     for (int i=0; i<pointcloud.size(); i++)
         points.push_back(pointcloud.point(i));
 
-    observe(points);
+    observe(camera_position, points);
 }
 
-void PointcloudHumanPredictor::observe(const std::vector<Eigen::Vector3d>& pointcloud)
+void PointcloudHumanPredictor::observe(const Eigen::Vector3d& camera_position, const std::vector<Eigen::Vector3d>& pointcloud)
 {
-    optimizeHumanShape(pointcloud);
+    optimizeHumanShape(camera_position, pointcloud);
 
     // TODO: observe spheres from human shape
     // predictor_->observe();
 }
 
-void PointcloudHumanPredictor::optimizeHumanShape(const std::vector<Eigen::Vector3d>& pointcloud)
+void PointcloudHumanPredictor::optimizeHumanShape(const Eigen::Vector3d& camera_position, const std::vector<Eigen::Vector3d>& pointcloud)
 {
     const int num_joints = human_shape_.numJoints();
 
@@ -108,7 +108,7 @@ void PointcloudHumanPredictor::optimizeHumanShape(const std::vector<Eigen::Vecto
         }
 
         // length constraint adjustment
-        human_shape_.projectToJointLengthConstraintedDomain();
+        human_shape_.projectToConstrainedDomain(camera_position, pointcloud);
 
         iteration++;
     }

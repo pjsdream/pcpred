@@ -6,6 +6,7 @@
 #include <iostream>
 
 #include <vector>
+#include <utility>
 #include <algorithm>
 
 #include <ros/console.h>
@@ -31,6 +32,97 @@ const std::vector<Eigen::Vector3d>& GVVDataImporter::pointcloud()
     return pointcloud_;
 }
 
+const Eigen::MatrixXd& GVVDataImporter::depthFrame()
+{
+    return data_;
+}
+
+
+Eigen::Vector3d GVVDataImporter::cameraPosition()
+{
+    const int rows = data_.rows();
+
+    Eigen::Matrix4d positions;
+
+    int col = 0;
+    for (int i=0; i<rows; i += rows - 1)
+    {
+        positions(0, col) = 1;
+        positions(1, col) = i + 1;
+        positions(2, col) = 0.0;
+        positions(3, col) = 1.0;
+        col++;
+
+        positions(0, col) = 1;
+        positions(1, col) = i + 1;
+        positions(2, col) = 1.0;
+        positions(3, col) = 1.0;
+        col++;
+    }
+
+    Eigen::Matrix4d CP = intrinsics_.colPivHouseholderQr().solve(positions);
+    for (int i=0; i<4; i++)
+        CP.block(0, i, 4, 1) /= CP(3, i);
+
+    Eigen::Matrix4d GP = extrinsics_.colPivHouseholderQr().solve(CP);
+
+    const Eigen::Vector3d p0 = GP.block(0, 0, 3, 1);
+    const Eigen::Vector3d p1 = GP.block(0, 1, 3, 1);
+    const Eigen::Vector3d p2 = GP.block(0, 2, 3, 1);
+    const Eigen::Vector3d p3 = GP.block(0, 3, 3, 1);
+
+    const Eigen::Vector3d v0 = p1 - p0;
+    const Eigen::Vector3d v1 = p2 - p3;
+    const Eigen::Vector3d v2 = p2 - p0;
+
+    const double a = v0.dot(v0);
+    const double b = v0.dot(v1);
+    const double c = v1.dot(v1);
+    const double det = a*c - b*b;
+
+    const double t = (v0.dot(v2) * c - v1.dot(v2) * b) / det;
+
+    return p0 + t * (p1 - p0);
+}
+
+std::vector<Eigen::Vector3d> GVVDataImporter::cameraEndpoints()
+{
+    std::vector<Eigen::Vector3d> result;
+
+    const int rows = data_.rows();
+    const int cols = data_.cols();
+
+    Eigen::MatrixXd positions(4, 8);
+
+    int col = 0;
+    for (int i=0; i<rows; i += rows - 1)
+    {
+        for (int j=0; j<cols; j += cols - 1)
+        {
+            positions(0, col  ) = j + 1;
+            positions(1, col  ) = i + 1;
+            positions(2, col  ) = 0.0;
+            positions(3, col  ) = 1.0;
+            positions(0, col+4) = j + 1;
+            positions(1, col+4) = i + 1;
+            positions(2, col+4) = 1.0;
+            positions(3, col+4) = 1.0;
+            col++;
+        }
+    }
+
+    Eigen::MatrixXd CP = intrinsics_.colPivHouseholderQr().solve(positions);
+    for (int i=0; i<8; i++)
+        CP.block(0, i, 4, 1) /= CP(3, i);
+
+    Eigen::MatrixXd GP = extrinsics_.colPivHouseholderQr().solve(CP);
+
+    for (int i=0; i<8; i++)
+        result.push_back( GP.block(0, i, 3, 1) );
+
+    return result;
+}
+
 
 bool GVVDataImporter::existFile(const char* filename)
 {
@@ -50,6 +142,18 @@ bool GVVDataImporter::import(int sequence, int frame, bool median_filter)
 
     loadDepthFrameFromFile(filename);
     get3DPointCloudFromDepthFrame(median_filter);
+
+    return true;
+}
+
+bool GVVDataImporter::importDepthFrame(int sequence, int frame)
+{
+    char filename[128];
+    sprintf(filename, "../data/D%d/depth%04d.bin", sequence, frame);
+    if (!existFile(filename))
+        return false;
+
+    loadDepthFrameFromFile(filename);
 
     return true;
 }
@@ -121,23 +225,23 @@ void GVVDataImporter::get3DPointCloudFromDepthFrame(bool median_filter)
         {
             for (int j=0; j<U; j++)
             {
-                if (data_(i, j) != background_intensity)
+                //if (data_(i, j) != background_intensity)
                 {
                     std::vector<double> values;
-                    for (int k=0; k<8; k++)
+                    for (int k=0; k<9; k++)
                     {
                         const int x = i + neighbor[k][0];
                         const int y = j + neighbor[k][1];
 
-                        if (0<=x && x<V && 0<=y && y<U && data_(x, y) != background_intensity)
+                        if (0<=x && x<V && 0<=y && y<U)// && data_(x, y) != background_intensity)
                             values.push_back(data_(x, y));
                     }
 
                     std::sort(values.begin(), values.end());
                     const int size = values.size();
-                    if (size % 2 == 0)
-                        data_(i, j) = (values[size/2 - 1] + values[size/2]) / 2.0;
-                    else
+                    //if (size % 2 == 0)
+                        //data_(i, j) = (values[size/2 - 1] + values[size/2]) / 2.0;
+                    //else
                         data_(i, j) = values[size/2];
                 }
             }
@@ -162,8 +266,8 @@ void GVVDataImporter::get3DPointCloudFromDepthFrame(bool median_filter)
         {
             B(0, col) = i / V + 1;
             B(1, col) = i % V + 1;
-            B(2, col) = data_(i%V, i/V) / (float)((1<<16) - 1);
-            B(3, col) = 1.f;
+            B(2, col) = data_(i%V, i/V) / (double)((1<<16) - 1);
+            B(3, col) = 1.0;
             col++;
         }
     }
@@ -171,15 +275,12 @@ void GVVDataImporter::get3DPointCloudFromDepthFrame(bool median_filter)
     // perspective
     Eigen::MatrixXd CP = intrinsics_.colPivHouseholderQr().solve(B);
     for (int i=0; i<cols; i++)
-    {
-        for (int j=0; j<4; j++)
-            CP(j,i) /= CP(3,i);
-    }
+        CP.block(0, i, 4, 1) /= CP(3,i);
 
     Eigen::MatrixXd GP = extrinsics_.colPivHouseholderQr().solve(CP);
 
     for (int i=0; i<cols; i++)
-        pointcloud_.push_back(GP.col(i).block(0, 0, 3, 1));
+        pointcloud_.push_back(GP.block(0, i, 3, 1));
 
 
     /* extract human shape */

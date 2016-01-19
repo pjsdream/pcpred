@@ -41,8 +41,8 @@ public:
 
     void loadHumanShapeFromFile(const char* filename);
 
-    void observe(const Pointcloud& pointcloud); // redirects to function using a list of centers
-    void observe(const std::vector<Eigen::Vector3d>& pointcloud);
+    void observe(const Eigen::Vector3d& camera_position, const Pointcloud& pointcloud); // redirects to function using a list of centers
+    void observe(const Eigen::Vector3d& camera_position, const std::vector<Eigen::Vector3d>& pointcloud);
 
     void predict(int frame_count);
 
@@ -55,7 +55,7 @@ public:
 
 private:
 
-    void optimizeHumanShape(const std::vector<Eigen::Vector3d>& pointcloud);
+    void optimizeHumanShape(const Eigen::Vector3d& camera_position, const std::vector<Eigen::Vector3d>& pointcloud);
 
     Human human_shape_;
 

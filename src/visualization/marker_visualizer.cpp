@@ -77,9 +77,9 @@ void MarkerVisualizer::drawSphere(const char* ns, int id, const Eigen::Vector3d&
     marker.pose.orientation.z = 0.0;
     marker.pose.orientation.w = 1.0;
 
-    marker.scale.x = radius;
-    marker.scale.y = radius;
-    marker.scale.z = radius;
+    marker.scale.x = 2. * radius;
+    marker.scale.y = 2. * radius;
+    marker.scale.z = 2. * radius;
 
     marker.color.r = 1.0f;
     marker.color.g = 0.0f;
@@ -122,9 +122,9 @@ void MarkerVisualizer::drawEllipsoid(const char* ns, int id, const Eigen::Vector
     marker.pose.orientation.z = q.z();
     marker.pose.orientation.w = q.w();
 
-    marker.scale.x = r(0);
-    marker.scale.y = r(1);
-    marker.scale.z = r(2);
+    marker.scale.x = 2. * r(0);
+    marker.scale.y = 2. * r(1);
+    marker.scale.z = 2. * r(2);
 
     marker.color.r = 0.0f;
     marker.color.g = 1.0f;
@@ -176,9 +176,9 @@ void MarkerVisualizer::drawGaussianDistribution(const char* ns, int id, const Ei
     marker.pose.orientation.z = q.z();
     marker.pose.orientation.w = q.w();
 
-    marker.scale.x = probability_radius * std::sqrt(r[0]) + offset;
-    marker.scale.y = probability_radius * std::sqrt(r[1]) + offset;
-    marker.scale.z = probability_radius * std::sqrt(r[2]) + offset;
+    marker.scale.x = 2. * (probability_radius * std::sqrt(r[0]) + offset);
+    marker.scale.y = 2. * (probability_radius * std::sqrt(r[1]) + offset);
+    marker.scale.z = 2. * (probability_radius * std::sqrt(r[2]) + offset);
 
     marker.color.r = 0.0f;
     marker.color.g = 1.0f;

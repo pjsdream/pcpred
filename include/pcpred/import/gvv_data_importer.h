@@ -15,10 +15,16 @@ class GVVDataImporter
 public:
 
     bool import(int sequence, int frame, bool median_filter);
+    bool importDepthFrame(int sequence, int frame);
 
     void printFrameInfo();
 
     const std::vector<Eigen::Vector3d>& pointcloud();
+    const Eigen::MatrixXd& depthFrame();
+    inline const Eigen::Matrix4d& intrinsic() { return intrinsics_; }
+    inline const Eigen::Matrix4d& extrinsic() { return extrinsics_; }
+    Eigen::Vector3d cameraPosition();
+    std::vector<Eigen::Vector3d> cameraEndpoints();
 
 private:
 

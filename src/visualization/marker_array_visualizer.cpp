@@ -30,6 +30,44 @@ void MarkerArrayVisualizer::publish(const visualization_msgs::MarkerArray& marke
 }
 
 
+void MarkerArrayVisualizer::drawSphere(const char* ns, const Eigen::Vector3d& center, double radius)
+{
+    visualization_msgs::MarkerArray marker_array;
+
+    visualization_msgs::Marker marker;
+
+    marker.header.frame_id = "/world";
+    marker.header.stamp = ros::Time::now();
+
+    marker.ns = ns;
+    marker.id = 0;
+    marker.type = visualization_msgs::Marker::SPHERE;
+    marker.action = visualization_msgs::Marker::ADD;
+
+    marker.pose.position.x = center(0);
+    marker.pose.position.y = center(1);
+    marker.pose.position.z = center(2);
+    marker.pose.orientation.x = 0.0;
+    marker.pose.orientation.y = 0.0;
+    marker.pose.orientation.z = 0.0;
+    marker.pose.orientation.w = 1.0;
+
+    marker.scale.x = 2. * radius;
+    marker.scale.y = 2. * radius;
+    marker.scale.z = 2. * radius;
+
+    marker.color.r = 1.0;
+    marker.color.g = 0.0;
+    marker.color.b = 0.0;
+    marker.color.a = 1.0;
+
+    marker.lifetime = ros::Duration();
+
+    marker_array.markers.push_back(marker);
+
+    publish(marker_array);
+}
+
 void MarkerArrayVisualizer::drawSpheres(const char* ns, const std::vector<Eigen::Vector3d>& center, const std::vector<double> radius)
 {
     visualization_msgs::MarkerArray marker_array;
@@ -56,13 +94,13 @@ void MarkerArrayVisualizer::drawSpheres(const char* ns, const std::vector<Eigen:
         marker.pose.orientation.z = 0.0;
         marker.pose.orientation.w = 1.0;
 
-        marker.scale.x = radius[i];
-        marker.scale.y = radius[i];
-        marker.scale.z = radius[i];
+        marker.scale.x = 2. * radius[i];
+        marker.scale.y = 2. * radius[i];
+        marker.scale.z = 2. * radius[i];
 
-        marker.color.r = 1.0f;
-        marker.color.g = 0.0f;
-        marker.color.b = 0.0f;
+        marker.color.r = 1.0;
+        marker.color.g = 0.0;
+        marker.color.b = 0.0;
         marker.color.a = 1.0;
 
         marker.lifetime = ros::Duration();
@@ -110,13 +148,13 @@ void MarkerArrayVisualizer::drawEllipsoids(const char* ns, const std::vector<Eig
         marker.pose.orientation.z = q.z();
         marker.pose.orientation.w = q.w();
 
-        marker.scale.x = r(0);
-        marker.scale.y = r(1);
-        marker.scale.z = r(2);
+        marker.scale.x = 2. * r(0);
+        marker.scale.y = 2. * r(1);
+        marker.scale.z = 2. * r(2);
 
-        marker.color.r = 0.0f;
-        marker.color.g = 1.0f;
-        marker.color.b = 0.0f;
+        marker.color.r = 0.0;
+        marker.color.g = 1.0;
+        marker.color.b = 0.0;
         marker.color.a = 0.5;
 
         marker.lifetime = ros::Duration();
@@ -124,5 +162,149 @@ void MarkerArrayVisualizer::drawEllipsoids(const char* ns, const std::vector<Eig
         marker_array.markers.push_back(marker);
     }
 
+    publish(marker_array);
+}
+
+void MarkerArrayVisualizer::drawSphereList(const char* ns, const std::vector<Eigen::Vector3d>& centers, double radius)
+{
+    visualization_msgs::MarkerArray marker_array;
+
+    visualization_msgs::Marker marker;
+
+    marker.header.frame_id = "/world";
+    marker.header.stamp = ros::Time::now();
+
+    marker.ns = ns;
+    marker.id = 0;
+    marker.type = visualization_msgs::Marker::SPHERE_LIST;
+    marker.action = visualization_msgs::Marker::ADD;
+
+    marker.pose.position.x = 0.0;
+    marker.pose.position.y = 0.0;
+    marker.pose.position.z = 0.0;
+    marker.pose.orientation.x = 0.0;
+    marker.pose.orientation.y = 0.0;
+    marker.pose.orientation.z = 0.0;
+    marker.pose.orientation.w = 1.0;
+
+    marker.scale.x = 2. * radius;
+    marker.scale.y = 2. * radius;
+    marker.scale.z = 2. * radius;
+
+    marker.color.r = 1.0f;
+    marker.color.g = 0.0f;
+    marker.color.b = 0.0f;
+    marker.color.a = 1.0;
+
+    marker.lifetime = ros::Duration();
+
+    const int size = centers.size();
+
+    for (int i=0; i<size; i++)
+    {
+        ::geometry_msgs::Point point;
+        point.x = centers[i](0);
+        point.y = centers[i](1);
+        point.z = centers[i](2);
+        marker.points.push_back(point);
+    }
+
+    marker_array.markers.push_back(marker);
+    publish(marker_array);
+}
+
+void MarkerArrayVisualizer::drawLineStrip(const char* ns, const std::vector<Eigen::Vector3d>& endpoints)
+{
+    visualization_msgs::MarkerArray marker_array;
+
+    visualization_msgs::Marker marker;
+
+    marker.header.frame_id = "/world";
+    marker.header.stamp = ros::Time::now();
+
+    marker.ns = ns;
+    marker.id = 0;
+    marker.type = visualization_msgs::Marker::LINE_STRIP;
+    marker.action = visualization_msgs::Marker::ADD;
+
+    marker.pose.position.x = 0.0;
+    marker.pose.position.y = 0.0;
+    marker.pose.position.z = 0.0;
+    marker.pose.orientation.x = 0.0;
+    marker.pose.orientation.y = 0.0;
+    marker.pose.orientation.z = 0.0;
+    marker.pose.orientation.w = 1.0;
+
+    marker.scale.x = 0.01;
+    marker.scale.y = 0.0;
+    marker.scale.z = 0.0;
+
+    marker.color.r = 1.0;
+    marker.color.g = 1.0;
+    marker.color.b = 0.0;
+    marker.color.a = 1.0;
+
+    marker.lifetime = ros::Duration();
+
+    const int size = endpoints.size();
+    geometry_msgs::Point point;
+
+    for (int i=0; i<size; i++)
+    {
+        point.x = endpoints[i](0);
+        point.y = endpoints[i](1);
+        point.z = endpoints[i](2);
+        marker.points.push_back(point);
+    }
+
+    marker_array.markers.push_back(marker);
+    publish(marker_array);
+}
+
+void MarkerArrayVisualizer::drawLineList(const char* ns, const std::vector<Eigen::Vector3d>& endpoints)
+{
+    visualization_msgs::MarkerArray marker_array;
+
+    visualization_msgs::Marker marker;
+
+    marker.header.frame_id = "/world";
+    marker.header.stamp = ros::Time::now();
+
+    marker.ns = ns;
+    marker.id = 0;
+    marker.type = visualization_msgs::Marker::LINE_LIST;
+    marker.action = visualization_msgs::Marker::ADD;
+
+    marker.pose.position.x = 0.0;
+    marker.pose.position.y = 0.0;
+    marker.pose.position.z = 0.0;
+    marker.pose.orientation.x = 0.0;
+    marker.pose.orientation.y = 0.0;
+    marker.pose.orientation.z = 0.0;
+    marker.pose.orientation.w = 1.0;
+
+    marker.scale.x = 0.01;
+    marker.scale.y = 0.0;
+    marker.scale.z = 0.0;
+
+    marker.color.r = 1.0;
+    marker.color.g = 1.0;
+    marker.color.b = 0.0;
+    marker.color.a = 1.0;
+
+    marker.lifetime = ros::Duration();
+
+    const int size = endpoints.size();
+    geometry_msgs::Point point;
+
+    for (int i=0; i<size; i++)
+    {
+        point.x = endpoints[i](0);
+        point.y = endpoints[i](1);
+        point.z = endpoints[i](2);
+        marker.points.push_back(point);
+    }
+
+    marker_array.markers.push_back(marker);
     publish(marker_array);
 }

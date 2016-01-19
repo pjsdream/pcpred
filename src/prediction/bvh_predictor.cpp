@@ -42,7 +42,7 @@ BvhPredictor::BvhPredictor(const char* filename)
 
     // TODO: initialize predictor with the number of spheres to be predicted
     const int num_joints = bvh_importer_.numJoints();
-    const double sphere_radius = 0.1; // all spheres have radius 10cm
+    const double sphere_radius = 0.05; // all spheres have radius 5cm
 
     // sphere at root joint
     JointBoundSphere sphere;
@@ -58,7 +58,7 @@ BvhPredictor::BvhPredictor(const char* filename)
         for (int j=0; j<offsets.size(); j++)
         {
             const double length = offsets[j].norm();
-            const int sphere_count = (int)(length / (sphere_radius)) + 2;
+            const int sphere_count = (int)(length / (sphere_radius * 2.0)) + 2;
 
             for (int k=1; k<sphere_count; k++)
             {

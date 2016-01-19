@@ -43,6 +43,7 @@ file(GLOB_RECURSE HEADER_FILES RELATIVE ${PROJECT_SOURCE_DIR} *.h)
 # pcpred library
 rosbuild_add_library(pcpred
 src/detection/depth_frame_human_detector.cpp
+src/detection/pointcloud_human_detector.cpp
 src/prediction/point_predictor.cpp
 src/prediction/points_predictor.cpp
 src/prediction/pointcloud_human_predictor.cpp

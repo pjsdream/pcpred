@@ -2,6 +2,8 @@
 
 #include <algorithm>
 
+#include <stdlib.h>
+
 #include <stdio.h>
 
 using namespace pcpred;
@@ -12,7 +14,10 @@ Human::Human()
     // initialize optimization parameters by default values
     setIterativeProjectionMaximumIteration(5);
     setIterativeProjectionAlpha(0.9);
+    setIterativeProjectionNumberOfSamples(100);
     setLengthConstraintEpsilon(0.1);  // 10% allowed length change
+
+    srand(1234);
 }
 
 void Human::getCapsule(int capsule_index, Eigen::Vector3d centers[2], double radius[2])
@@ -79,6 +84,12 @@ void Human::addCapsule(const char* joint_name1, const char* joint_name2)
 void Human::jointPositionMove(int joint_index, const Eigen::Vector3d& displacement)
 {
     joints_[joint_index].position += displacement;
+}
+
+void Human::setJointPositions(const std::vector<Eigen::Vector3d>& joint_positions)
+{
+    for (int i=0; i<joint_positions.size(); i++)
+        joints_[i].position = joint_positions[i];
 }
 
 int Human::closestCapsuleIndex(const Eigen::Vector3d& point)
@@ -189,6 +200,8 @@ void Human::bestPullingClosestCapsule(const Eigen::Vector3d& point, int capsule_
             const double capsule_distance = (p0 - point).norm() - r0;
             joint_indices[0] = i0;
             joint_displacements[0] = (point - p0).normalized() * capsule_distance;
+            joint_indices[1] = i1;
+            joint_displacements[1] = (point - p0).normalized() * capsule_distance;
         }
 
         else if (t >= 1.0)
@@ -196,6 +209,8 @@ void Human::bestPullingClosestCapsule(const Eigen::Vector3d& point, int capsule_
             const double capsule_distance = (p1 - point).norm() - r1;
             joint_indices[0] = i1;
             joint_displacements[0] = (point - p1).normalized() * capsule_distance;
+            joint_indices[1] = i1;
+            joint_displacements[1] = (point - p1).normalized() * capsule_distance;
         }
 
         else
@@ -210,8 +225,11 @@ void Human::bestPullingClosestCapsule(const Eigen::Vector3d& point, int capsule_
     }
 }
 
-void Human::projectToJointLengthConstraintedDomain()
+void Human::projectToConstrainedDomain(const Eigen::Vector3d& camera_position, const std::vector<Eigen::Vector3d>& pointcloud)
 {
+    const int num_points = pointcloud.size();
+    const int num_capsules = capsules_.size();
+
     int iteration = 0;
     bool is_converged = false;
 
@@ -219,7 +237,8 @@ void Human::projectToJointLengthConstraintedDomain()
     {
         is_converged = true;
 
-        for (int i=0; i<capsules_.size(); i++)
+        // length constraints
+        for (int i=0; i<num_capsules; i++)
         {
             const int i0 = capsules_[i].joint_ids[0];
             const int i1 = capsules_[i].joint_ids[1];
@@ -251,6 +270,74 @@ void Human::projectToJointLengthConstraintedDomain()
             }
         }
 
+        // z-surface constraints
+        for (int i=0; i<iterative_projection_num_samples_; i++)
+        {
+            // ray casting to spheres
+            const int capsule_divisor = 4;
+            const double threshold = 0.1;
+
+            const Eigen::Vector3d p = pointcloud[ rand() % num_points ];
+            const double measurement = (p - camera_position).norm();
+            const Eigen::Vector3d v = (p - camera_position) / measurement;
+
+            for (int j=0; j<num_capsules; j++)
+            {
+                const int i0 = capsules_[j].joint_ids[0];
+                const int i1 = capsules_[j].joint_ids[1];
+                const double r0 = joints_[i0].radius;
+                const double r1 = joints_[i1].radius;
+
+                for (int k=0; k<=capsule_divisor; k++)
+                {
+                    Eigen::Vector3d& p0 = joints_[i0].position;
+                    Eigen::Vector3d& p1 = joints_[i1].position;
+
+                    const double t = (double)k / capsule_divisor;
+
+                    const Eigen::Vector3d c = (1. - t) * p0 + t * p1;
+                    const double r = (1. - t) * r0 + t * r1;
+
+                    const double s = v.dot(c - camera_position);
+                    const double d = (c - camera_position).norm();
+                    const double a = std::sqrt(d*d - s*s);
+                    if (a <= r)
+                    {
+                        const double m = s - std::sqrt(r*r - a*a);
+                        if (m < measurement - 0.05 && measurement - m <= threshold)
+                        {
+                            const Eigen::Vector3d displacement = (measurement - m - 0.05) * v;
+                            p0 += 0.7 * iterative_projection_alpha_ * (1. - t) * displacement;
+                            p1 += 0.7 * iterative_projection_alpha_ * t * displacement;
+                        }
+                    }
+                }
+            }
+
+            // ray casting to capsule
+            /*
+            const Eigen::Vector3d point = pointcloud[ rand() % num_points ];
+            const double measurement = (point - camera_position).norm();
+            const Eigen::Vector3d direction = (point - camera_position) / measurement;
+
+            for (int j=0; j<num_capsules; j++)
+            {
+                const double ray_distance = measurement - 0.0001; // rayCastDistanceToCapsule(j);
+
+                if (ray_distance < measurement)
+                {
+                    joints_[ capsules_[j].joint_ids[0] ].position += iterative_projection_alpha_ * (measurement - ray_distance) * direction;
+                    joints_[ capsules_[j].joint_ids[1] ].position += iterative_projection_alpha_ * (measurement - ray_distance) * direction;
+                }
+            }
+            */
+        }
+
         iteration++;
     }
+}
+
+double Human::rayCastDistanceToCapsule(int capsule_index)
+{
+    return 100.0;
 }
