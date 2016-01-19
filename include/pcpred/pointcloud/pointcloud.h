@@ -21,6 +21,8 @@ public:
     inline const Eigen::Vector3d& point(int i) const { return pointcloud_[i]; }
 
     void push_back(const Eigen::Vector3d& point);
+    void clear();
+
     void rotate(double angle, const Eigen::Vector3d& axis);
     void translate(const Eigen::Vector3d& t);
 

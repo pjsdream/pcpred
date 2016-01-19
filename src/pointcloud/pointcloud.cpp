@@ -24,6 +24,12 @@ void Pointcloud::push_back(const Eigen::Vector3d& point)
     pointcloud_.push_back(point);
 }
 
+void Pointcloud::clear()
+{
+    pointcloud_.clear();
+}
+
+
 void Pointcloud::rotate(double angle, const Eigen::Vector3d& axis)
 {
     Eigen::AngleAxisd aa(angle, axis);
