@@ -3,8 +3,9 @@
 #include <algorithm>
 
 #include <stdlib.h>
-
 #include <stdio.h>
+
+#include <omp.h>
 
 using namespace pcpred;
 
@@ -307,15 +308,15 @@ void Human::projectToConstrainedDomain(const Eigen::Vector3d& camera_position, c
                         if (m < measurement - 0.05 && measurement - m <= threshold)
                         {
                             const Eigen::Vector3d displacement = (measurement - m - 0.05) * v;
-                            p0 += 0.7 * iterative_projection_alpha_ * (1. - t) * displacement;
-                            p1 += 0.7 * iterative_projection_alpha_ * t * displacement;
+                            p0 += 0.1 * iterative_projection_alpha_ * (1. - t) * displacement;
+                            p1 += 0.1 * iterative_projection_alpha_ * t * displacement;
                         }
                     }
                 }
             }
 
             // ray casting to capsule
-            /*
+            #if 0
             const Eigen::Vector3d point = pointcloud[ rand() % num_points ];
             const double measurement = (point - camera_position).norm();
             const Eigen::Vector3d direction = (point - camera_position) / measurement;
@@ -330,7 +331,7 @@ void Human::projectToConstrainedDomain(const Eigen::Vector3d& camera_position, c
                     joints_[ capsules_[j].joint_ids[1] ].position += iterative_projection_alpha_ * (measurement - ray_distance) * direction;
                 }
             }
-            */
+            #endif
         }
 
         iteration++;

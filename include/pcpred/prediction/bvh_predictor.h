@@ -19,10 +19,6 @@ class BvhPredictor
 {
 private:
 
-    // chi-square-based table for determining axis length of ellipsoid
-    static bool gaussian_distribution_radius_table_initialized_;
-    static std::map<double, double> gaussian_distribution_radius_table_;
-
     // sphere position in joint's local coordinate system
     struct JointBoundSphere
     {

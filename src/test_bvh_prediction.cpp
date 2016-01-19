@@ -30,7 +30,7 @@ int main(int argc, char** argv)
     */
 
     const double timestep = 0.05;               // 0.05 s
-    const double sensor_error = 0.001;          // 1 mm
+    const double sensor_error = 0.01;           // 1 cm
     const double collision_probability = 0.95;  // 95%
     const int acceleration_inference_window_size = 5;
     const int prediction_frames = 3;
@@ -62,6 +62,7 @@ int main(int argc, char** argv)
 
         printf("time = %8.4lf s\n", predictor.time());
 
+        // to retrieve 95% probability contour ellipsoids
         for (int future_frame_index = 0; future_frame_index < prediction_frames; future_frame_index++)
         {
             std::vector<Eigen::Vector3d> centers;
@@ -75,6 +76,20 @@ int main(int argc, char** argv)
                 //   the center:                centers[j]
                 //   the principal axes:        the eigenvectors of A[j]
                 //   the length principal axes: the eigenvalues of A[j]
+            }
+        }
+
+        // to retrieve gaussian distribution
+        for (int future_frame_index = 0; future_frame_index < prediction_frames; future_frame_index++)
+        {
+            std::vector<Eigen::Vector3d> mu;
+            std::vector<Eigen::Matrix3d> sigma;
+
+            predictor.getPredictedGaussianDistribution(future_frame_index, mu, sigma);
+
+            for (int j=0; j<mu.size(); j++)
+            {
+                // probabilistic density function p(x[j]) ~ N(mu[j], sigma[j])
             }
         }
 

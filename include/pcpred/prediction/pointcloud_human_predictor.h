@@ -37,6 +37,12 @@ public:
     // capsule human model to spheres
     inline void setCapsuleDivisor(int d) { capsule_divisor_ = d; }
 
+    // prediction parameters
+    void setTimestep(double timestep);
+    void setSensorDiagonalCovariance(double v);
+    void setCollisionProbability(double p);
+    void setAccelerationInferenceWindowSize(double window_size);
+
     int numSpheres();
 
     void loadHumanShapeFromFile(const char* filename);
@@ -48,16 +54,19 @@ public:
 
     void getPredictionResult(int frame_number, int sphere_index, Eigen::Vector3d& mu, Eigen::Matrix3d& sigma);
     void getPredictionResults(int frame_number, std::vector<Eigen::Vector3d>& mu, std::vector<Eigen::Matrix3d>& sigma);
+    void getPredictedEllipsoids(int frame_number, std::vector<Eigen::Vector3d>& c, std::vector<Eigen::Matrix3d>& A);
 
     // visualize functions
     void setVisualizerTopic(const char* topic);
     void visualizeHuman();
+    void visualizePredictionUpto(const int frame_count);
 
 private:
 
     void optimizeHumanShape(const Eigen::Vector3d& camera_position, const std::vector<Eigen::Vector3d>& pointcloud);
 
     Human human_shape_;
+    std::vector<double> sphere_radius_;
 
     PointsPredictor* predictor_;
 
@@ -66,6 +75,8 @@ private:
     double gradient_descent_alpha_;
 
     int capsule_divisor_;
+
+    double collision_probability_;
 
     MarkerArrayVisualizer* visualizer_;
 };

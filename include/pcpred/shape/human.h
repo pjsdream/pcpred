@@ -43,6 +43,7 @@ public:
                     capsules_[capsule_index].joint_ids[0], capsules_[capsule_index].joint_ids[1]
                 );
     }
+    inline double capsuleInitialLength(int capsule_index) { return capsules_[capsule_index].initial_length; }
 
     void getCapsule(int capsule_index, Eigen::Vector3d centers[2], double radius[2]);
 
@@ -50,6 +51,8 @@ public:
     inline void setIterativeProjectionAlpha(double alpha) { iterative_projection_alpha_ = alpha; }
     inline void setLengthConstraintEpsilon(double epsilon) { length_constraint_epsilon_ = epsilon; }
     inline void setIterativeProjectionNumberOfSamples(int n) { iterative_projection_num_samples_ = n; }
+
+    inline double lengthConstraintEpsilon() { return length_constraint_epsilon_; }
 
     void loadHumanShapeFromFile(const char* filename);
 

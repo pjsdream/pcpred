@@ -1,35 +1,14 @@
 #include <pcpred/prediction/bvh_predictor.h>
 
+#include <pcpred/util/chi_square.h>
+
 #include <stdio.h>
 
 using namespace pcpred;
 
 
-bool BvhPredictor::gaussian_distribution_radius_table_initialized_ = false;
-std::map<double, double> BvhPredictor::gaussian_distribution_radius_table_;
-
-
 BvhPredictor::BvhPredictor(const char* filename)
 {
-    // initialize chi square table
-    if (gaussian_distribution_radius_table_initialized_ == false)
-    {
-        // from chi-squared distribution wiki page for dimension = 3
-        gaussian_distribution_radius_table_initialized_ = true;
-        gaussian_distribution_radius_table_[1.0 - 0.95 ] = std::sqrt( 0.35);
-        gaussian_distribution_radius_table_[1.0 - 0.90 ] = std::sqrt( 0.58);
-        gaussian_distribution_radius_table_[1.0 - 0.80 ] = std::sqrt( 1.01);
-        gaussian_distribution_radius_table_[1.0 - 0.70 ] = std::sqrt( 1.42);
-        gaussian_distribution_radius_table_[1.0 - 0.50 ] = std::sqrt( 2.37);
-        gaussian_distribution_radius_table_[1.0 - 0.30 ] = std::sqrt( 3.66);
-        gaussian_distribution_radius_table_[1.0 - 0.20 ] = std::sqrt( 4.64);
-        gaussian_distribution_radius_table_[1.0 - 0.10 ] = std::sqrt( 6.25);
-        gaussian_distribution_radius_table_[1.0 - 0.05 ] = std::sqrt( 7.82);
-        gaussian_distribution_radius_table_[1.0 - 0.01 ] = std::sqrt(11.34);
-        gaussian_distribution_radius_table_[1.0 - 0.001] = std::sqrt(16.27);
-    }
-
-
     // import bvh file
     bvh_importer_.import(filename);
 
@@ -158,7 +137,7 @@ void BvhPredictor::getPredictedEllipsoids(int frame_number, std::vector<Eigen::V
         // radius: square roots of eigenvalues of covariance
         const Eigen::VectorXd& r = svd.singularValues();
         const Eigen::Vector3d radius_vector =
-                gaussian_distribution_radius_table_[collision_probability_] * Eigen::Vector3d(std::sqrt(r(0)), std::sqrt(r(1)), std::sqrt(r(2)))
+                gaussianDistributionRadius3D(collision_probability_) * Eigen::Vector3d(std::sqrt(r(0)), std::sqrt(r(1)), std::sqrt(r(2)))
                 + spheres_[i].radius * Eigen::Vector3d(1., 1., 1.);
         const Eigen::Matrix3d radius_matrix = radius_vector.asDiagonal();
 
