@@ -170,6 +170,11 @@ void BvhPredictor::getPredictedEllipsoids(int frame_number, std::vector<Eigen::V
     }
 }
 
+void BvhPredictor::getPredictedGaussianDistribution(int frame_number, std::vector<Eigen::Vector3d>& mu, std::vector<Eigen::Matrix3d>& sigma)
+{
+    points_predictor_->getPredictionResults(frame_number, mu, sigma);
+}
+
 
 void BvhPredictor::setVisualizerTopic(const char* topic)
 {
