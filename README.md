@@ -20,8 +20,8 @@ while (true)
 }
 ```
 
-* More details in  
-  pcpred/src/test_bvh_prediction.cpp
+More details in  
+  **pcpred/src/test_bvh_prediction.cpp**
 
 ## Dynamic obstacle prediction with point cluod input
 
@@ -44,36 +44,39 @@ while (true)
 }
 ```
 
+More details in
+  **pcpred/src/test_gvv_prediction.cpp**
+
 ## How to run
 
 1. Install ROS
 
-2. Downlaod Eigen3
+2. Downlaod **Eigen3**
    and put the source folder into  
-     pcpred/include/
+     **pcpred/include/**
 
    To run with point cloud data captured by MPI GVV group,
    download sequences from http://gvvperfcapeva.mpi-inf.mpg.de/public/InertialDepthTracker/index.php
    and unzip at  
-     pcpred/data/
+     **pcpred/data/**
 
 3. Build with  
-     pcpred/CMakeLists.txt
+     **pcpred/CMakeLists.txt**
 
-4. Launch pcpred/launch/test.launch  
-   e.g.  $ roslaunch pcpred test.launch
+4. Launch **pcpred/launch/test.launch**  
+   e.g.  **$ roslaunch pcpred test.launch**
 
 5. Run test programs
 
-  1. BVH motion input
+  1. **BVH motion input**
 
-     run pcpred/bin/test_bvh_prediction
+     run **pcpred/bin/test_bvh_prediction**
      with the first argument the bvh filename  
-     e.g.  $ ./test_bvh_prediction ../data/bvh/walking.bvh
+     e.g.  **$ ./test_bvh_prediction ../data/bvh/walking.bvh**
 
-  2. MPI GVV point cloud input
+  2. **MPI GVV point cloud input**
 
-     run pcpred/bin/test_gvv_prediction
+     run **pcpred/bin/test_gvv_prediction**
      with the first argument the sequence number  
-     e.g.  $ ./test_gvv_prediction 1
+     e.g.  **$ ./test_gvv_prediction 1**
 
