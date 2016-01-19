@@ -74,7 +74,7 @@ More details in **pcpred/src/test_gvv_prediction.cpp**
 
   2. **MPI GVV point cloud input**
 
-     run **pcpred/bin/test_gvv_prediction**
+     run **pcpred/bin/test_gvvdata_prediction**
      with the first argument the sequence number  
-     e.g.  **$ ./test_gvv_prediction 1**
+     e.g.  **$ ./test_gvvdata_prediction 1**
 
