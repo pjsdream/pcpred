@@ -20,8 +20,7 @@ while (true)
 }
 ```
 
-More details in  
-  **pcpred/src/test_bvh_prediction.cpp**
+More details in **pcpred/src/test_bvh_prediction.cpp**
 
 ## Dynamic obstacle prediction with point cluod input
 
@@ -44,8 +43,7 @@ while (true)
 }
 ```
 
-More details in
-  **pcpred/src/test_gvv_prediction.cpp**
+More details in **pcpred/src/test_gvv_prediction.cpp**
 
 ## How to run
 
