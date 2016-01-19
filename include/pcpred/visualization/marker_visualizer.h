@@ -21,9 +21,6 @@ class MarkerVisualizer : public Visualizer
 private:
     static const int CAPACITY = 1000;
 
-    static std::map<double, double> gaussian_distribution_radius_table_;
-    static bool gaussian_distribution_radius_table_initialized_;
-
 public:
 
     explicit MarkerVisualizer(const char* topic = "visualization_marker");

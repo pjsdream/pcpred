@@ -1,5 +1,7 @@
 #include <pcpred/visualization/marker_visualizer.h>
 
+#include <pcpred/util/chi_square.h>
+
 #include <Eigen/SVD>
 
 #include <cmath>
@@ -12,31 +14,9 @@
 using namespace pcpred;
 
 
-std::map<double, double> MarkerVisualizer::gaussian_distribution_radius_table_;
-bool MarkerVisualizer::gaussian_distribution_radius_table_initialized_ = false;
-
-
 MarkerVisualizer::MarkerVisualizer(const char* topic)
     : Visualizer(topic)
 {
-    if (gaussian_distribution_radius_table_initialized_ == false)
-    {
-        // from chi-squared distribution wiki page
-        // dimension = 3
-        gaussian_distribution_radius_table_initialized_ = true;
-        gaussian_distribution_radius_table_[1.0 - 0.95 ] = std::sqrt( 0.35);
-        gaussian_distribution_radius_table_[1.0 - 0.90 ] = std::sqrt( 0.58);
-        gaussian_distribution_radius_table_[1.0 - 0.80 ] = std::sqrt( 1.01);
-        gaussian_distribution_radius_table_[1.0 - 0.70 ] = std::sqrt( 1.42);
-        gaussian_distribution_radius_table_[1.0 - 0.50 ] = std::sqrt( 2.37);
-        gaussian_distribution_radius_table_[1.0 - 0.30 ] = std::sqrt( 3.66);
-        gaussian_distribution_radius_table_[1.0 - 0.20 ] = std::sqrt( 4.64);
-        gaussian_distribution_radius_table_[1.0 - 0.10 ] = std::sqrt( 6.25);
-        gaussian_distribution_radius_table_[1.0 - 0.05 ] = std::sqrt( 7.82);
-        gaussian_distribution_radius_table_[1.0 - 0.01 ] = std::sqrt(11.34);
-        gaussian_distribution_radius_table_[1.0 - 0.001] = std::sqrt(16.27);
-    }
-
     ros::NodeHandle n;
     publisher_ = n.advertise<visualization_msgs::Marker>(topic, CAPACITY);
 
@@ -138,13 +118,6 @@ void MarkerVisualizer::drawEllipsoid(const char* ns, int id, const Eigen::Vector
 
 void MarkerVisualizer::drawGaussianDistribution(const char* ns, int id, const Eigen::Vector3d& mu, const Eigen::Matrix3d& sigma, double probability, double offset)
 {
-    if (gaussian_distribution_radius_table_.find(probability) == gaussian_distribution_radius_table_.end())
-    {
-        ROS_WARN("gaussian distribution drawing for probability %lf is not supported", probability);
-        ROS_WARN("supported probabilities: 0.05 0.1 0.2 0.3 0.5 0.7 0.8 0.9 0.95 0.99 0.999");
-        return;
-    }
-
     visualization_msgs::Marker marker;
 
     marker.header.frame_id = "/world";
@@ -166,7 +139,7 @@ void MarkerVisualizer::drawGaussianDistribution(const char* ns, int id, const Ei
         Q.col(2) *= -1.;
     const Eigen::Quaterniond q(Q);
 
-    const double probability_radius = gaussian_distribution_radius_table_[probability];
+    const double probability_radius = gaussianDistributionRadius3D(probability);
 
     marker.pose.position.x = mu[0];
     marker.pose.position.y = mu[1];
