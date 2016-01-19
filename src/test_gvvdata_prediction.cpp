@@ -62,12 +62,14 @@ int main(int argc, char** argv)
         {
             std::vector<Eigen::Vector3d> mu;
             std::vector<Eigen::Matrix3d> sigma;
+            std::vector<double> radius;
 
-            predictor.getPredictedGaussianDistribution(future_frame_index, mu, sigma);
+            predictor.getPredictedGaussianDistribution(future_frame_index, mu, sigma, radius);
 
             for (int j=0; j<mu.size(); j++)
             {
-                // probabilistic density function p(x[j]) ~ N(mu[j], sigma[j])
+                // probabilistic density function of sphere's center p(x[j]) ~ N(mu[j], sigma[j])
+                // radius of sphere is radius[j]
             }
         }
 

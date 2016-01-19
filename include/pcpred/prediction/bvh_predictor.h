@@ -54,7 +54,7 @@ public:
     void getPredictedEllipsoids(int frame_number, std::vector<Eigen::Vector3d>& c, std::vector<Eigen::Matrix3d>& A);
 
     // prediction result at a specific future frame as a list of ellipsoids
-    void getPredictedGaussianDistribution(int frame_number, std::vector<Eigen::Vector3d>& mu, std::vector<Eigen::Matrix3d>& sigma);
+    void getPredictedGaussianDistribution(int frame_number, std::vector<Eigen::Vector3d>& mu, std::vector<Eigen::Matrix3d>& sigma, std::vector<double>& radius);
 
     // visualize functions
     void setVisualizerTopic(const char* topic);

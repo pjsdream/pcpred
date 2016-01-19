@@ -100,9 +100,11 @@ void PointcloudHumanPredictor::getPredictionResult(int frame_number, int sphere_
     predictor_->getPredictionResult(frame_number, sphere_index, mu, sigma);
 }
 
-void PointcloudHumanPredictor::getPredictionResults(int frame_number, std::vector<Eigen::Vector3d>& mu, std::vector<Eigen::Matrix3d>& sigma)
+void PointcloudHumanPredictor::getPredictionResults(int frame_number, std::vector<Eigen::Vector3d>& mu, std::vector<Eigen::Matrix3d>& sigma, std::vector<double>& radius)
 {
     predictor_->getPredictionResults(frame_number, mu, sigma);
+
+    radius = sphere_radius_;
 }
 
 

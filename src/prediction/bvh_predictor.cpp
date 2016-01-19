@@ -149,9 +149,13 @@ void BvhPredictor::getPredictedEllipsoids(int frame_number, std::vector<Eigen::V
     }
 }
 
-void BvhPredictor::getPredictedGaussianDistribution(int frame_number, std::vector<Eigen::Vector3d>& mu, std::vector<Eigen::Matrix3d>& sigma)
+void BvhPredictor::getPredictedGaussianDistribution(int frame_number, std::vector<Eigen::Vector3d>& mu, std::vector<Eigen::Matrix3d>& sigma, std::vector<double>& radius)
 {
     points_predictor_->getPredictionResults(frame_number, mu, sigma);
+
+    radius.resize( spheres_.size() );
+    for (int i=0; i<spheres_.size(); i++)
+        radius[i] = spheres_[i].radius;
 }
 
 
