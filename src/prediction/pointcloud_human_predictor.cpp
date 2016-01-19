@@ -12,13 +12,14 @@ PointcloudHumanPredictor::PointcloudHumanPredictor()
     predictor_ = 0;
     visualizer_ = 0;
 
+    // approximate a capsule with 4 spheres
+    capsule_divisor_ = 4;
+
     // set up default parameters
     // parameters for human shape length constraint optimization are set up by its constructor
     setMaximumIterations(5);
     setGradientDescentMaximumIterations(5);
     setGradientDescentAlpha(0.1);
-
-    setCapsuleDivisor(4);
 }
 
 void PointcloudHumanPredictor::setHumanShapeLengthConstraintEpsilon(double epsilon)

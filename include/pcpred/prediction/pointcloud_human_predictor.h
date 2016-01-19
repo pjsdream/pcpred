@@ -34,9 +34,6 @@ public:
     inline void setGradientDescentAlpha(double alpha) { gradient_descent_alpha_ = alpha; }
     void setHumanShapeLengthConstraintEpsilon(double epslion);
 
-    // capsule human model to spheres
-    inline void setCapsuleDivisor(int d) { capsule_divisor_ = d; }
-
     // prediction parameters
     void setTimestep(double timestep);
     void setSensorDiagonalCovariance(double v);

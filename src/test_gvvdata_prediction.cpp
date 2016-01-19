@@ -42,7 +42,6 @@ int main(int argc, char** argv)
     predictor.setGradientDescentMaximumIterations(5);
     predictor.setGradientDescentAlpha(0.005);
     predictor.setHumanShapeLengthConstraintEpsilon(0.01);
-    predictor.setCapsuleDivisor(4);
 
     predictor.setVisualizerTopic("gvv_prediction");
 

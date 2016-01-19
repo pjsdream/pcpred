@@ -38,7 +38,6 @@ public:
     void setGradientDescentMaximumIterations(int iterations);
     void setGradientDescentAlpha(double alpha);
     void setHumanShapeLengthConstraintEpsilon(double epsilon);
-    void setCapsuleDivisor(int divisor);
 
     void moveToNextFrame();
     inline double time() { return time_; }

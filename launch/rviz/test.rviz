@@ -5,7 +5,8 @@ Panels:
     Property Tree Widget:
       Expanded:
         - /MarkerArray1/Namespaces1
-        - /MarkerArray3/Namespaces1
+        - /MarkerArray2/Namespaces1
+        - /MarkerArray4/Status1
         - /MarkerArray4/Namespaces1
       Splitter Ratio: 0.520134
     Tree Height: 633
@@ -27,7 +28,7 @@ Panels:
     Experimental: false
     Name: Time
     SyncMode: 0
-    SyncSource: ""
+    SyncSource: PointCloud2
 Visualization Manager:
   Class: ""
   Displays:
@@ -59,14 +60,6 @@ Visualization Manager:
     - Class: rviz/MarkerArray
       Enabled: true
       Marker Topic: /bvh_prediction_test
-      Name: MarkerArray
-      Namespaces:
-        {}
-      Queue Size: 100
-      Value: true
-    - Class: rviz/MarkerArray
-      Enabled: true
-      Marker Topic: camera
       Name: MarkerArray
       Namespaces:
         {}
@@ -138,6 +131,14 @@ Visualization Manager:
         {}
       Queue Size: 100
       Value: true
+    - Class: rviz/MarkerArray
+      Enabled: true
+      Marker Topic: camera
+      Name: MarkerArray
+      Namespaces:
+        {}
+      Queue Size: 100
+      Value: true
     - Alpha: 0.5
       Autocompute Intensity Bounds: true
       Autocompute Value Bounds:
@@ -199,22 +200,22 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 2.48194
+      Distance: 3.07979
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.06
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: -0.497756
-        Y: -0.468244
-        Z: 0.536457
+        X: -0.48248
+        Y: -0.223643
+        Z: 1.07112
       Name: Current View
       Near Clip Distance: 0.01
-      Pitch: 0.2948
+      Pitch: 0.184799
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 0.000153814
+      Yaw: 0.0033083
     Saved: ~
 Window Geometry:
   Displays:
@@ -232,5 +233,5 @@ Window Geometry:
   Views:
     collapsed: false
   Width: 1509
-  X: 68
-  Y: 26
+  X: 58
+  Y: 16

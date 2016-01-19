@@ -44,7 +44,6 @@ int main(int argc, char** argv)
     predictor.setGradientDescentMaximumIterations(5);
     predictor.setGradientDescentAlpha(0.003);
     predictor.setHumanShapeLengthConstraintEpsilon(0.01);
-    predictor.setCapsuleDivisor(4);
 
     predictor.setTimestep(timestep);
     predictor.setSensorDiagonalCovariance(sensor_error * sensor_error);   // variance is proportional to square of sensing error

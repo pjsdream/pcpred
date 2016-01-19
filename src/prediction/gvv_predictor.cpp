@@ -35,7 +35,6 @@ GvvPredictor::GvvPredictor(int sequence_number)
     setGradientDescentMaximumIterations(5);
     setGradientDescentAlpha(0.005);
     setHumanShapeLengthConstraintEpsilon(0.01);
-    setCapsuleDivisor(4);
 }
 
 
@@ -91,11 +90,6 @@ void GvvPredictor::setGradientDescentAlpha(double alpha)
 void GvvPredictor::setHumanShapeLengthConstraintEpsilon(double epsilon)
 {
     predictor_.setHumanShapeLengthConstraintEpsilon(epsilon);
-}
-
-void GvvPredictor::setCapsuleDivisor(int divisor)
-{
-    predictor_.setCapsuleDivisor(divisor);
 }
 
 
