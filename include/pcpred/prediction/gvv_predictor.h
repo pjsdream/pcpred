@@ -40,6 +40,7 @@ public:
     void setHumanShapeLengthConstraintEpsilon(double epsilon);
 
     void moveToNextFrame();
+    void moveTo(double time);
     inline double time() { return time_; }
 
     // prediction result at a specific future time as a list of ellipsoids

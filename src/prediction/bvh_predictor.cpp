@@ -114,6 +114,20 @@ void BvhPredictor::moveToNextFrame()
     points_predictor_->observe(points);
 }
 
+void BvhPredictor::moveTo(double time)
+{
+    time_ = time;
+    if (time_ < 0.0)
+        time_ = 0.0;
+
+    // TODO: observe spheres
+    std::vector<Eigen::Vector3d> points;
+    for (int i=0; i<spheres_.size(); i++)
+        points.push_back( bvh_importer_.jointTransformation(time_, spheres_[i].joint_index) * spheres_[i].position );
+
+    points_predictor_->observe(points);
+}
+
 void BvhPredictor::getPredictedEllipsoids(double future_time, std::vector<Eigen::Vector3d>& c, std::vector<Eigen::Matrix3d>& A)
 {
     std::vector<Eigen::Matrix3d> sigma;

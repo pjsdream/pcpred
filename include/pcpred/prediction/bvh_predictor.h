@@ -42,6 +42,7 @@ public:
     void setCollisionProbability(double probability);
 
     void moveToNextFrame();  // move to next frame (next input stream)
+    void moveTo(double time);
     inline double time() { return time_; }  // current time
 
     // prediction result at a specific future time as a list of ellipsoids

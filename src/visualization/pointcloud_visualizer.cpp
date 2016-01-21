@@ -33,7 +33,8 @@ void PointcloudVisualizer::drawPointcloud(const std::vector<Eigen::Vector3d>& po
     PointCloud msg;
     msg.header.frame_id = "/world";
     //msg.header.frame_id = "/camera_depth_optical_frame";
-    pcl_conversions::toPCL(ros::Time::now(), msg.header.stamp);
+    //pcl_conversions::toPCL(ros::Time::now(), msg.header.stamp);
+    msg.header.stamp = ros::Time::now().toNSec() / 1000ull;
 
     msg.width = pointcloud.size();
     msg.height = 1;
@@ -49,7 +50,8 @@ void PointcloudVisualizer::drawPointcloud(const Pointcloud& pointcloud)
     PointCloud msg;
     msg.header.frame_id = "/world";
     //msg.header.frame_id = "/camera_depth_optical_frame";
-    pcl_conversions::toPCL(ros::Time::now(), msg.header.stamp);
+    //pcl_conversions::toPCL(ros::Time::now(), msg.header.stamp);
+    msg.header.stamp = ros::Time::now().toNSec() / 1000ull;
 
     msg.width = pointcloud.size();
     msg.height = 1;

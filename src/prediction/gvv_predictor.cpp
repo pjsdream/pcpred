@@ -120,6 +120,32 @@ void GvvPredictor::moveToNextFrame()
     predictor_.observe(camera_position, pointcloud_);
 }
 
+void GvvPredictor::moveTo(double time)
+{
+    time_ = time;
+    if (time_ < 0.0)
+        time_ = 0.0;
+
+    const int frame = time_ / motion_timestep_;
+
+    if (importer_.import(sequence_number_, frame, false) == false ||
+        importer_.pointcloud().size() == 0)
+        importer_.import(sequence_number_, last_imported_frame_, false);
+    else
+        last_imported_frame_ = frame;
+
+    Pointcloud original_pointcloud = importer_.pointcloud();
+
+    pointcloud_.clear();
+    const int size = original_pointcloud.size();
+    for (int i=0; i<3000; i++)
+        pointcloud_.push_back( transformation_ * original_pointcloud.point( rand() % size ) );
+
+    const Eigen::Vector3d camera_position = transformation_ * importer_.cameraPosition();
+
+    predictor_.observe(camera_position, pointcloud_);
+}
+
 
 void GvvPredictor::getPredictedGaussianDistribution(double future_time, std::vector<Eigen::Vector3d>& mu, std::vector<Eigen::Matrix3d>& sigma, std::vector<double>& radius)
 {
