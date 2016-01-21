@@ -67,6 +67,7 @@ src/visualization/marker_array_visualizer.cpp
 src/visualization/pointcloud_visualizer.cpp
 src/import/bvh_importer.cpp
 src/import/gvv_data_importer.cpp
+src/import/openni_subscriber.cpp
 src/util/chi_square.cpp
 ${HEADER_FILES}
 )
@@ -107,3 +108,9 @@ rosbuild_add_executable(test_bvh_import
 src/test_bvh_import.cpp
 )
 target_link_libraries(test_bvh_import pcpred)
+
+# test application for openni raw image subscriber
+rosbuild_add_executable(test_openni_subscriber
+src/test_openni_subscriber.cpp
+)
+target_link_libraries(test_openni_subscriber pcpred)

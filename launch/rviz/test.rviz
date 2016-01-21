@@ -51,12 +51,12 @@ Visualization Manager:
       Reference Frame: <Fixed Frame>
       Value: true
     - Class: rviz/Axes
-      Enabled: true
+      Enabled: false
       Length: 1
       Name: Axes
       Radius: 0.01
       Reference Frame: <Fixed Frame>
-      Value: true
+      Value: false
     - Class: rviz/MarkerArray
       Enabled: true
       Marker Topic: /bvh_prediction_test
@@ -173,7 +173,10 @@ Visualization Manager:
       Marker Topic: gvv_prediction
       Name: MarkerArray
       Namespaces:
-        {}
+        human: true
+        prediction_frame0: true
+        prediction_frame1: true
+        prediction_frame2: true
       Queue Size: 100
       Value: true
   Enabled: true
@@ -200,22 +203,22 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 3.07979
+      Distance: 2.8231
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.06
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: -0.48248
-        Y: -0.223643
-        Z: 1.07112
+        X: -0.586112
+        Y: -0.234925
+        Z: 1.04947
       Name: Current View
       Near Clip Distance: 0.01
-      Pitch: 0.184799
+      Pitch: -0.120201
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 0.0033083
+      Yaw: 0.0283046
     Saved: ~
 Window Geometry:
   Displays:
