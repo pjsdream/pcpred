@@ -22,13 +22,14 @@ OpenniSubscriber::OpenniSubscriber()
 {
     print_message_flag_ = false;
     message_received_ = false;
+    is_recording_ = false;
 
     raw_data_.resize(640, 480);
 
     // ros subscriber setup
     ros::NodeHandle n;
-    raw_image_subscriber_ = n.subscribe("camera/depth/image_raw", 1, callbackRawImage);
-    camera_info_subscriber_ = n.subscribe("camera/depth/camera_info", 1, callbackCameraInfo);
+    raw_image_subscriber_ = n.subscribe("camera/depth/image_raw", 1000, callbackRawImage);
+    camera_info_subscriber_ = n.subscribe("camera/depth/camera_info", 1000, callbackCameraInfo);
 }
 
 
@@ -65,6 +66,9 @@ void OpenniSubscriber::onReceivedRawImage(const sensor_msgs::Image::ConstPtr& ms
     {
         ROS_WARN("Not supported depth image encoding");
     }
+
+    if (is_recording_)
+        recorded_raw_data_.push_back(raw_data_);
 }
 
 void OpenniSubscriber::onReceivedCameraInfo(const sensor_msgs::CameraInfo::ConstPtr& msg)
@@ -111,6 +115,9 @@ void OpenniSubscriber::onReceivedCameraInfo(const sensor_msgs::CameraInfo::Const
     for (int i=0; i<3; i++)
         for (int j=0; j<3; j++)
             intrinsics_(i, j) = msg->K[i*3 + j];
+
+    if (is_recording_)
+        recorded_intrinsics_.push_back(intrinsics_);
 }
 
 
@@ -185,32 +192,46 @@ std::vector<Eigen::Vector3d> OpenniSubscriber::pointcloud()
 
 void OpenniSubscriber::record(int frame_count, int sequence_number)
 {
-    for (int frame = 0; frame < frame_count; frame++)
+    is_recording_ = true;
+
+    int frame = 0;
+    while (frame < frame_count)
     {
-        readDepthFrame();
+        recorded_raw_data_.clear();
+        recorded_intrinsics_.clear();
+        ros::spinOnce();
 
-        char filename[128];
-        sprintf(filename, "../data/C%d/image%04d.txt", sequence_number, frame);
-        FILE* fp = fopen(filename, "wb");
+        const int recorded_frames = std::min(recorded_raw_data_.size(), recorded_intrinsics_.size());
 
-        // intrinsics
-        float intrinsics[9];
-        for (int i=0; i<3; i++)
-            for (int j=0; j<3; j++)
-                intrinsics[i + j*3] = intrinsics_(i, j);
-        fwrite(intrinsics, sizeof(float), 9, fp);
-
-        const unsigned short dim[2] = {raw_data_.rows(), raw_data_.cols()};
-        fwrite(dim, sizeof(unsigned short), 2, fp);
-
-        std::vector<unsigned short> v;
-        for (int i=0; i<dim[0]; i++)
+        int count = 0;
+        while (count < recorded_frames && frame < frame_count)
         {
-            for (int j=0; j<dim[1]; j++)
-                v.push_back( raw_data_(i, j) );
-        }
-        fwrite(&v[0], sizeof(unsigned short), v.size(), fp);
+            char filename[128];
+            sprintf(filename, "../data/C%d/image%04d.txt", sequence_number, frame);
+            FILE* fp = fopen(filename, "wb");
 
-        fclose(fp);
+            // intrinsics
+            float intrinsics[9];
+            for (int i=0; i<3; i++)
+                for (int j=0; j<3; j++)
+                    intrinsics[i + j*3] = recorded_intrinsics_[count](i, j);
+            fwrite(intrinsics, sizeof(float), 9, fp);
+
+            const unsigned short dim[2] = {recorded_raw_data_[count].rows(), recorded_raw_data_[count].cols()};
+            fwrite(dim, sizeof(unsigned short), 2, fp);
+
+            std::vector<unsigned short> v;
+            for (int i=0; i<dim[0]; i++)
+            {
+                for (int j=0; j<dim[1]; j++)
+                    v.push_back( recorded_raw_data_[count](i, j) );
+            }
+            fwrite(&v[0], sizeof(unsigned short), v.size(), fp);
+
+            fclose(fp);
+
+            frame++;
+            count++;
+        }
     }
 }

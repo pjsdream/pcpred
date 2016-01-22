@@ -47,6 +47,10 @@ private:
 
     bool print_message_flag_;
     bool message_received_;
+
+    bool is_recording_;
+    std::vector<Eigen::MatrixXd> recorded_raw_data_;
+    std::vector<Eigen::Matrix3d> recorded_intrinsics_;
 };
 
 }

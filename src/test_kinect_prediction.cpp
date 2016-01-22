@@ -23,7 +23,7 @@ int main(int argc, char** argv)
     const double prediction_timestep = 0.05;
     const double sensor_error = 0.005;
     const double collision_probability = 0.95;
-    const int acceleration_inference_window_size = 25;
+    const int acceleration_inference_window_size = 5;
     const int prediction_frames = 6;
 
     ros::Rate rate(1.0 / timestep);

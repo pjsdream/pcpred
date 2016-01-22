@@ -14,6 +14,8 @@ class OpenniImporter
 {
 public:
 
+    OpenniImporter();
+
     bool import(int sequence_number, int frame);
 
     std::vector<Eigen::Vector3d> pointcloud();
@@ -28,6 +30,9 @@ private:
 
     std::vector<Eigen::Vector3d> pointcloud_;
 
+    int last_sequence_number_;
+    int background_intensity_;
+    double crop_[4];
 };
 
 }

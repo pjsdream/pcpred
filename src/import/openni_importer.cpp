@@ -5,6 +5,12 @@
 using namespace pcpred;
 
 
+OpenniImporter::OpenniImporter()
+{
+    last_sequence_number_ = -1;
+}
+
+
 bool OpenniImporter::import(int sequence_number, int frame)
 {
     char filename[128];
@@ -37,9 +43,19 @@ bool OpenniImporter::import(int sequence_number, int frame)
     delete data;
     fclose(fp);
 
+    if (last_sequence_number_ != sequence_number)
+    {
+        sprintf(filename, "../data/C%d/crop.txt", sequence_number);
+        fp = fopen(filename, "r");
+
+        fscanf(fp, "%d%lf%lf%lf%lf", &background_intensity_, &crop_[0], &crop_[1], &crop_[2], &crop_[3]);
+
+        fclose(fp);
+
+        last_sequence_number_ = sequence_number;
+    }
 
 
-    const double background_intensity = 2800;
 
     pointcloud_.clear();
 
@@ -50,7 +66,7 @@ bool OpenniImporter::import(int sequence_number, int frame)
     int cols = 0;
     for (int i=0; i<U*V; i++)
     {
-        if (raw_data_(i%V, i/V) < background_intensity)
+        if (raw_data_(i%V, i/V) < background_intensity_)
             cols++;
     }
     if (cols == 0)
@@ -63,9 +79,9 @@ bool OpenniImporter::import(int sequence_number, int frame)
         const int x = i/V;
         const int y = i%V;
 
-        if (raw_data_(i%V, i/V) < background_intensity &&
-                0.18*U <= x && x <= 0.6*U &&
-                0.0*V <= y && y <= 0.8*V)
+        if (raw_data_(i%V, i/V) < background_intensity_ &&
+                crop_[0]*U <= x && x <= crop_[1]*U &&
+                crop_[2]*V <= y && y <= crop_[3]*V)
         {
             B(0, col) = i / V;
             B(1, col) = i % V;
@@ -85,9 +101,9 @@ bool OpenniImporter::import(int sequence_number, int frame)
         const int x = i/V;
         const int y = i%V;
 
-        if (raw_data_(i%V, i/V) < background_intensity &&
-                0.18*U <= x && x <= 0.6*U &&
-                0.0*V <= y && y <= 0.8*V)
+        if (raw_data_(i%V, i/V) < background_intensity_ &&
+                crop_[0]*U <= x && x <= crop_[1]*U &&
+                crop_[2]*V <= y && y <= crop_[3]*V)
         {
             pointcloud_.push_back(CP.block(0, col, 3, 1) * raw_data_(i%V, i/V) / 1000.0);
             col++;
