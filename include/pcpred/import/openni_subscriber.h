@@ -32,6 +32,8 @@ public:
     void readDepthFrame();
     std::vector<Eigen::Vector3d> pointcloud();
 
+    void record(int frame_count, int sequence_number);
+
 private:
 
     ros::Subscriber raw_image_subscriber_;

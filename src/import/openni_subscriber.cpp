@@ -1,7 +1,5 @@
 #include <pcpred/import/openni_subscriber.h>
 
-#include <sensor_msgs/image_encodings.h>
-
 #include <iostream>
 
 using namespace pcpred;
@@ -121,10 +119,8 @@ void OpenniSubscriber::readDepthFrame()
     const double background_intensity = 2800;
 
     // In this current implementation, the timestamps from raw image and camera info may not be matched
-    ros::spinOnce();
-    printf("message received? %d\n", message_received_);
-    if (!message_received_)
-        return;
+    while (!message_received_)
+        ros::spinOnce();
     message_received_ = false;
 
     pointcloud_.clear();
@@ -184,4 +180,37 @@ void OpenniSubscriber::readDepthFrame()
 std::vector<Eigen::Vector3d> OpenniSubscriber::pointcloud()
 {
     return pointcloud_;
+}
+
+
+void OpenniSubscriber::record(int frame_count, int sequence_number)
+{
+    for (int frame = 0; frame < frame_count; frame++)
+    {
+        readDepthFrame();
+
+        char filename[128];
+        sprintf(filename, "../data/C%d/image%04d.txt", sequence_number, frame);
+        FILE* fp = fopen(filename, "wb");
+
+        // intrinsics
+        float intrinsics[9];
+        for (int i=0; i<3; i++)
+            for (int j=0; j<3; j++)
+                intrinsics[i + j*3] = intrinsics_(i, j);
+        fwrite(intrinsics, sizeof(float), 9, fp);
+
+        const unsigned short dim[2] = {raw_data_.rows(), raw_data_.cols()};
+        fwrite(dim, sizeof(unsigned short), 2, fp);
+
+        std::vector<unsigned short> v;
+        for (int i=0; i<dim[0]; i++)
+        {
+            for (int j=0; j<dim[1]; j++)
+                v.push_back( raw_data_(i, j) );
+        }
+        fwrite(&v[0], sizeof(unsigned short), v.size(), fp);
+
+        fclose(fp);
+    }
 }
