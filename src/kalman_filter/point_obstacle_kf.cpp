@@ -4,6 +4,9 @@
 
 #include <algorithm>
 
+#include <stdio.h>
+
+
 using namespace pcpred;
 
 
@@ -15,12 +18,12 @@ PointObstacleKalmanFilter::PointObstacleKalmanFilter()
     C_ = Eigen::Matrix<double, 6, 6>::Identity();
     d_sigma_ = Eigen::Matrix<double, 6, 6>::Zero();
 
-    setTimestep(0.1);
+    setObservationTimestep(0.1);
     setSensorDiagonalCovariance(0.01);
     setAccelerationInferenceWindowSize(2);
 }
 
-void PointObstacleKalmanFilter::setTimestep(double timestep)
+void PointObstacleKalmanFilter::setObservationTimestep(double timestep)
 {
     timestep_ = timestep;
 
@@ -48,6 +51,20 @@ void PointObstacleKalmanFilter::addStateHistory(const Eigen::VectorXd& mu, const
 void PointObstacleKalmanFilter::setCurrentObservation(const Eigen::VectorXd& z)
 {
     z_ = z;
+
+    computeAccelerationAndVariance();
+
+    Eigen::VectorXd mu;
+    Eigen::MatrixXd sigma;
+
+    // In the first step, if measurement is given then kalmna filtering
+    // If not, initialize x0 with sensor input data
+    if (!x_mu_history_.empty())
+        updateControlAndMeasurement(x_mu_history_.back(), x_sigma_history_.back(), mu, sigma);
+    else
+        initializeFirstStateWithObservation(mu, sigma);
+
+    addStateHistory(mu, sigma);
 }
 
 void PointObstacleKalmanFilter::setAccelerationInferenceWindowSize(int window_size)
@@ -56,29 +73,18 @@ void PointObstacleKalmanFilter::setAccelerationInferenceWindowSize(int window_si
 }
 
 
-void PointObstacleKalmanFilter::predict(int frame_count)
+void PointObstacleKalmanFilter::predict(double time_difference, Eigen::VectorXd& mu, Eigen::MatrixXd& sigma)
 {
-    x_mu_result_.clear();
-    x_sigma_result_.clear();
-
-    computeAccelerationAndVariance();
-
-    // In the first step, if measurement is given then kalmna filtering
-    // If not, initialize x0 with sensor input data
-    if (!x_mu_history_.empty())
-        updateControlAndMeasurement(x_mu_history_.back(), x_sigma_history_.back());
-    else
-        initializeFirstStateWithObservation();
-
-    // For the remaining steps, measurements are not given
-    // and the result only relies on control updates
-    for (int i=1; i<frame_count; i++)
-        updateControlOnly(x_mu_result_.back(), x_sigma_result_.back());
+    updateControlOnly(time_difference, x_mu_history_.back(), x_sigma_history_.back(), mu, sigma);
 }
 
 void PointObstacleKalmanFilter::computeAccelerationAndVariance()
 {
+    const double motion_variance = 0.01 * timestep_ * timestep_;
+
     e_sigma_ = Eigen::Matrix<double, 6, 6>::Zero();
+    e_sigma_.block(3, 3, 3, 3) = Eigen::Matrix3d::Identity() * motion_variance;
+    u_ = Eigen::Vector3d(0, 0, 0);
 
     const int history_count = x_mu_history_.size();
 
@@ -106,56 +112,33 @@ void PointObstacleKalmanFilter::computeAccelerationAndVariance()
             weight++;
         }
 
-        u_ = mu1;
-        e_sigma_.block(3, 3, 3, 3) = sigma1;
+        u_ = mu1 * timestep_;
+        e_sigma_.block(3, 3, 3, 3) += sigma1 * timestep_ * timestep_;
     }
 }
 
-void PointObstacleKalmanFilter::initializeFirstStateWithObservation()
+void PointObstacleKalmanFilter::initializeFirstStateWithObservation(Eigen::VectorXd& mu, Eigen::MatrixXd& sigma)
 {
-    Eigen::VectorXd x_mu(6);
-    Eigen::MatrixXd x_sigma(6, 6);
-
-    x_mu = z_;
-    x_sigma = d_sigma_;
-
-    x_mu_result_.push_back(x_mu);
-    x_sigma_result_.push_back(x_sigma);
+    mu = z_;
+    sigma = d_sigma_;
 }
 
-void PointObstacleKalmanFilter::updateControlAndMeasurement(const Eigen::VectorXd& last_x_mu, const Eigen::MatrixXd& last_x_sigma)
+void PointObstacleKalmanFilter::updateControlAndMeasurement(const Eigen::VectorXd& last_x_mu, const Eigen::MatrixXd& last_x_sigma, Eigen::VectorXd& mu, Eigen::MatrixXd& sigma)
 {
-    Eigen::VectorXd x_mu(6);
-    Eigen::Matrix<double, 6, 6> x_sigma;
-
     Eigen::Matrix<double, 6, 6> K; // kalman gain
 
-    x_mu = A_ * last_x_mu + B_ * u_;
-    x_sigma = A_ * last_x_sigma * A_.transpose() + e_sigma_;
-    K = x_sigma * C_.transpose() * (C_ * x_sigma * C_.transpose() + d_sigma_).inverse();
-    x_mu += K * (z_ - C_ * x_mu);
-    x_sigma = (Eigen::MatrixXd::Identity(6, 6) - K * C_) * x_sigma;
-
-    x_mu_result_.push_back(x_mu);
-    x_sigma_result_.push_back(x_sigma);
+    mu = A_ * last_x_mu + B_ * u_;
+    sigma = A_ * last_x_sigma * A_.transpose() + e_sigma_;
+    K = sigma * C_.transpose() * (C_ * sigma * C_.transpose() + d_sigma_).inverse();
+    mu += K * (z_ - C_ * mu);
+    sigma = (Eigen::MatrixXd::Identity(6, 6) - K * C_) * sigma;
 }
 
-void PointObstacleKalmanFilter::updateControlOnly(const Eigen::VectorXd& last_x_mu, const Eigen::MatrixXd& last_x_sigma)
+void PointObstacleKalmanFilter::updateControlOnly(double time_difference, const Eigen::VectorXd& last_x_mu, const Eigen::MatrixXd& last_x_sigma, Eigen::VectorXd& mu, Eigen::MatrixXd& sigma)
 {
-    Eigen::VectorXd x_mu(6);
-    Eigen::MatrixXd x_sigma(6, 6);
+    Eigen::Matrix<double, 6, 6> A = Eigen::Matrix<double, 6, 6>::Identity();
+    A.block(0, 3, 3, 3) = Eigen::Matrix3d::Identity() * time_difference;
 
-    x_mu = A_ * last_x_mu + B_ * u_;
-    x_sigma = A_ * last_x_sigma * A_.transpose() + e_sigma_;
-
-    x_mu_result_.push_back(x_mu);
-    x_sigma_result_.push_back(x_sigma);
+    mu = A * last_x_mu + B_ * (u_ / timestep_ * time_difference);
+    sigma = A * last_x_sigma * A.transpose() + (e_sigma_ / timestep_ / timestep_ * time_difference * time_difference);
 }
-
-
-void PointObstacleKalmanFilter::getPredictionResultAtFrame(int i, Eigen::VectorXd& mu, Eigen::MatrixXd& sigma)
-{
-    mu = x_mu_result_[i];
-    sigma = x_sigma_result_[i];
-}
-

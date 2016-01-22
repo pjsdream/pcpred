@@ -16,24 +16,22 @@ public:
 
     PointObstacleKalmanFilter();
 
-    void setTimestep(double timestep);
+    void setObservationTimestep(double timestep);
     void setSensorDiagonalCovariance(double v);
     void clearStateHistory();
     void addStateHistory(const Eigen::VectorXd& mu, const Eigen::MatrixXd& sigma);
     void setCurrentObservation(const Eigen::VectorXd& z);
     void setAccelerationInferenceWindowSize(int window_size);
 
-    void predict(int frame_count);
-
-    void getPredictionResultAtFrame(int i, Eigen::VectorXd& mu, Eigen::MatrixXd& sigma);
+    void predict(double time_difference, Eigen::VectorXd& mu, Eigen::MatrixXd& sigma);
 
 private:
 
     // These functions receive the gaussian distribution parameters of last state
     // The result is pushed back to result arrays
-    void initializeFirstStateWithObservation();
-    void updateControlAndMeasurement(const Eigen::VectorXd& last_x_mu, const Eigen::MatrixXd& last_x_sigma);
-    void updateControlOnly(const Eigen::VectorXd& last_x_mu, const Eigen::MatrixXd& last_x_sigma);
+    void initializeFirstStateWithObservation(Eigen::VectorXd& mu, Eigen::MatrixXd& sigma);
+    void updateControlAndMeasurement(const Eigen::VectorXd& last_x_mu, const Eigen::MatrixXd& last_x_sigma, Eigen::VectorXd& mu, Eigen::MatrixXd& sigma);
+    void updateControlOnly(double time_difference, const Eigen::VectorXd& last_x_mu, const Eigen::MatrixXd& last_x_sigma, Eigen::VectorXd& mu, Eigen::MatrixXd& sigma);
 
     // acceleratoin inference
     void computeAccelerationAndVariance();
@@ -60,10 +58,6 @@ private:
     // e_t ~ N(0, sigma_e_t) where sigma is determined by history
     // d_t ~ N(0, sigma_d_t)
     Eigen::Matrix<double, 6, 6> d_sigma_;
-
-    // kalman filter result
-    std::vector<Eigen::VectorXd> x_mu_result_;
-    std::vector<Eigen::MatrixXd> x_sigma_result_;
 };
 
 }
