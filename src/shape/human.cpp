@@ -157,7 +157,7 @@ int Human::closestCapsuleIndex(const Eigen::Vector3d& point)
 void Human::bestPullingClosestCapsule(const Eigen::Vector3d& point, int capsule_index,
                                       int joint_indices[2], Eigen::Vector3d joint_displacements[2])
 {
-    const double outlier_threshold = 0.5;
+    const double outlier_threshold = 0.2;
 
     joint_indices[0] = 0;
     joint_indices[1] = 0;
