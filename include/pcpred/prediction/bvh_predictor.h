@@ -44,22 +44,19 @@ public:
     void moveToNextFrame();  // move to next frame (next input stream)
     inline double time() { return time_; }  // current time
 
-    // prediction of next few frames beginning from current time
-    void predict(int frame_count);
-
-    // prediction result at a specific future frame as a list of ellipsoids
+    // prediction result at a specific future time as a list of ellipsoids
     //   the center:                centers[i]
     //   the principal axes:        the eigenvectors of A[i]
     //   the length principal axes: the eigenvalues of A[i]
-    void getPredictedEllipsoids(int frame_number, std::vector<Eigen::Vector3d>& c, std::vector<Eigen::Matrix3d>& A);
+    void getPredictedEllipsoids(double future_time, std::vector<Eigen::Vector3d>& c, std::vector<Eigen::Matrix3d>& A);
 
-    // prediction result at a specific future frame as a list of ellipsoids
-    void getPredictedGaussianDistribution(int frame_number, std::vector<Eigen::Vector3d>& mu, std::vector<Eigen::Matrix3d>& sigma, std::vector<double>& radius);
+    // prediction result at a specific future time as a list of ellipsoids
+    void getPredictedGaussianDistribution(double future_time, std::vector<Eigen::Vector3d>& mu, std::vector<Eigen::Matrix3d>& sigma, std::vector<double>& radius);
 
     // visualize functions
     void setVisualizerTopic(const char* topic);
     void visualizeHuman();
-    void visualizePredictionUpto(int frame_count);
+    void visualizePrediction(double future_time);
 
 private:
 

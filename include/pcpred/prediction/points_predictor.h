@@ -18,16 +18,14 @@ public:
 
     inline int numSpheres() { return num_spheres_; }
 
-    void setTimestep(double timestep);
+    void setObservationTimestep(double timestep);
     void setSensorDiagonalCovariance(double v);
     void setAccelerationInferenceWindowSize(int window_size);
 
     void observe(const std::vector<Eigen::Vector3d>& p);
 
-    void predict(int frame_count);
-
-    void getPredictionResult(int frame_number, int sphere_index, Eigen::Vector3d& mu, Eigen::Matrix3d& sigma);
-    void getPredictionResults(int frame_number, std::vector<Eigen::Vector3d>& mu, std::vector<Eigen::Matrix3d>& sigma);
+    void predict(double time_difference, std::vector<Eigen::Vector3d>& mu, std::vector<Eigen::Matrix3d>& sigma);
+    void predict(double time_difference, int sphere_index, Eigen::Vector3d& mu, Eigen::Matrix3d& sigma);
 
 private:
 

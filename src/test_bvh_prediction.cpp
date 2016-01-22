@@ -30,6 +30,7 @@ int main(int argc, char** argv)
     */
 
     const double timestep = 0.05;               // 0.05 s
+    const double prediction_timestep = 0.05;    // 0.05 s
     const double sensor_error = 0.01;           // 1 cm
     const double collision_probability = 0.95;  // 95%
     const int acceleration_inference_window_size = 5;
@@ -58,7 +59,6 @@ int main(int argc, char** argv)
     while(true)
     {
         predictor.moveToNextFrame();
-        predictor.predict(prediction_frames);
 
         printf("time = %8.4lf s\n", predictor.time());
 
@@ -68,7 +68,7 @@ int main(int argc, char** argv)
             std::vector<Eigen::Vector3d> centers;
             std::vector<Eigen::Matrix3d> A;
 
-            predictor.getPredictedEllipsoids(future_frame_index, centers, A);
+            predictor.getPredictedEllipsoids(future_frame_index * prediction_timestep, centers, A);
 
             for (int j=0; j<centers.size(); j++)
             {
@@ -86,7 +86,7 @@ int main(int argc, char** argv)
             std::vector<Eigen::Matrix3d> sigma;
             std::vector<double> radius;
 
-            predictor.getPredictedGaussianDistribution(future_frame_index, mu, sigma, radius);
+            predictor.getPredictedGaussianDistribution(future_frame_index * prediction_timestep, mu, sigma, radius);
 
             for (int j=0; j<mu.size(); j++)
             {
@@ -97,7 +97,9 @@ int main(int argc, char** argv)
 
 
         predictor.visualizeHuman();
-        predictor.visualizePredictionUpto(prediction_frames);
+
+        for (int future_frame_index = 0; future_frame_index < prediction_frames; future_frame_index++)
+            predictor.visualizePrediction(future_frame_index * prediction_timestep);
 
 
         fflush(stdout);

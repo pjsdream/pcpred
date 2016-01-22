@@ -22,6 +22,7 @@ int main(int argc, char** argv)
 
 
     const double timestep = 0.05;
+    const double prediction_timestep = 0.05;
     const double sensor_error = 0.01;
     const double collision_probability = 0.95;
     const int acceleration_inference_window_size = 5;
@@ -53,7 +54,6 @@ int main(int argc, char** argv)
     while (true)
     {
         predictor.moveToNextFrame();
-        predictor.predict(prediction_frames);
 
         printf("time = %8.4lf s\n", predictor.time());
 
@@ -64,7 +64,7 @@ int main(int argc, char** argv)
             std::vector<Eigen::Matrix3d> sigma;
             std::vector<double> radius;
 
-            predictor.getPredictedGaussianDistribution(future_frame_index, mu, sigma, radius);
+            predictor.getPredictedGaussianDistribution(future_frame_index * prediction_timestep, mu, sigma, radius);
 
             for (int j=0; j<mu.size(); j++)
             {
@@ -76,7 +76,9 @@ int main(int argc, char** argv)
         // to visualize
         predictor.visualizePointcloud();
         predictor.visualizeHuman();
-        predictor.visualizePredictionUpto(prediction_frames);
+
+        for (int future_frame_index = 0; future_frame_index < prediction_frames; future_frame_index++)
+            predictor.visualizePrediction(future_frame_index * prediction_timestep);
 
         fflush(stdout);
         rate.sleep();

@@ -58,6 +58,7 @@ src/prediction/points_predictor.cpp
 src/prediction/pointcloud_human_predictor.cpp
 src/prediction/bvh_predictor.cpp
 src/prediction/gvv_predictor.cpp
+src/prediction/kinect_predictor.cpp
 src/shape/human.cpp
 src/kalman_filter/point_obstacle_kf.cpp
 src/pointcloud/pointcloud.cpp
@@ -68,6 +69,7 @@ src/visualization/pointcloud_visualizer.cpp
 src/import/bvh_importer.cpp
 src/import/gvv_data_importer.cpp
 src/import/openni_subscriber.cpp
+src/import/openni_importer.cpp
 src/util/chi_square.cpp
 ${HEADER_FILES}
 )
@@ -84,11 +86,12 @@ src/test_bvh_prediction.cpp
 )
 target_link_libraries(test_bvh_prediction pcpred)
 
+# (deprecated)
 # test application for pointcloud human prediction
-rosbuild_add_executable(test_pointcloud_prediction
-src/test_pointcloud_prediction.cpp
-)
-target_link_libraries(test_pointcloud_prediction pcpred)
+#rosbuild_add_executable(test_pointcloud_prediction
+#src/test_pointcloud_prediction.cpp
+#)
+#target_link_libraries(test_pointcloud_prediction pcpred)
 
 # test application for gvv pointcloud human prediction
 rosbuild_add_executable(test_gvvdata_prediction
@@ -114,3 +117,15 @@ rosbuild_add_executable(test_openni_subscriber
 src/test_openni_subscriber.cpp
 )
 target_link_libraries(test_openni_subscriber pcpred)
+
+# test application for openni record playback
+rosbuild_add_executable(test_openni_playback
+src/test_openni_playback.cpp
+)
+target_link_libraries(test_openni_playback pcpred)
+
+# test application for kinect prediction
+rosbuild_add_executable(test_kinect_prediction
+src/test_kinect_prediction.cpp
+)
+target_link_libraries(test_kinect_prediction pcpred)

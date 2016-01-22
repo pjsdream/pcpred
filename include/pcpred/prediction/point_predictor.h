@@ -16,15 +16,13 @@ public:
 
     PointPredictor();
 
-    void setTimestep(double timestep);
+    void setObservationTimestep(double timestep);
     void setSensorDiagonalCovariance(double v);
     void setAccelerationInferenceWindowSize(int window_size);
 
     void observe(const Eigen::Vector3d& p);
 
-    void predict(int frame_count);
-
-    void getPredictionResult(int frame_number, Eigen::Vector3d& mu, Eigen::Matrix3d& sigma);
+    void predict(double time_difference, Eigen::Vector3d& mu, Eigen::Matrix3d& sigma);
 
 private:
 

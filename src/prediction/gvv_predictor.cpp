@@ -53,7 +53,7 @@ void GvvPredictor::translate(const Eigen::Vector3d& t)
 void GvvPredictor::setTimestep(double timestep)
 {
     timestep_ = timestep;
-    predictor_.setTimestep(timestep);
+    predictor_.setObservationTimestep(timestep);
 }
 
 void GvvPredictor::setSensorDiagonalCovariance(double v)
@@ -121,15 +121,9 @@ void GvvPredictor::moveToNextFrame()
 }
 
 
-void GvvPredictor::predict(int frame_count)
+void GvvPredictor::getPredictedGaussianDistribution(double future_time, std::vector<Eigen::Vector3d>& mu, std::vector<Eigen::Matrix3d>& sigma, std::vector<double>& radius)
 {
-    predictor_.predict(frame_count);
-}
-
-
-void GvvPredictor::getPredictedGaussianDistribution(int frame_number, std::vector<Eigen::Vector3d>& mu, std::vector<Eigen::Matrix3d>& sigma, std::vector<double>& radius)
-{
-    predictor_.getPredictionResults(frame_number, mu, sigma, radius);
+    predictor_.predict(future_time, mu, sigma, radius);
 }
 
 
@@ -154,7 +148,7 @@ void GvvPredictor::visualizeHuman()
     predictor_.visualizeHuman();
 }
 
-void GvvPredictor::visualizePredictionUpto(int frame_count)
+void GvvPredictor::visualizePrediction(double future_time)
 {
-    predictor_.visualizePredictionUpto(frame_count);
+    predictor_.visualizePrediction(future_time);
 }

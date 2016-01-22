@@ -35,7 +35,7 @@ public:
     void setHumanShapeLengthConstraintEpsilon(double epslion);
 
     // prediction parameters
-    void setTimestep(double timestep);
+    void setObservationTimestep(double timestep);
     void setSensorDiagonalCovariance(double v);
     void setCollisionProbability(double p);
     void setAccelerationInferenceWindowSize(double window_size);
@@ -47,16 +47,14 @@ public:
     void observe(const Eigen::Vector3d& camera_position, const Pointcloud& pointcloud); // redirects to function using a list of centers
     void observe(const Eigen::Vector3d& camera_position, const std::vector<Eigen::Vector3d>& pointcloud);
 
-    void predict(int frame_count);
-
-    void getPredictionResult(int frame_number, int sphere_index, Eigen::Vector3d& mu, Eigen::Matrix3d& sigma);
-    void getPredictionResults(int frame_number, std::vector<Eigen::Vector3d>& mu, std::vector<Eigen::Matrix3d>& sigma, std::vector<double>& radius);
-    void getPredictedEllipsoids(int frame_number, std::vector<Eigen::Vector3d>& c, std::vector<Eigen::Matrix3d>& A);
+    void predict(double time_difference, int sphere_index, Eigen::Vector3d& mu, Eigen::Matrix3d& sigma, double& radius);
+    void predict(double time_difference, std::vector<Eigen::Vector3d>& mu, std::vector<Eigen::Matrix3d>& sigma, std::vector<double>& radius);
+    void getPredictedEllipsoids(double time_difference, std::vector<Eigen::Vector3d>& c, std::vector<Eigen::Matrix3d>& A);
 
     // visualize functions
     void setVisualizerTopic(const char* topic);
     void visualizeHuman();
-    void visualizePredictionUpto(const int frame_count);
+    void visualizePrediction(double future_time);
 
 private:
 

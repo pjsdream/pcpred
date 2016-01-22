@@ -31,8 +31,8 @@ void PointcloudVisualizer::publish(const PointCloud& marker)
 void PointcloudVisualizer::drawPointcloud(const std::vector<Eigen::Vector3d>& pointcloud)
 {
     PointCloud msg;
-    //msg.header.frame_id = "/world";
-    msg.header.frame_id = "/camera_depth_optical_frame";
+    msg.header.frame_id = "/world";
+    //msg.header.frame_id = "/camera_depth_optical_frame";
     pcl_conversions::toPCL(ros::Time::now(), msg.header.stamp);
 
     msg.width = pointcloud.size();
@@ -48,6 +48,7 @@ void PointcloudVisualizer::drawPointcloud(const Pointcloud& pointcloud)
 {
     PointCloud msg;
     msg.header.frame_id = "/world";
+    //msg.header.frame_id = "/camera_depth_optical_frame";
     pcl_conversions::toPCL(ros::Time::now(), msg.header.stamp);
 
     msg.width = pointcloud.size();

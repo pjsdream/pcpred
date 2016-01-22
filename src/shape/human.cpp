@@ -157,6 +157,8 @@ int Human::closestCapsuleIndex(const Eigen::Vector3d& point)
 void Human::bestPullingClosestCapsule(const Eigen::Vector3d& point, int capsule_index,
                                       int joint_indices[2], Eigen::Vector3d joint_displacements[2])
 {
+    const double outlier_threshold = 0.5;
+
     joint_indices[0] = 0;
     joint_indices[1] = 0;
     joint_displacements[0] = Eigen::Vector3d(0., 0., 0.);
@@ -182,6 +184,8 @@ void Human::bestPullingClosestCapsule(const Eigen::Vector3d& point, int capsule_
     if (d <= rd)
     {
         const double capsule_distance = (p1 - point).norm() - r1;
+        if (std::abs(capsule_distance) > outlier_threshold)
+            return;
         joint_indices[0] = i1;
         joint_displacements[0] = (point - p1).normalized() * capsule_distance;
     }
@@ -199,6 +203,8 @@ void Human::bestPullingClosestCapsule(const Eigen::Vector3d& point, int capsule_
         if (t <= 0.0)
         {
             const double capsule_distance = (p0 - point).norm() - r0;
+            if (std::abs(capsule_distance) > outlier_threshold)
+                return;
             joint_indices[0] = i0;
             joint_displacements[0] = (point - p0).normalized() * capsule_distance;
             joint_indices[1] = i1;
@@ -208,6 +214,8 @@ void Human::bestPullingClosestCapsule(const Eigen::Vector3d& point, int capsule_
         else if (t >= 1.0)
         {
             const double capsule_distance = (p1 - point).norm() - r1;
+            if (std::abs(capsule_distance) > outlier_threshold)
+                return;
             joint_indices[0] = i1;
             joint_displacements[0] = (point - p1).normalized() * capsule_distance;
             joint_indices[1] = i1;
@@ -217,6 +225,8 @@ void Human::bestPullingClosestCapsule(const Eigen::Vector3d& point, int capsule_
         else
         {
             const double capsule_distance = (cross.norm() / d / cos_alpha) - ((1. - t) * r0 + t * r1);
+            if (std::abs(capsule_distance) > outlier_threshold)
+                return;
             const Eigen::Vector3d direction = (point - (1. - t) * p0 - t * p1).normalized() * capsule_distance;
             joint_indices[0] = i0;
             joint_displacements[0] = direction;

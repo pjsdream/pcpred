@@ -5,7 +5,7 @@
 
 #include <stdio.h>
 
-#include <unistd.h>
+#include <time.h>
 #include <stdlib.h>
 
 using namespace pcpred;
@@ -24,27 +24,13 @@ int main(int argc, char** argv)
 
     PointcloudVisualizer visualizer("openni_test");
 
-    if (fork() != 0)
+    for (int i = 5; i > 0; i--)
     {
-        printf("rosbag play started\n");
+        printf("%d\n", i);
         fflush(stdout);
-        system("rosbag play ../data/bag/kinect1.bag >/dev/null");
-        return 0;
+        sleep(1);
     }
-
-    int frame = 0;
-    while (true)
-    {
-        subscriber->readDepthFrame();
-
-        visualizer.drawPointcloud( subscriber->pointcloud() );
-
-        printf("frame %4d\n", frame);
-        fflush(stdout);
-        rate.sleep();
-
-        frame++;
-    }
+    subscriber->record(300, 1);
 
     return 0;
 }

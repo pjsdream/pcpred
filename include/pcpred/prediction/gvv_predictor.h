@@ -42,16 +42,13 @@ public:
     void moveToNextFrame();
     inline double time() { return time_; }
 
-    // prediction of next few frames beginning from current time
-    void predict(int frame_count);
-
-    // prediction result at a specific future frame as a list of ellipsoids
-    void getPredictedGaussianDistribution(int frame_number, std::vector<Eigen::Vector3d>& mu, std::vector<Eigen::Matrix3d>& sigma, std::vector<double>& radius);
+    // prediction result at a specific future time as a list of ellipsoids
+    void getPredictedGaussianDistribution(double future_time, std::vector<Eigen::Vector3d>& mu, std::vector<Eigen::Matrix3d>& sigma, std::vector<double>& radius);
 
     void setVisualizerTopic(const char* topic);
     void visualizePointcloud();
     void visualizeHuman();
-    void visualizePredictionUpto(int frame_count);
+    void visualizePrediction(double future_time);
 
 private:
 

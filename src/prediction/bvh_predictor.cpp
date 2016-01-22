@@ -80,7 +80,7 @@ void BvhPredictor::translate(const Eigen::Vector3d& t)
 void BvhPredictor::setTimestep(double timestep)
 {
     timestep_ = timestep;
-    points_predictor_->setTimestep(timestep);
+    points_predictor_->setObservationTimestep(timestep);
 }
 
 void BvhPredictor::setSensorDiagonalCovariance(double v)
@@ -114,19 +114,11 @@ void BvhPredictor::moveToNextFrame()
     points_predictor_->observe(points);
 }
 
-void BvhPredictor::predict(int frame_count)
-{
-    if (time_ < 0.0)
-        moveToNextFrame();
-
-    points_predictor_->predict(frame_count);
-}
-
-void BvhPredictor::getPredictedEllipsoids(int frame_number, std::vector<Eigen::Vector3d>& c, std::vector<Eigen::Matrix3d>& A)
+void BvhPredictor::getPredictedEllipsoids(double future_time, std::vector<Eigen::Vector3d>& c, std::vector<Eigen::Matrix3d>& A)
 {
     std::vector<Eigen::Matrix3d> sigma;
 
-    points_predictor_->getPredictionResults(frame_number, c, sigma);
+    points_predictor_->predict(future_time, c, sigma);
 
     A.resize(sigma.size());
     for (int i=0; i<sigma.size(); i++)
@@ -149,9 +141,9 @@ void BvhPredictor::getPredictedEllipsoids(int frame_number, std::vector<Eigen::V
     }
 }
 
-void BvhPredictor::getPredictedGaussianDistribution(int frame_number, std::vector<Eigen::Vector3d>& mu, std::vector<Eigen::Matrix3d>& sigma, std::vector<double>& radius)
+void BvhPredictor::getPredictedGaussianDistribution(double future_time, std::vector<Eigen::Vector3d>& mu, std::vector<Eigen::Matrix3d>& sigma, std::vector<double>& radius)
 {
-    points_predictor_->getPredictionResults(frame_number, mu, sigma);
+    points_predictor_->predict(future_time, mu, sigma);
 
     radius.resize( spheres_.size() );
     for (int i=0; i<spheres_.size(); i++)
@@ -180,18 +172,15 @@ void BvhPredictor::visualizeHuman()
     visualizer_->drawSpheres("human", centers, radius);
 }
 
-void BvhPredictor::visualizePredictionUpto(int frame_count)
+void BvhPredictor::visualizePrediction(double future_time)
 {
-    for (int i=0; i<frame_count; i++)
-    {
-        std::vector<Eigen::Vector3d> c;  // centers of ellipsoids
-        std::vector<Eigen::Matrix3d> A;  // matrixs that define ellipsoid axes
+    std::vector<Eigen::Vector3d> c;  // centers of ellipsoids
+    std::vector<Eigen::Matrix3d> A;  // matrixs that define ellipsoid axes
 
-        getPredictedEllipsoids(i, c, A);
+    getPredictedEllipsoids(future_time, c, A);
 
-        char buffer[128];
-        sprintf(buffer, "prediction_frame%d", i);
+    char buffer[128];
+    sprintf(buffer, "prediction_frame_%.3lf", future_time);
 
-        visualizer_->drawEllipsoids(buffer, c, A);
-    }
+    visualizer_->drawEllipsoids(buffer, c, A);
 }

@@ -28,9 +28,9 @@ void PointcloudHumanPredictor::setHumanShapeLengthConstraintEpsilon(double epsil
 }
 
 
-void PointcloudHumanPredictor::setTimestep(double timestep)
+void PointcloudHumanPredictor::setObservationTimestep(double timestep)
 {
-    predictor_->setTimestep(timestep);
+    predictor_->setObservationTimestep(timestep);
 }
 
 void PointcloudHumanPredictor::setSensorDiagonalCovariance(double v)
@@ -83,26 +83,23 @@ void PointcloudHumanPredictor::loadHumanShapeFromFile(const char* filename)
     predictor_ = new PointsPredictor(numSpheres());
 
     // predictor initial parameter setup
-    setTimestep(0.1);
+    setObservationTimestep(0.1);
     setSensorDiagonalCovariance(0.001 * 0.001);
     setCollisionProbability(0.95);
     setAccelerationInferenceWindowSize(5);
 }
 
 
-void PointcloudHumanPredictor::predict(int frame_count)
+void PointcloudHumanPredictor::predict(double time_difference, int sphere_index, Eigen::Vector3d& mu, Eigen::Matrix3d& sigma, double& radius)
 {
-    predictor_->predict(frame_count);
+    predictor_->predict(time_difference, sphere_index, mu, sigma);
+
+    radius = sphere_radius_[sphere_index];
 }
 
-void PointcloudHumanPredictor::getPredictionResult(int frame_number, int sphere_index, Eigen::Vector3d& mu, Eigen::Matrix3d& sigma)
+void PointcloudHumanPredictor::predict(double time_difference, std::vector<Eigen::Vector3d>& mu, std::vector<Eigen::Matrix3d>& sigma, std::vector<double>& radius)
 {
-    predictor_->getPredictionResult(frame_number, sphere_index, mu, sigma);
-}
-
-void PointcloudHumanPredictor::getPredictionResults(int frame_number, std::vector<Eigen::Vector3d>& mu, std::vector<Eigen::Matrix3d>& sigma, std::vector<double>& radius)
-{
-    predictor_->getPredictionResults(frame_number, mu, sigma);
+    predictor_->predict(time_difference, mu, sigma);
 
     radius = sphere_radius_;
 }
@@ -196,11 +193,11 @@ void PointcloudHumanPredictor::optimizeHumanShape(const Eigen::Vector3d& camera_
     }
 }
 
-void PointcloudHumanPredictor::getPredictedEllipsoids(int frame_number, std::vector<Eigen::Vector3d>& c, std::vector<Eigen::Matrix3d>& A)
+void PointcloudHumanPredictor::getPredictedEllipsoids(double time_difference, std::vector<Eigen::Vector3d>& c, std::vector<Eigen::Matrix3d>& A)
 {
     std::vector<Eigen::Matrix3d> sigma;
 
-    predictor_->getPredictionResults(frame_number, c, sigma);
+    predictor_->predict(time_difference, c, sigma);
 
     A.resize(sigma.size());
     for (int i=0; i<sigma.size(); i++)
@@ -260,18 +257,15 @@ void PointcloudHumanPredictor::visualizeHuman()
     visualizer_->drawSpheres("human", centers, radius);
 }
 
-void PointcloudHumanPredictor::visualizePredictionUpto(const int frame_count)
+void PointcloudHumanPredictor::visualizePrediction(double future_time)
 {
-    for (int i=0; i<frame_count; i++)
-    {
-        std::vector<Eigen::Vector3d> c;  // centers of ellipsoids
-        std::vector<Eigen::Matrix3d> A;  // matrixs that define ellipsoid axes
+    std::vector<Eigen::Vector3d> c;  // centers of ellipsoids
+    std::vector<Eigen::Matrix3d> A;  // matrixs that define ellipsoid axes
 
-        getPredictedEllipsoids(i, c, A);
+    getPredictedEllipsoids(future_time, c, A);
 
-        char buffer[128];
-        sprintf(buffer, "prediction_frame%d", i);
+    char buffer[128];
+    sprintf(buffer, "prediction_frame_%.3lf", future_time);
 
-        visualizer_->drawEllipsoids(buffer, c, A);
-    }
+    visualizer_->drawEllipsoids(buffer, c, A);
 }

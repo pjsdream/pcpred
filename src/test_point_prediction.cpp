@@ -51,11 +51,11 @@ int main(int argc, char** argv)
 
     const int frame_count = duration * fps;
     const int predict_frame_count = 20;
-    const int acceleration_inference_window_size = 10;
+    const int acceleration_inference_window_size = 5;
     const double radius = 0.1;
 
     PointPredictor predictor;
-    predictor.setTimestep(timestep);
+    predictor.setObservationTimestep(timestep);
     predictor.setSensorDiagonalCovariance(sensor_error * sensor_error); // variance is proportional to square of sensing error
     predictor.setAccelerationInferenceWindowSize(acceleration_inference_window_size);
 
@@ -78,14 +78,13 @@ int main(int argc, char** argv)
     for (int i=0; i<path.size(); i++)
     {
         predictor.observe(path[i]);
-        predictor.predict(predict_frame_count);
 
         for (int j=0; j<predict_frame_count; j++)
         {
             Eigen::Vector3d mu;
             Eigen::Matrix3d sigma;
 
-            predictor.getPredictionResult(j, mu, sigma);
+            predictor.predict(j * timestep, mu, sigma);
             visualizer.drawGaussianDistribution("prediction", j, mu, sigma, 0.95, radius);
 
             std::cout << "Prediction at time " << i << " of time " << i+j << std::endl;
