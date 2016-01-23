@@ -90,6 +90,17 @@ void PointcloudHumanPredictor::loadHumanShapeFromFile(const char* filename)
 }
 
 
+void PointcloudHumanPredictor::rotate(double angle, const Eigen::Vector3d& axis)
+{
+    human_shape_.rotate(angle, axis);
+}
+
+void PointcloudHumanPredictor::translate(const Eigen::Vector3d& t)
+{
+    human_shape_.translate(t);
+}
+
+
 void PointcloudHumanPredictor::predict(double time_difference, int sphere_index, Eigen::Vector3d& mu, Eigen::Matrix3d& sigma, double& radius)
 {
     predictor_->predict(time_difference, sphere_index, mu, sigma);

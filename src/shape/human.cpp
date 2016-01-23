@@ -63,6 +63,19 @@ void Human::loadHumanShapeFromFile(const char* filename)
     fclose(fp);
 }
 
+void Human::rotate(double angle, const Eigen::Vector3d& axis)
+{
+    Eigen::AngleAxisd aa(angle, axis);
+    for (int i=0; i<joints_.size(); i++)
+        joints_[i].position = aa * joints_[i].position;
+}
+
+void Human::translate(const Eigen::Vector3d& t)
+{
+    for (int i=0; i<joints_.size(); i++)
+        joints_[i].position += t;
+}
+
 void Human::addJoint(const char* joint_name, const Eigen::Vector3d& center, double radius)
 {
     joint_name_to_index_map_[joint_name] = joints_.size();

@@ -44,6 +44,9 @@ public:
 
     void loadHumanShapeFromFile(const char* filename);
 
+    void rotate(double angle, const Eigen::Vector3d& axis);
+    void translate(const Eigen::Vector3d& t);
+
     void observe(const Eigen::Vector3d& camera_position, const Pointcloud& pointcloud); // redirects to function using a list of centers
     void observe(const Eigen::Vector3d& camera_position, const std::vector<Eigen::Vector3d>& pointcloud);
 

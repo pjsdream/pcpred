@@ -56,6 +56,9 @@ public:
 
     void loadHumanShapeFromFile(const char* filename);
 
+    void rotate(double angle, const Eigen::Vector3d& axis);
+    void translate(const Eigen::Vector3d& t);
+
     void addJoint(const char* joint_name, const Eigen::Vector3d& center, double radius);
     void addCapsule(const char* joint_name1, const char* joint_name2);
     void jointPositionMove(int joint_index, const Eigen::Vector3d& displacement);

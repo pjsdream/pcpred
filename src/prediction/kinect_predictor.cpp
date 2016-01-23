@@ -44,11 +44,13 @@ void KinectPredictor::rotate(double angle, const Eigen::Vector3d& axis)
 {
     Eigen::AngleAxisd aa(angle, axis);
     transformation_.prerotate(aa);
+    predictor_.rotate(angle, axis);
 }
 
 void KinectPredictor::translate(const Eigen::Vector3d& t)
 {
     transformation_.pretranslate(t);
+    predictor_.translate(t);
 }
 
 
