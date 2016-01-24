@@ -10,7 +10,7 @@ using namespace pcpred;
 
 int main(int argc, char** argv)
 {
-    std::string filename = "../data/bvh/walking.bvh";
+    std::string filename = "package://pcpred/data/bvh/walking.bvh";
     if (argc >= 2)
         filename = argv[1];
 

@@ -1,8 +1,18 @@
 #include <pcpred/import/openni_importer.h>
 
+#include <resource_retriever/retriever.h>
+
 #include <stdio.h>
 
 using namespace pcpred;
+
+
+
+void OpenniImporter::readStream(void* buffer, int bytes, char*& stream)
+{
+    memcpy(buffer, stream, bytes);
+    stream += bytes;
+}
 
 
 OpenniImporter::OpenniImporter()
@@ -14,11 +24,72 @@ OpenniImporter::OpenniImporter()
 bool OpenniImporter::import(int sequence_number, int frame)
 {
     char filename[128];
+    char package_filename[128];
+
     sprintf(filename, "../data/C%d/image%04d.txt", sequence_number, frame);
     FILE* fp = fopen(filename, "rb");
-    if (fp == NULL)
-        return false;
 
+    if (fp == NULL)
+    {
+        resource_retriever::Retriever retriever;
+        resource_retriever::MemoryResource resource;
+
+        sprintf(package_filename, "package://pcpred/data/C%d/image%04d.txt", sequence_number, frame);
+
+        try
+        {
+            resource = retriever.get(package_filename);
+        }
+        catch (resource_retriever::Exception& e)
+        {
+            return false;
+        }
+
+        readData((char*)resource.data.get());
+    }
+    else
+    {
+        readData(fp);
+    }
+
+
+    if (last_sequence_number_ != sequence_number)
+    {
+        sprintf(filename, "../data/C%d/crop.txt", sequence_number);
+        fp = fopen(filename, "r");
+        if (fp == NULL)
+        {
+            resource_retriever::Retriever retriever;
+            resource_retriever::MemoryResource resource;
+
+            sprintf(package_filename, "package://pcpred/data/C%d/crop.txt", sequence_number);
+
+            try
+            {
+                resource = retriever.get(package_filename);
+            }
+            catch (resource_retriever::Exception& e)
+            {
+                return false;
+            }
+
+            std::istringstream s((char*)resource.data.get());
+            readCrop(s);
+        }
+        else
+        {
+            readCrop(fp);
+        }
+
+        last_sequence_number_ = sequence_number;
+    }
+
+    convertToPointcloud();
+    return true;
+}
+
+void OpenniImporter::readData(FILE*& fp)
+{
     float intrinsics[9];
     fread(intrinsics, sizeof(float), 9, fp);
     intrinsics_ = Eigen::Map<Eigen::Matrix<float, 3, 3> >(intrinsics).cast<double>();
@@ -42,21 +113,47 @@ bool OpenniImporter::import(int sequence_number, int frame)
 
     delete data;
     fclose(fp);
+}
 
-    if (last_sequence_number_ != sequence_number)
+void OpenniImporter::readData(char* stream)
+{
+    float intrinsics[9];
+    readStream(intrinsics, sizeof(float) * 9, stream);
+    intrinsics_ = Eigen::Map<Eigen::Matrix<float, 3, 3> >(intrinsics).cast<double>();
+
+    unsigned short dim[2];
+    readStream(dim, sizeof(unsigned short) * 2, stream);
+
+    unsigned short* data = new unsigned short[dim[0] * dim[1]];
+    readStream(data, sizeof(unsigned short) * dim[0] * dim[1], stream);
+
+    raw_data_.resize(dim[0], dim[1]);
+    for (int i=0; i<dim[0]; i++)
     {
-        sprintf(filename, "../data/C%d/crop.txt", sequence_number);
-        fp = fopen(filename, "r");
-
-        fscanf(fp, "%d%lf%lf%lf%lf", &background_intensity_, &crop_[0], &crop_[1], &crop_[2], &crop_[3]);
-
-        fclose(fp);
-
-        last_sequence_number_ = sequence_number;
+        for (int j=0; j<dim[1]; j++)
+        {
+            raw_data_(i, j) = data[i*dim[1] + j];
+            if (raw_data_(i, j) == 0)
+                raw_data_(i, j) = 65535;
+        }
     }
 
+    delete data;
+}
 
+void OpenniImporter::readCrop(FILE*& fp)
+{
+    fscanf(fp, "%d%lf%lf%lf%lf", &background_intensity_, &crop_[0], &crop_[1], &crop_[2], &crop_[3]);
+    fclose(fp);
+}
 
+void OpenniImporter::readCrop(std::istringstream& s)
+{
+    s >> background_intensity_ >> crop_[0] >> crop_[1] >> crop_[2] >> crop_[3];
+}
+
+void OpenniImporter::convertToPointcloud()
+{
     pointcloud_.clear();
 
     const int V = raw_data_.rows();
@@ -70,7 +167,7 @@ bool OpenniImporter::import(int sequence_number, int frame)
             cols++;
     }
     if (cols == 0)
-        return true;
+        return;
 
     Eigen::Matrix3Xd B(3, cols);
     int col = 0;
@@ -109,8 +206,6 @@ bool OpenniImporter::import(int sequence_number, int frame)
             col++;
         }
     }
-
-    return true;
 }
 
 std::vector<Eigen::Vector3d> OpenniImporter::pointcloud()

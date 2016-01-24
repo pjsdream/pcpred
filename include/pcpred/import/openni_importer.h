@@ -3,6 +3,7 @@
 
 
 #include <vector>
+#include <sstream>
 
 #include <Eigen/Dense>
 
@@ -12,6 +13,10 @@ namespace pcpred
 
 class OpenniImporter
 {
+private:
+
+    static void readStream(void* buffer, int bytes, char*& stream);
+
 public:
 
     OpenniImporter();
@@ -23,6 +28,12 @@ public:
     inline Eigen::Vector3d cameraPosition() { return Eigen::Vector3d(0., 0., 0.); }
 
 private:
+
+    void readData(FILE*& fp);
+    void readData(char* stream);
+    void readCrop(FILE*& fp);
+    void readCrop(std::istringstream& s);
+    void convertToPointcloud();
 
     Eigen::MatrixXd raw_data_;
 

@@ -43,8 +43,6 @@ int main(int argc, char** argv)
     predictor.setGradientDescentAlpha(0.005);
     predictor.setHumanShapeLengthConstraintEpsilon(0.01);
 
-    predictor.rotate(M_PI / 2.0, Eigen::Vector3d(0, 1, 0));
-
     predictor.setVisualizerTopic("kinect_prediction");
 
     // input sequence transformation

@@ -12,6 +12,10 @@ namespace pcpred
 
 class GVVDataImporter
 {
+private:
+
+    static void readStream(void* buffer, int bytes, char*& stream);
+
 public:
 
     bool import(int sequence, int frame, bool median_filter);
@@ -29,6 +33,7 @@ public:
 private:
 
     void loadDepthFrameFromFile(const char* filename);
+    void loadDepthFrameFromFile(char* stream);
     void get3DPointCloudFromDepthFrame(bool median_filter);
     bool existFile(const char* filename);
 

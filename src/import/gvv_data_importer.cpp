@@ -1,5 +1,7 @@
 #include <pcpred/import/gvv_data_importer.h>
 
+#include <resource_retriever/retriever.h>
+
 #include <cassert>
 
 #include <stdio.h>
@@ -13,6 +15,12 @@
 
 using namespace pcpred;
 
+
+void GVVDataImporter::readStream(void* buffer, int bytes, char*& stream)
+{
+    memcpy(buffer, stream, bytes);
+    stream += bytes;
+}
 
 void GVVDataImporter::printFrameInfo()
 {
@@ -136,9 +144,29 @@ bool GVVDataImporter::existFile(const char* filename)
 bool GVVDataImporter::import(int sequence, int frame, bool median_filter)
 {
     char filename[128];
-    sprintf(filename, "../data/D%d/depth%04d.bin", sequence, frame);
+    sprintf(filename, "../data/D%d/depth%04d.binaaa", sequence, frame);
     if (!existFile(filename))
-        return false;
+    {
+        char package_filename[128];
+        sprintf(package_filename, "package://pcpred/data/D%d/depth%04d.bin", sequence, frame);
+
+        resource_retriever::Retriever retriever;
+        resource_retriever::MemoryResource resource;
+
+        try
+        {
+            resource = retriever.get(package_filename);
+        }
+        catch (resource_retriever::Exception& e)
+        {
+            return false;
+        }
+
+        loadDepthFrameFromFile((char *)resource.data.get());
+        get3DPointCloudFromDepthFrame(median_filter);
+
+        return true;
+    }
 
     loadDepthFrameFromFile(filename);
     get3DPointCloudFromDepthFrame(median_filter);
@@ -149,9 +177,28 @@ bool GVVDataImporter::import(int sequence, int frame, bool median_filter)
 bool GVVDataImporter::importDepthFrame(int sequence, int frame)
 {
     char filename[128];
-    sprintf(filename, "../data/D%d/depth%04d.bin", sequence, frame);
+    sprintf(filename, "../data/D%d/depth%04d.binaaa", sequence, frame);
     if (!existFile(filename))
-        return false;
+    {
+        char package_filename[128];
+        sprintf(package_filename, "package://pcpred/data/D%d/depth%04d.bin", sequence, frame);
+
+        resource_retriever::Retriever retriever;
+        resource_retriever::MemoryResource resource;
+
+        try
+        {
+            resource = retriever.get(package_filename);
+        }
+        catch (resource_retriever::Exception& e)
+        {
+            return false;
+        }
+
+        loadDepthFrameFromFile((char *)resource.data.get());
+
+        return true;
+    }
 
     loadDepthFrameFromFile(filename);
 
@@ -178,7 +225,7 @@ void GVVDataImporter::loadDepthFrameFromFile(const char* filename)
     fread(matrix, sizeof(float), 16, fp);
     intrinsics_ = Eigen::Map<Eigen::Matrix4f>(matrix).cast<double>();
 
-    fread(&size_, sizeof(float), 1, fp);
+    fread(&size_, sizeof(int), 1, fp);
 
     unsigned short* raw_data_short_ = new unsigned short[size_ / 2];
     fread(raw_data_short_, sizeof(unsigned short), size_ / 2, fp);
@@ -201,6 +248,49 @@ void GVVDataImporter::loadDepthFrameFromFile(const char* filename)
     delete raw_data_short_;
     delete raw_data_;
     fclose(fp);
+}
+
+void GVVDataImporter::loadDepthFrameFromFile(char* stream)
+{
+    short magic_number;
+    readStream(&magic_number, sizeof(short), stream);
+    assert(magic_number == 28746); // Unknown file type!
+
+    readStream(dim_, sizeof(short) * 2, stream);
+    readStream(&memory_layout_, sizeof(int), stream);
+    readStream(&min_, sizeof(short), stream);
+    readStream(&max_, sizeof(short), stream);
+    readStream(&special_, sizeof(short), stream);
+
+    float matrix[16];
+    readStream(matrix, sizeof(float) * 16, stream);
+    extrinsics_ = Eigen::Map<Eigen::Matrix4f>(matrix).cast<double>(); // both matlab fread and eigen map fill in column-major order
+    readStream(matrix, sizeof(float) * 16, stream);
+    intrinsics_ = Eigen::Map<Eigen::Matrix4f>(matrix).cast<double>();
+
+    readStream(&size_, sizeof(int), stream);
+    fflush(stdout);
+
+    unsigned short* raw_data_short_ = new unsigned short[size_ / 2];
+    readStream(raw_data_short_, sizeof(unsigned short) * (size_ / 2), stream);
+
+    double* raw_data_ = new double[size_ / 2];
+    for (int i=0; i<size_ / 2; i++)
+        raw_data_[i] = raw_data_short_[i];
+
+    assert(min_ == 0 && max_ == 0 && special_ == 0); // Only 16-Bit uncompressed depth maps are supported!
+
+    switch (memory_layout_)
+    {
+    case 0:
+        data_ = Eigen::Map<Eigen::MatrixXd>(raw_data_, (int)dim_[0], (int)dim_[1]).transpose().colwise().reverse();
+        break;
+    default:
+        ROS_ERROR("GVV data importer: Memory layout %d not yet supported!", memory_layout_);
+    }
+
+    delete raw_data_short_;
+    delete raw_data_;
 }
 
 void GVVDataImporter::get3DPointCloudFromDepthFrame(bool median_filter)

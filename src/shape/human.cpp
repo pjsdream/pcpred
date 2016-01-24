@@ -1,5 +1,7 @@
 #include <pcpred/shape/human.h>
 
+#include <resource_retriever/retriever.h>
+
 #include <algorithm>
 
 #include <stdlib.h>
@@ -39,28 +41,71 @@ void Human::loadHumanShapeFromFile(const char* filename)
     capsules_.clear();
 
     FILE* fp = fopen(filename, "r");
-
-    char name1[128];
-    char name2[128];
-
-    int num_joints;
-    fscanf(fp, "%d", &num_joints);
-    for (int i=0; i<num_joints; i++)
+    if (fp == NULL)
     {
-        double x, y, z, r;
-        fscanf(fp, "%s%lf%lf%lf%lf", name1, &x, &y, &z, &r);
-        addJoint(name1, Eigen::Vector3d(x, y, z), r);
+        // assuem filename = "../data/..."
+        char package_filename[128];
+        sprintf(package_filename, "package://pcpred/%s", filename + 3);
+
+        resource_retriever::Retriever retriever;
+        resource_retriever::MemoryResource resource;
+
+        try
+        {
+            resource = retriever.get(package_filename);
+        }
+        catch (resource_retriever::Exception& e)
+        {
+            return;
+        }
+
+        std::istringstream s((char*)resource.data.get());
+
+        char name1[128];
+        char name2[128];
+
+        int num_joints;
+        s >> num_joints;
+        for (int i=0; i<num_joints; i++)
+        {
+            double x, y, z, r;
+            s >> name1 >> x >> y >> z >> r;
+            addJoint(name1, Eigen::Vector3d(x, y, z), r);
+        }
+
+        int num_capsules;
+        s >> num_capsules;
+        for (int i=0; i<num_capsules; i++)
+        {
+            s >> name1 >> name2;
+            addCapsule(name1, name2);
+        }
     }
 
-    int num_capsules;
-    fscanf(fp, "%d", &num_capsules);
-    for (int i=0; i<num_capsules; i++)
+    else
     {
-        fscanf(fp, "%s%s", name1, name2);
-        addCapsule(name1, name2);
-    }
+        char name1[128];
+        char name2[128];
 
-    fclose(fp);
+        int num_joints;
+        fscanf(fp, "%d", &num_joints);
+        for (int i=0; i<num_joints; i++)
+        {
+            double x, y, z, r;
+            fscanf(fp, "%s%lf%lf%lf%lf", name1, &x, &y, &z, &r);
+            addJoint(name1, Eigen::Vector3d(x, y, z), r);
+        }
+
+        int num_capsules;
+        fscanf(fp, "%d", &num_capsules);
+        for (int i=0; i<num_capsules; i++)
+        {
+            fscanf(fp, "%s%s", name1, name2);
+            addCapsule(name1, name2);
+        }
+
+        fclose(fp);
+    }
 }
 
 void Human::rotate(double angle, const Eigen::Vector3d& axis)

@@ -5,6 +5,7 @@
 #include <vector>
 #include <string>
 #include <map>
+#include <sstream>
 #include <utility>
 
 #include <Eigen/Dense>
@@ -52,9 +53,13 @@ public:
 private:
 
     void initialize();
+
     void readHierarchy(FILE*& fp);
+    void readHierarchy(std::istringstream& s);
     void readMotion(FILE*& fp);
+    void readMotion(std::istringstream& s);
     void readHierarchyJoint(FILE*& fp, int parent_index);
+    void readHierarchyJoint(std::istringstream& s, int parent_index);
 
     double frame_time_;
     int num_frames_;
