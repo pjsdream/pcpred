@@ -144,7 +144,7 @@ bool GVVDataImporter::existFile(const char* filename)
 bool GVVDataImporter::import(int sequence, int frame, bool median_filter)
 {
     char filename[128];
-    sprintf(filename, "../data/D%d/depth%04d.binaaa", sequence, frame);
+    sprintf(filename, "../data/D%d/depth%04d.bin", sequence, frame);
     if (!existFile(filename))
     {
         char package_filename[128];
@@ -177,7 +177,7 @@ bool GVVDataImporter::import(int sequence, int frame, bool median_filter)
 bool GVVDataImporter::importDepthFrame(int sequence, int frame)
 {
     char filename[128];
-    sprintf(filename, "../data/D%d/depth%04d.binaaa", sequence, frame);
+    sprintf(filename, "../data/D%d/depth%04d.bin", sequence, frame);
     if (!existFile(filename))
     {
         char package_filename[128];
