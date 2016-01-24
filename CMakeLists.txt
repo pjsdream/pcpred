@@ -129,3 +129,9 @@ rosbuild_add_executable(test_kinect_prediction
 src/test_kinect_prediction.cpp
 )
 target_link_libraries(test_kinect_prediction pcpred)
+
+# demo
+rosbuild_add_executable(demo
+src/demo.cpp
+)
+target_link_libraries(demo pcpred)
