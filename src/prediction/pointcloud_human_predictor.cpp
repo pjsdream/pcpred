@@ -58,22 +58,108 @@ void PointcloudHumanPredictor::loadHumanShapeFromFile(const char* filename)
 {
     human_shape_.loadHumanShapeFromFile(filename);
 
+    is_arm_.clear();
+    shoulder_sphere_index_.clear();
+    length_limit_.clear();
+    int shoulder_index[2][2];
+    double lengths[2][2];
+
     sphere_radius_.clear();
     for (int i=0; i<human_shape_.numJoints(); i++)
+    {
         sphere_radius_.push_back(human_shape_.jointRadius(i));
+
+        if (human_shape_.jointName(i) == "LS")
+        {
+            shoulder_index[0][0] = i;
+        }
+        else if (human_shape_.jointName(i) == "RS")
+        {
+            shoulder_index[1][0] = i;
+        }
+
+        if (human_shape_.jointName(i) == "LE")
+        {
+            shoulder_index[0][1] = i;
+            lengths[0][0] = (human_shape_.jointPosition(i) - human_shape_.jointPosition(shoulder_index[0][0])).norm();
+            is_arm_.push_back(true);
+            shoulder_sphere_index_.push_back(shoulder_index[0][0]);
+            length_limit_.push_back(lengths[0][0]);
+        }
+        else if (human_shape_.jointName(i) == "LW")
+        {
+            lengths[0][1] = (human_shape_.jointPosition(i) - human_shape_.jointPosition(shoulder_index[0][1])).norm();
+            is_arm_.push_back(true);
+            shoulder_sphere_index_.push_back(shoulder_index[0][0]);
+            length_limit_.push_back(lengths[0][0] + lengths[0][1]);
+        }
+        else if (human_shape_.jointName(i) == "RE")
+        {
+            shoulder_index[1][1] = i;
+            lengths[1][0] = (human_shape_.jointPosition(i) - human_shape_.jointPosition(shoulder_index[1][0])).norm();
+            is_arm_.push_back(true);
+            shoulder_sphere_index_.push_back(shoulder_index[1][0]);
+            length_limit_.push_back(lengths[1][0]);
+        }
+        else if (human_shape_.jointName(i) == "RW")
+        {
+            lengths[1][1] = (human_shape_.jointPosition(i) - human_shape_.jointPosition(shoulder_index[1][1])).norm();
+            is_arm_.push_back(true);
+            shoulder_sphere_index_.push_back(shoulder_index[1][0]);
+            length_limit_.push_back(lengths[1][0] + lengths[1][1]);
+        }
+        else
+        {
+            is_arm_.push_back(false);
+            shoulder_sphere_index_.push_back(0);
+            length_limit_.push_back(0.0);
+        }
+    }
 
     for (int i=0; i<human_shape_.numCapsules(); i++)
     {
+        std::string joint_names[2];
         Eigen::Vector3d capsule_centers[2];
         double capsule_radius[2];
 
-        human_shape_.getCapsule(i, capsule_centers, capsule_radius);
+        human_shape_.getCapsule(i, joint_names, capsule_centers, capsule_radius);
 
         for (int j=1; j<=capsule_divisor_; j++)
         {
             const double t = (double)j / (capsule_divisor_ + 1);
 
             sphere_radius_.push_back( (1.-t) * capsule_radius[0] + t * capsule_radius[1] );
+
+            if (joint_names[1] == "LE")
+            {
+                is_arm_.push_back(true);
+                shoulder_sphere_index_.push_back(shoulder_index[0][0]);
+                length_limit_.push_back(lengths[0][0] * t);
+            }
+            else if (joint_names[1] == "LW")
+            {
+                is_arm_.push_back(true);
+                shoulder_sphere_index_.push_back(shoulder_index[0][0]);
+                length_limit_.push_back(lengths[0][0] + lengths[0][1] * t);
+            }
+            else if (joint_names[1] == "RE")
+            {
+                is_arm_.push_back(true);
+                shoulder_sphere_index_.push_back(shoulder_index[1][0]);
+                length_limit_.push_back(lengths[1][0] * t);
+            }
+            else if (joint_names[1] == "RW")
+            {
+                is_arm_.push_back(true);
+                shoulder_sphere_index_.push_back(shoulder_index[1][0]);
+                length_limit_.push_back(lengths[1][0] + lengths[1][1] * t);
+            }
+            else
+            {
+                is_arm_.push_back(false);
+                shoulder_sphere_index_.push_back(0);
+                length_limit_.push_back(0.0);
+            }
         }
     }
 
@@ -105,14 +191,32 @@ void PointcloudHumanPredictor::predict(double time_difference, int sphere_index,
 {
     predictor_->predict(time_difference, sphere_index, mu, sigma);
 
+    if (is_arm_[sphere_index])
+    {
+        const double l = length_limit_[sphere_index];
+        const int shoulder_sphere_index = shoulder_sphere_index_[sphere_index];
+        Eigen::Vector3d s_mu;
+        Eigen::Matrix3d s_sigma;
+
+        predictor_->predict(time_difference, shoulder_sphere_index, s_mu, s_sigma);
+        const double lt = (s_mu - mu).norm();
+
+        if (lt > l)
+            mu = s_mu + (mu - s_mu) / lt * l;
+    }
+
     radius = sphere_radius_[sphere_index];
 }
 
 void PointcloudHumanPredictor::predict(double time_difference, std::vector<Eigen::Vector3d>& mu, std::vector<Eigen::Matrix3d>& sigma, std::vector<double>& radius)
 {
-    predictor_->predict(time_difference, mu, sigma);
+    const int size = predictor_->numSpheres();
+    mu.resize(size);
+    sigma.resize(size);
+    radius.resize(size);
 
-    radius = sphere_radius_;
+    for (int i=0; i<size; i++)
+        predict(time_difference, i, mu[i], sigma[i], radius[i]);
 }
 
 
@@ -208,7 +312,9 @@ void PointcloudHumanPredictor::getPredictedEllipsoids(double time_difference, st
 {
     std::vector<Eigen::Matrix3d> sigma;
 
-    predictor_->predict(time_difference, c, sigma);
+    std::vector<double> radius;
+
+    predict(time_difference, c, sigma, radius);
 
     A.resize(sigma.size());
     for (int i=0; i<sigma.size(); i++)

@@ -34,6 +34,19 @@ void Human::getCapsule(int capsule_index, Eigen::Vector3d centers[2], double rad
     radius[1] = joints_[joint_index1].radius;
 }
 
+void Human::getCapsule(int capsule_index, std::string joint_names[2], Eigen::Vector3d centers[2], double radius[2])
+{
+    const int joint_index0 = capsules_[capsule_index].joint_ids[0];
+    const int joint_index1 = capsules_[capsule_index].joint_ids[1];
+
+    joint_names[0] = joints_[joint_index0].name;
+    joint_names[1] = joints_[joint_index1].name;
+    centers[0] = joints_[joint_index0].position;
+    centers[1] = joints_[joint_index1].position;
+    radius[0] = joints_[joint_index0].radius;
+    radius[1] = joints_[joint_index1].radius;
+}
+
 void Human::loadHumanShapeFromFile(const char* filename)
 {
     joint_name_to_index_map_.clear();
@@ -126,6 +139,7 @@ void Human::addJoint(const char* joint_name, const Eigen::Vector3d& center, doub
     joint_name_to_index_map_[joint_name] = joints_.size();
 
     HumanJoint joint;
+    joint.name = joint_name;
     joint.position = center;
     joint.radius = radius;
     joints_.push_back(joint);

@@ -19,6 +19,7 @@ private:
 
     struct HumanJoint
     {
+        std::string name;
         Eigen::Vector3d position;
         double radius;
     };
@@ -37,6 +38,7 @@ public:
     inline int numCapsules() { return capsules_.size(); }
     inline Eigen::Vector3d jointPosition(int joint_index) { return joints_[joint_index].position; }
     inline double jointRadius(int joint_index) { return joints_[joint_index].radius; }
+    inline std::string jointName(int joint_index) { return joints_[joint_index].name; }
     inline std::pair<int, int> capsuleEndpointJointIndices(int capsule_index)
     {
         return std::make_pair<int, int>(
@@ -46,6 +48,7 @@ public:
     inline double capsuleInitialLength(int capsule_index) { return capsules_[capsule_index].initial_length; }
 
     void getCapsule(int capsule_index, Eigen::Vector3d centers[2], double radius[2]);
+    void getCapsule(int capsule_index, std::string joint_names[2], Eigen::Vector3d centers[2], double radius[2]);
 
     inline void setIterativeProjectionMaximumIteration(int iteration) { iterative_projection_max_iteration_ = iteration; }
     inline void setIterativeProjectionAlpha(double alpha) { iterative_projection_alpha_ = alpha; }

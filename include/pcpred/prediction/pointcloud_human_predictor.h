@@ -65,6 +65,9 @@ private:
 
     Human human_shape_;
     std::vector<double> sphere_radius_;
+    std::vector<char> is_arm_;
+    std::vector<int> shoulder_sphere_index_;
+    std::vector<double> length_limit_;
 
     PointsPredictor* predictor_;
 

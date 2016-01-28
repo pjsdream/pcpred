@@ -80,7 +80,7 @@ void PointObstacleKalmanFilter::predict(double time_difference, Eigen::VectorXd&
 
 void PointObstacleKalmanFilter::computeAccelerationAndVariance()
 {
-    const double motion_variance = 0.01 * timestep_ * timestep_;
+    const double motion_variance = 0.1 * timestep_ * timestep_;
 
     e_sigma_ = Eigen::Matrix<double, 6, 6>::Zero();
     e_sigma_.block(3, 3, 3, 3) = Eigen::Matrix3d::Identity() * motion_variance;
