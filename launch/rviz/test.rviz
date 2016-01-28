@@ -10,6 +10,8 @@ Panels:
         - /MarkerArray4/Namespaces1
         - /MarkerArray5/Namespaces1
         - /Grid3/Offset1
+        - /figures1
+        - /figures1/Namespaces1
       Splitter Ratio: 0.520134
     Tree Height: 576
   - Class: rviz/Selection
@@ -71,12 +73,12 @@ Visualization Manager:
       Reference Frame: <Fixed Frame>
       Value: false
     - Class: rviz/Axes
-      Enabled: false
+      Enabled: true
       Length: 1
       Name: Axes
       Radius: 0.01
       Reference Frame: <Fixed Frame>
-      Value: false
+      Value: true
     - Class: rviz/MarkerArray
       Enabled: false
       Marker Topic: /bvh_prediction_test
@@ -208,7 +210,7 @@ Visualization Manager:
       Color: 255; 255; 255
       Color Transformer: Intensity
       Decay Time: 0
-      Enabled: true
+      Enabled: false
       Invert Rainbow: false
       Max Color: 255; 255; 255
       Max Intensity: 4096
@@ -224,6 +226,83 @@ Visualization Manager:
       Topic: /openni_test
       Use Fixed Frame: true
       Use rainbow: true
+      Value: false
+    - Alpha: 1
+      Autocompute Intensity Bounds: true
+      Autocompute Value Bounds:
+        Max Value: 10
+        Min Value: -10
+        Value: true
+      Axis: Z
+      Channel Name: intensity
+      Class: rviz/PointCloud2
+      Color: 255; 255; 255
+      Color Transformer: Intensity
+      Decay Time: 0
+      Enabled: false
+      Invert Rainbow: false
+      Max Color: 255; 255; 255
+      Max Intensity: 4096
+      Min Color: 0; 0; 0
+      Min Intensity: 0
+      Name: PointCloud2
+      Position Transformer: XYZ
+      Queue Size: 10
+      Selectable: true
+      Size (Pixels): 3
+      Size (m): 0.01
+      Style: Spheres
+      Topic: /kinect_prediction_pointcloud
+      Use Fixed Frame: true
+      Use rainbow: true
+      Value: false
+    - Class: rviz/MarkerArray
+      Enabled: false
+      Marker Topic: /kinect_prediction
+      Name: MarkerArray
+      Namespaces:
+        {}
+      Queue Size: 100
+      Value: false
+    - Alpha: 0.5
+      Cell Size: 0.1
+      Class: rviz/Grid
+      Color: 160; 160; 164
+      Enabled: false
+      Line Style:
+        Line Width: 0.03
+        Value: Lines
+      Name: Grid
+      Normal Cell Count: 0
+      Offset:
+        X: -0.4
+        Y: 0
+        Z: 0
+      Plane: YZ
+      Plane Cell Count: 1000
+      Reference Frame: <Fixed Frame>
+      Value: false
+    - Class: rviz/Marker
+      Enabled: false
+      Marker Topic: /prediction_test
+      Name: Marker
+      Namespaces:
+        {}
+      Queue Size: 100
+      Value: false
+    - Class: rviz/MarkerArray
+      Enabled: true
+      Marker Topic: /figures
+      Name: figures
+      Namespaces:
+        human: true
+        prediction_frame_0.000: true
+        prediction_frame_0.050: false
+        prediction_frame_0.100: false
+        prediction_frame_0.150: false
+        prediction_frame_0.200: false
+        prediction_frame_0.250: false
+      Queue Size: 100
       Value: true
     - Alpha: 1
       Autocompute Intensity Bounds: true
@@ -243,51 +322,17 @@ Visualization Manager:
       Max Intensity: 4096
       Min Color: 0; 0; 0
       Min Intensity: 0
-      Name: PointCloud2
+      Name: figures
       Position Transformer: XYZ
       Queue Size: 10
       Selectable: true
       Size (Pixels): 3
       Size (m): 0.01
-      Style: Spheres
-      Topic: /kinect_prediction_pointcloud
+      Style: Flat Squares
+      Topic: /figures_pointcloud
       Use Fixed Frame: true
       Use rainbow: true
       Value: true
-    - Class: rviz/MarkerArray
-      Enabled: true
-      Marker Topic: /kinect_prediction
-      Name: MarkerArray
-      Namespaces:
-        {}
-      Queue Size: 100
-      Value: true
-    - Alpha: 0.5
-      Cell Size: 0.1
-      Class: rviz/Grid
-      Color: 160; 160; 164
-      Enabled: false
-      Line Style:
-        Line Width: 0.03
-        Value: Lines
-      Name: Grid
-      Normal Cell Count: 0
-      Offset:
-        X: 0.6
-        Y: 0
-        Z: 0
-      Plane: YZ
-      Plane Cell Count: 1000
-      Reference Frame: <Fixed Frame>
-      Value: false
-    - Class: rviz/Marker
-      Enabled: false
-      Marker Topic: /prediction_test
-      Name: Marker
-      Namespaces:
-        {}
-      Queue Size: 100
-      Value: false
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -312,22 +357,22 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 4.57885
+      Distance: 2.77098
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.06
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: -0.088091
-        Y: -0.106311
-        Z: 0.614054
+        X: -0.426033
+        Y: 0.0651787
+        Z: 0.668123
       Name: Current View
       Near Clip Distance: 0.01
-      Pitch: 0.249798
+      Pitch: 0.545203
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 6.19987
+      Yaw: 6.25484
     Saved: ~
 Window Geometry:
   Displays:
@@ -345,5 +390,5 @@ Window Geometry:
   Views:
     collapsed: false
   Width: 1543
-  X: 302
-  Y: 249
+  X: 224
+  Y: 165
