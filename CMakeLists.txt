@@ -135,3 +135,9 @@ rosbuild_add_executable(demo
 src/demo.cpp
 )
 target_link_libraries(demo pcpred)
+
+# figures
+rosbuild_add_executable(figures
+src/figures.cpp
+)
+target_link_libraries(figures pcpred)

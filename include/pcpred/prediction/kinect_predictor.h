@@ -44,6 +44,7 @@ public:
 
     // prediction result at a specific future time as a list of ellipsoids
     void getPredictedGaussianDistribution(double future_time, std::vector<Eigen::Vector3d>& mu, std::vector<Eigen::Matrix3d>& sigma, std::vector<double>& radius);
+    inline const Pointcloud& pointcloud() { return pointcloud_; }
 
     void setVisualizerTopic(const char* topic);
     void visualizePointcloud();

@@ -36,7 +36,7 @@ void MarkerArrayVisualizer::drawSphere(const char* ns, const Eigen::Vector3d& ce
 
     visualization_msgs::Marker marker;
 
-    marker.header.frame_id = "/world";
+    marker.header.frame_id = "/segment_0";
     marker.header.stamp = ros::Time::now();
 
     marker.ns = ns;
@@ -78,7 +78,7 @@ void MarkerArrayVisualizer::drawSpheres(const char* ns, const std::vector<Eigen:
     {
         visualization_msgs::Marker marker;
 
-        marker.header.frame_id = "/world";
+        marker.header.frame_id = "/segment_0";
         marker.header.stamp = ros::Time::now();
 
         marker.ns = ns;
@@ -121,7 +121,7 @@ void MarkerArrayVisualizer::drawEllipsoids(const char* ns, const std::vector<Eig
     {
         visualization_msgs::Marker marker;
 
-        marker.header.frame_id = "/world";
+        marker.header.frame_id = "/segment_0";
         marker.header.stamp = ros::Time::now();
 
         marker.ns = ns;
@@ -171,7 +171,7 @@ void MarkerArrayVisualizer::drawSphereList(const char* ns, const std::vector<Eig
 
     visualization_msgs::Marker marker;
 
-    marker.header.frame_id = "/world";
+    marker.header.frame_id = "/segment_0";
     marker.header.stamp = ros::Time::now();
 
     marker.ns = ns;
@@ -219,7 +219,7 @@ void MarkerArrayVisualizer::drawLineStrip(const char* ns, const std::vector<Eige
 
     visualization_msgs::Marker marker;
 
-    marker.header.frame_id = "/world";
+    marker.header.frame_id = "/segment_0";
     marker.header.stamp = ros::Time::now();
 
     marker.ns = ns;
@@ -267,7 +267,7 @@ void MarkerArrayVisualizer::drawLineList(const char* ns, const std::vector<Eigen
 
     visualization_msgs::Marker marker;
 
-    marker.header.frame_id = "/world";
+    marker.header.frame_id = "/segment_0";
     marker.header.stamp = ros::Time::now();
 
     marker.ns = ns;
