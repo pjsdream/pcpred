@@ -11,17 +11,24 @@ class Singleton
 public:
 
 	virtual ~Singleton(void) {}
+    static bool isCreated();
 	static T* getInstance();
     static void destroy();
+    Singleton(void) {}
 
 protected:
 
-	Singleton(void) {}
 	static T* instance_;
 };
 
 template<class T>
 T* Singleton<T>::instance_ = 0;
+
+template<class T>
+bool Singleton<T>::isCreated()
+{
+    return instance_ != 0;
+}
 
 template<class T>
 T* Singleton<T>::getInstance()

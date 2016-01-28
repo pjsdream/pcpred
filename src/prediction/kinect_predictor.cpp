@@ -8,10 +8,17 @@ using namespace pcpred;
 const double KinectPredictor::motion_timestep_ = 0.033;
 
 
+KinectPredictor::KinectPredictor()
+{
+}
+
 KinectPredictor::KinectPredictor(int sequence_number)
 {
-    sequence_number_ = sequence_number;
+    setSequence(sequence_number);
+}
 
+void KinectPredictor::setSequence(int sequence_number)
+{
     pointcloud_visualizer_ = 0;
     time_ = -1.0;
 
@@ -23,6 +30,7 @@ KinectPredictor::KinectPredictor(int sequence_number)
     translate(Eigen::Vector3d(2.0, 0.0, 0.75));
 
     // load human shape
+    sequence_number_ = sequence_number;
     char filename[128];
     sprintf(filename, "../data/human/C%d.txt", sequence_number);
     predictor_.loadHumanShapeFromFile(filename);

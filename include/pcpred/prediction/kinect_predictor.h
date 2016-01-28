@@ -21,7 +21,9 @@ private:
 
 public:
 
+    KinectPredictor();
     KinectPredictor(int sequence_number);
+    void setSequence(int sequence_number);
 
     // transform of input sequences
     void rotate(double angle, const Eigen::Vector3d& axis);
