@@ -14,7 +14,7 @@ PointObstacleKalmanFilter::PointObstacleKalmanFilter()
 {
     A_ = Eigen::Matrix<double, 6, 6>::Identity();
     B_ = Eigen::Matrix<double, 6, 3>::Zero();
-    B_.block(0, 0, 3, 3) = Eigen::Matrix3d::Identity();
+    B_.block(3, 0, 3, 3) = Eigen::Matrix3d::Identity();
     C_ = Eigen::Matrix<double, 6, 6>::Identity();
     d_sigma_ = Eigen::Matrix<double, 6, 6>::Zero();
 
@@ -28,7 +28,6 @@ void PointObstacleKalmanFilter::setObservationTimestep(double timestep)
     timestep_ = timestep;
 
     A_.block(0, 3, 3, 3) = Eigen::Matrix3d::Identity() * timestep;
-    B_.block(3, 0, 3, 3) = Eigen::Matrix3d::Identity() * timestep;
 }
 
 void PointObstacleKalmanFilter::setSensorDiagonalCovariance(double v)
@@ -84,10 +83,8 @@ void PointObstacleKalmanFilter::computeAccelerationAndVariance()
     const double motion_variance = 0.01 * timestep_ * timestep_;
 
     e_sigma_ = Eigen::Matrix<double, 6, 6>::Zero();
-    e_sigma_.block(0, 0, 3, 3) = Eigen::Matrix3d::Identity() * motion_variance * timestep_ * timestep_;
     e_sigma_.block(3, 3, 3, 3) = Eigen::Matrix3d::Identity() * motion_variance;
     u_ = Eigen::Vector3d(0, 0, 0);
-    return;
 
     const int history_count = x_mu_history_.size();
 
@@ -98,15 +95,15 @@ void PointObstacleKalmanFilter::computeAccelerationAndVariance()
 
     else
     {
-        Eigen::Vector3d mu1 = (x_mu_history_[history_count - 1].block(3, 0, 3, 1) - x_mu_history_[history_count - 2].block(3, 0, 3, 1)) / timestep_;
-        Eigen::Matrix3d sigma1 = (x_sigma_history_[history_count - 1].block(3, 3, 3, 3) + x_sigma_history_[history_count - 2].block(3, 3, 3, 3)) / timestep_ / timestep_;
+        Eigen::Vector3d mu1 = x_mu_history_[history_count - 1].block(3, 0, 3, 1) - x_mu_history_[history_count - 2].block(3, 0, 3, 1);
+        Eigen::Matrix3d sigma1 = x_sigma_history_[history_count - 1].block(3, 3, 3, 3) + x_sigma_history_[history_count - 2].block(3, 3, 3, 3);
 
         const int window_size = std::min((int)history_count, window_size_);
         int weight = 1;
         for (int i=1; i<window_size - 1; i++)
         {
-            Eigen::Vector3d mu2 = (x_mu_history_[history_count - 1 - i].block(3, 0, 3, 1) - x_mu_history_[history_count - 2 - i].block(3, 0, 3, 1)) / timestep_;
-            Eigen::Matrix3d sigma2 = (x_sigma_history_[history_count - 1 - i].block(3, 3, 3, 3) + x_sigma_history_[history_count - 2 - i].block(3, 3, 3, 3)) / timestep_ / timestep_;
+            Eigen::Vector3d mu2 = x_mu_history_[history_count - 1 - i].block(3, 0, 3, 1) - x_mu_history_[history_count - 2 - i].block(3, 0, 3, 1);
+            Eigen::Matrix3d sigma2 = x_sigma_history_[history_count - 1 - i].block(3, 3, 3, 3) + x_sigma_history_[history_count - 2 - i].block(3, 3, 3, 3);
 
             const double t = 1.0 / (weight + 1);
             sigma1 = (1-t) * sigma1 + t * sigma2 + t * (1-t) * (mu1 - mu2) * (mu1 - mu2).transpose();
@@ -115,9 +112,8 @@ void PointObstacleKalmanFilter::computeAccelerationAndVariance()
             weight++;
         }
 
-        // u_ = mu1 * timestep_;
-        e_sigma_.block(0, 0, 3, 3) += sigma1 * timestep_ * timestep_ * timestep_ * timestep_ / 4;
-        e_sigma_.block(3, 3, 3, 3) += sigma1 * timestep_ * timestep_ / 4;
+        u_ = mu1 * timestep_;
+        e_sigma_.block(3, 3, 3, 3) += sigma1 * timestep_ * timestep_;
     }
 }
 
@@ -143,22 +139,6 @@ void PointObstacleKalmanFilter::updateControlOnly(double time_difference, const 
     Eigen::Matrix<double, 6, 6> A = Eigen::Matrix<double, 6, 6>::Identity();
     A.block(0, 3, 3, 3) = Eigen::Matrix3d::Identity() * time_difference;
 
-    /*
     mu = A * last_x_mu + B_ * (u_ / timestep_ * time_difference);
     sigma = A * last_x_sigma * A.transpose() + (e_sigma_ / timestep_ / timestep_ * time_difference * time_difference);
-    */
-
-    mu = last_x_mu;
-    sigma = last_x_sigma;
-
-    for (int i=0; i<(time_difference + 0.01) / timestep_; i++)
-    {
-        mu = A_ * mu + B_ * u_;
-        sigma = A_ * sigma * A_.transpose() + e_sigma_;
-    }
-
-    /*
-    std::cout << "sigma\n" << sigma << "\ne_sigma\n" << e_sigma_ << "\n\n";
-    fflush(stdout);
-    */
 }
