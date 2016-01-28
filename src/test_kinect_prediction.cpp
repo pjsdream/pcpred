@@ -21,10 +21,10 @@ int main(int argc, char** argv)
 
     const double timestep = 0.05;
     const double prediction_timestep = 0.05;
-    const double sensor_error = 0.005;
-    const double collision_probability = 0.95;
+    const double sensor_error = 0.01;
+    const double collision_probability = 0.90;
     const int acceleration_inference_window_size = 5;
-    const int prediction_frames = 6;
+    const int prediction_frames = 20;
 
     ros::Rate rate(1.0 / timestep);
     //ros::Rate rate(1.0);
@@ -49,6 +49,48 @@ int main(int argc, char** argv)
     // for example:
     //   predictor.rotate(M_PI / 2.0, Eigen::Vector3d(0.0, 0.0, 1.0));
     //   predictor.translate(Eigen::Vector3d(-1.0, 0.0, 0.0));
+
+    const Eigen::Vector3d pointcloud_translates[] =
+    {
+        Eigen::Vector3d(0.1, -0.7, -0.9),
+        Eigen::Vector3d(0.18, 1, -0.9),
+        Eigen::Vector3d(0, -0.5, -0.9),
+        Eigen::Vector3d(-0.2, 0.7, -0.9),
+        Eigen::Vector3d(0.75, -0.9, -0.9),
+        Eigen::Vector3d(0.7, -0.7, -0.9),
+        Eigen::Vector3d(0, -0, -0.9),
+        Eigen::Vector3d(0, -0, -0.9),
+        Eigen::Vector3d(0, -0, -0.9),
+        Eigen::Vector3d(0, -0, -0.9),
+    };
+    const double z_rotations[] =
+    {
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        -30.0 / 180.0 * M_PI,
+        -30.0 / 180.0 * M_PI,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+    };
+
+    // transform
+    predictor.translate( Eigen::Vector3d(0.4, 0.0, 0.0) );
+    predictor.rotate( z_rotations[sequence_number - 1], Eigen::Vector3d(0, 0, 1) );
+    predictor.translate( Eigen::Vector3d(-0.4, 0.0, 0.0) );
+    predictor.translate( pointcloud_translates[sequence_number - 1] );
+
+
+    for (int i = 3; i > 0; i--)
+    {
+        printf("%d\n", i);
+        fflush(stdout);
+        sleep(1);
+    }
+
 
     while (true)
     {

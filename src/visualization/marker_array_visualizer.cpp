@@ -155,7 +155,7 @@ void MarkerArrayVisualizer::drawEllipsoids(const char* ns, const std::vector<Eig
         marker.color.r = 0.0;
         marker.color.g = 1.0;
         marker.color.b = 0.0;
-        marker.color.a = 0.1;
+        marker.color.a = 0.5;
 
         marker.lifetime = ros::Duration();
 

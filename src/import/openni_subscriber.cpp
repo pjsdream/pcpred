@@ -1,5 +1,6 @@
 #include <pcpred/import/openni_subscriber.h>
 
+#include <stdio.h>
 #include <iostream>
 
 using namespace pcpred;
@@ -206,6 +207,7 @@ void OpenniSubscriber::record(int frame_count, int sequence_number)
         int count = 0;
         while (count < recorded_frames && frame < frame_count)
         {
+            printf("recording %d/%d\n", frame, frame_count);
             char filename[128];
             sprintf(filename, "../data/C%d/image%04d.txt", sequence_number, frame);
             FILE* fp = fopen(filename, "wb");

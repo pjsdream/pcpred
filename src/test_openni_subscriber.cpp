@@ -30,7 +30,7 @@ int main(int argc, char** argv)
 
     ros::Rate rate(30);
 
-    for (int i = 5; i > 0; i--)
+    for (int i = 10; i > 0; i--)
     {
         printf("%d\n", i);
         fflush(stdout);
