@@ -21,13 +21,18 @@ int main(int argc, char** argv)
 
     const double timestep = 0.05;
     const double prediction_timestep = 0.05;
-    const double sensor_error = 0.01;
-    const double collision_probability = 0.90;
+    double sensor_error = 0.005;
+    double collision_probability = 0.95;
     const int acceleration_inference_window_size = 5;
     const int prediction_frames = 20;
 
     ros::Rate rate(1.0 / timestep);
     //ros::Rate rate(1.0);
+
+
+    n.param("/itomp_planner/sensor_error", sensor_error, 0.005);
+    n.param("/itomp_planner/collision_probability", collision_probability, 0.95);
+
 
 
 
@@ -57,11 +62,11 @@ int main(int argc, char** argv)
         Eigen::Vector3d(0, -0.5, -0.9),
         Eigen::Vector3d(-0.2, 0.7, -0.9),
         Eigen::Vector3d(0.75, -0.9, -0.9),
-        Eigen::Vector3d(0.7, -0.7, -0.9),
-        Eigen::Vector3d(0, -0, -0.9),
-        Eigen::Vector3d(0, -0, -0.9),
-        Eigen::Vector3d(0, -0, -0.9),
-        Eigen::Vector3d(0, -0, -0.9),
+        Eigen::Vector3d(0.75, -0.8, -0.9),
+        Eigen::Vector3d(5.0, -0.0, -0.9),
+        Eigen::Vector3d(5.0, -0.0, -0.9),
+        Eigen::Vector3d(0.8, 2.5, -0.6),
+        Eigen::Vector3d(0.7, 1.7, -0.7),
     };
     const double z_rotations[] =
     {
@@ -70,11 +75,11 @@ int main(int argc, char** argv)
         0.0,
         0.0,
         -30.0 / 180.0 * M_PI,
-        -30.0 / 180.0 * M_PI,
+        -15.0 / 180.0 * M_PI,
         0.0,
         0.0,
-        0.0,
-        0.0,
+        -90.0 / 180.0 * M_PI,
+        -90.0 / 180.0 * M_PI,
     };
 
     // transform

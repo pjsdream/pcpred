@@ -1,6 +1,7 @@
 # intermediate files
 bin/
 lib/
+build/
 
 # external libraries
 include/Eigen/

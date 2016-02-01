@@ -1,5 +1,7 @@
 #include <pcpred/visualization/marker_array_visualizer.h>
 
+#include <pcpred/util/chi_square.h>
+
 #include <Eigen/SVD>
 
 #include <cmath>
@@ -98,9 +100,9 @@ void MarkerArrayVisualizer::drawSpheres(const char* ns, const std::vector<Eigen:
         marker.scale.y = 2. * radius[i];
         marker.scale.z = 2. * radius[i];
 
-        marker.color.r = 1.0;
+        marker.color.r = 0.0;
         marker.color.g = 0.0;
-        marker.color.b = 0.0;
+        marker.color.b = 1.0;
         marker.color.a = 1.0;
 
         marker.lifetime = ros::Duration();
@@ -152,10 +154,66 @@ void MarkerArrayVisualizer::drawEllipsoids(const char* ns, const std::vector<Eig
         marker.scale.y = 2. * r(1);
         marker.scale.z = 2. * r(2);
 
-        marker.color.r = 0.0;
-        marker.color.g = 1.0;
+        marker.color.r = 1.0;
+        marker.color.g = 0.0;
         marker.color.b = 0.0;
-        marker.color.a = 0.5;
+        marker.color.a = 0.2;
+
+        marker.lifetime = ros::Duration();
+
+        marker_array.markers.push_back(marker);
+    }
+
+    publish(marker_array);
+}
+
+void MarkerArrayVisualizer::drawGaussianDistributions(const char* ns, const std::vector<Eigen::Vector3d>& mu, const std::vector<Eigen::Matrix3d>& sigma, double probability, const std::vector<double>& offset)
+{
+    visualization_msgs::MarkerArray marker_array;
+
+    const int size = mu.size();
+
+    for (int i=0; i<size; i++)
+    {
+        visualization_msgs::Marker marker;
+
+        marker.header.frame_id = "/segment_0";
+        marker.header.stamp = ros::Time::now();
+
+        marker.ns = ns;
+        marker.id = i;
+        marker.type = visualization_msgs::Marker::SPHERE;
+        marker.action = visualization_msgs::Marker::ADD;
+
+        // axis: eigenvectors
+        // radius: eigenvalues
+        Eigen::JacobiSVD<Eigen::MatrixXd> svd(sigma[i], Eigen::ComputeThinU | Eigen::ComputeThinV);
+        const Eigen::VectorXd& r = svd.singularValues();
+        Eigen::Matrix3d Q = svd.matrixU();
+
+        // to make determinant 1
+        if (Q.determinant() < 0)
+            Q.col(2) *= -1.;
+        const Eigen::Quaterniond q(Q);
+
+        marker.pose.position.x = mu[i](0);
+        marker.pose.position.y = mu[i](1);
+        marker.pose.position.z = mu[i](2);
+        marker.pose.orientation.x = q.x();
+        marker.pose.orientation.y = q.y();
+        marker.pose.orientation.z = q.z();
+        marker.pose.orientation.w = q.w();
+
+        const double probability_radius = gaussianDistributionRadius3D(probability);
+
+        marker.scale.x = 2. * (probability_radius * std::sqrt(r[0]) + offset[i]);
+        marker.scale.y = 2. * (probability_radius * std::sqrt(r[1]) + offset[i]);
+        marker.scale.z = 2. * (probability_radius * std::sqrt(r[2]) + offset[i]);
+
+        marker.color.r = 1.0;
+        marker.color.g = 0.0;
+        marker.color.b = 0.0;
+        marker.color.a = 0.25;
 
         marker.lifetime = ros::Duration();
 
