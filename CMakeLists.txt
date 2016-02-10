@@ -46,71 +46,16 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
 endif()
 
-# header files
-file(GLOB_RECURSE HEADER_FILES RELATIVE ${PROJECT_SOURCE_DIR} *.h)
+# header/src files
+file(GLOB_RECURSE HEADER_FILES ${PROJECT_SOURCE_DIR}/include/pcpred/*.h)
+file(GLOB_RECURSE SOURCE_FILES ${PROJECT_SOURCE_DIR}/src/*/*.cpp)
 
 # pcpred library
 rosbuild_add_library(pcpred
-src/detection/depth_frame_human_detector.cpp
-src/detection/pointcloud_human_detector.cpp
-src/prediction/point_predictor.cpp
-src/prediction/points_predictor.cpp
-src/prediction/pointcloud_human_predictor.cpp
-src/prediction/bvh_predictor.cpp
-src/prediction/gvv_predictor.cpp
-src/prediction/kinect_predictor.cpp
-src/shape/human.cpp
-src/kalman_filter/point_obstacle_kf.cpp
-src/pointcloud/pointcloud.cpp
-src/visualization/visualizer.cpp
-src/visualization/marker_visualizer.cpp
-src/visualization/marker_array_visualizer.cpp
-src/visualization/pointcloud_visualizer.cpp
-src/import/bvh_importer.cpp
-src/import/gvv_data_importer.cpp
-src/import/openni_subscriber.cpp
-src/import/openni_importer.cpp
-src/util/chi_square.cpp
+${SOURCE_FILES}
 ${HEADER_FILES}
 )
 
-# test application for point prediction
-rosbuild_add_executable(test_point_prediction
-src/test_point_prediction.cpp
-)
-target_link_libraries(test_point_prediction pcpred)
-
-# test application for points prediction using bvh data
-rosbuild_add_executable(test_bvh_prediction
-src/test_bvh_prediction.cpp
-)
-target_link_libraries(test_bvh_prediction pcpred)
-
-# (deprecated)
-# test application for pointcloud human prediction
-#rosbuild_add_executable(test_pointcloud_prediction
-#src/test_pointcloud_prediction.cpp
-#)
-#target_link_libraries(test_pointcloud_prediction pcpred)
-
-# test application for gvv pointcloud human prediction
-rosbuild_add_executable(test_gvvdata_prediction
-src/test_gvvdata_prediction.cpp
-)
-target_link_libraries(test_gvvdata_prediction pcpred)
-
-# test application for gvv point cloud data import
-rosbuild_add_executable(test_gvvdata_import
-src/test_gvvdata_import.cpp
-)
-target_link_libraries(test_gvvdata_import pcpred)
-target_link_libraries(test_gvvdata_import ${PCL_LIBRARIES})
-
-# test application for bvh data import
-rosbuild_add_executable(test_bvh_import
-src/test_bvh_import.cpp
-)
-target_link_libraries(test_bvh_import pcpred)
 
 # test application for openni raw image subscriber
 rosbuild_add_executable(test_openni_subscriber
@@ -129,15 +74,3 @@ rosbuild_add_executable(test_kinect_prediction
 src/test_kinect_prediction.cpp
 )
 target_link_libraries(test_kinect_prediction pcpred)
-
-# demo
-rosbuild_add_executable(demo
-src/demo.cpp
-)
-target_link_libraries(demo pcpred)
-
-# figures
-rosbuild_add_executable(figures
-src/figures.cpp
-)
-target_link_libraries(figures pcpred)
