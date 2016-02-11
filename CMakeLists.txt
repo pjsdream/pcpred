@@ -74,3 +74,11 @@ rosbuild_add_executable(test_kinect_prediction
 src/test_kinect_prediction.cpp
 )
 target_link_libraries(test_kinect_prediction pcpred)
+
+
+
+# test application for gpr tutorial
+rosbuild_add_executable(test_gpr_tutorial
+src/test_gpr_tutorial.cpp
+)
+target_link_libraries(test_gpr_tutorial pcpred)
