@@ -36,7 +36,7 @@ void GaussianProcessRegression::setObservation(const Eigen::VectorXd &X, const E
         {
             K_(i,j) = sigma_f_ * sigma_f_ * std::exp( -(X[i]-X[j]) * (X[i]-X[j]) / (2. * l_ * l_));
 
-            if (X[i] == X[j])
+            if (i==j)
                 K_(i,j) += sigma_n_ * sigma_n_;
 
             K_(j,i) = K_(i,j);
@@ -73,9 +73,6 @@ void GaussianProcessRegression::regression(const Eigen::VectorXd& X, Eigen::Vect
         for (int j=0; j<n; j++)
         {
             K1(i,j) = sigma_f_ * sigma_f_ * std::exp( -(X[i]-X_[j]) * (X[i]-X_[j]) / (2. * l_ * l_));
-
-            if (X[i] == X_[j])
-                K1(i,j) += sigma_n_ * sigma_n_;
         }
     }
 
@@ -85,7 +82,7 @@ void GaussianProcessRegression::regression(const Eigen::VectorXd& X, Eigen::Vect
         {
             K2(i,j) = sigma_f_ * sigma_f_ * std::exp( -(X[i]-X[j]) * (X[i]-X[j]) / (2. * l_ * l_));
 
-            if (X[i] == X[j])
+            if (i==j)
                 K2(i,j) += sigma_n_ * sigma_n_;
 
             K2(j,i) = K2(i,j);

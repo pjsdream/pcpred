@@ -82,3 +82,9 @@ rosbuild_add_executable(test_gpr_tutorial
 src/test_gpr_tutorial.cpp
 )
 target_link_libraries(test_gpr_tutorial pcpred)
+
+# test application for curve fitting
+rosbuild_add_executable(test_curve_fitting
+src/test_curve_fitting.cpp
+)
+target_link_libraries(test_curve_fitting pcpred)

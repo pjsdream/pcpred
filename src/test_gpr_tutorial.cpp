@@ -15,11 +15,12 @@ int main(int argc, char** argv)
     ros::Duration d(1.0);
 
     GaussianProcessRegression gpr;
+    gpr.setHyperParameters(1.0, 1.27, 0.3);
 
     d.sleep();
 
     const int n = 100;
-    const double m = -1.7;
+    const double m = -3.0;
     const double M = 0.3;
 
     Eigen::VectorXd X(6), Y(6), O(n);
@@ -33,6 +34,7 @@ int main(int argc, char** argv)
     }
 
     gpr.setObservation(X, Y);
+    gpr.print();
     gpr.visualizeRegression(O);
 
     d.sleep();
