@@ -41,7 +41,7 @@ public:
     inline std::string jointName(int joint_index) { return joints_[joint_index].name; }
     inline std::pair<int, int> capsuleEndpointJointIndices(int capsule_index)
     {
-        return std::make_pair<int, int>(
+        return std::make_pair(
                     capsules_[capsule_index].joint_ids[0], capsules_[capsule_index].joint_ids[1]
                 );
     }

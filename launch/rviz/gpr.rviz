@@ -5,9 +5,7 @@ Panels:
     Property Tree Widget:
       Expanded:
         - /Global Options1
-        - /MarkerArray1
-        - /MarkerArray1/Status1
-        - /MarkerArray1/Namespaces1
+        - /gpr tutorial1/Namespaces1
       Splitter Ratio: 0.520134
     Tree Height: 576
   - Class: rviz/Selection
@@ -60,10 +58,21 @@ Visualization Manager:
     - Class: rviz/MarkerArray
       Enabled: true
       Marker Topic: gpr
-      Name: MarkerArray
+      Name: gpr tutorial
       Namespaces:
         input: true
         regression: true
+      Queue Size: 100
+      Value: true
+    - Class: rviz/MarkerArray
+      Enabled: true
+      Marker Topic: gpr_curves
+      Name: gpr curves
+      Namespaces:
+        curve_input: true
+        curve_output: true
+        curve_regression: true
+        curve_test: true
       Queue Size: 100
       Value: true
   Enabled: true
@@ -89,20 +98,23 @@ Visualization Manager:
   Value: true
   Views:
     Current:
-      Angle: -0.0399998
-      Class: rviz/TopDownOrtho
+      Class: rviz/Orbit
+      Distance: 6.81502
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.06
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
+      Focal Point:
+        X: 1.02672
+        Y: 1.59172
+        Z: 0.790135
       Name: Current View
       Near Clip Distance: 0.01
-      Scale: 163.517
+      Pitch: 0.384796
       Target Frame: <Fixed Frame>
-      Value: TopDownOrtho (rviz)
-      X: -0.680743
-      Y: -0.379673
+      Value: Orbit (rviz)
+      Yaw: 4.47773
     Saved: ~
 Window Geometry:
   Displays:
@@ -120,5 +132,5 @@ Window Geometry:
   Views:
     collapsed: false
   Width: 1543
-  X: 220
-  Y: 37
+  X: 212
+  Y: 29

@@ -31,6 +31,9 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 #rosbuild_add_executable(example examples/example.cpp)
 #target_link_libraries(example ${PROJECT_NAME})
 
+# c++11
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11")
+
 # pcl library setup
 find_package(PCL 1.7 REQUIRED)
 include_directories(${PCL_INCLUDE_DIRS})
@@ -82,6 +85,12 @@ rosbuild_add_executable(test_gpr_tutorial
 src/test_gpr_tutorial.cpp
 )
 target_link_libraries(test_gpr_tutorial pcpred)
+
+# test application for gpr tutorial
+rosbuild_add_executable(test_gpr_curves
+src/test_gpr_curves.cpp
+)
+target_link_libraries(test_gpr_curves pcpred)
 
 # test application for curve fitting
 rosbuild_add_executable(test_curve_fitting

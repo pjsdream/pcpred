@@ -1,6 +1,6 @@
 #include <ros/ros.h>
 
-#include <pcpred/gaussian_process/gpr.h>
+#include <pcpred/gaussian_process/gpr_univariate.h>
 
 #include <stdio.h>
 
@@ -14,8 +14,9 @@ int main(int argc, char** argv)
     ros::NodeHandle nh;
     ros::Duration d(1.0);
 
-    GaussianProcessRegression gpr;
-    gpr.setHyperParameters(1.0, 1.27, 0.3);
+    GprUnivariate gpr;
+    //gpr.setHyperParameters(1.0, 1.27, 0.3);
+    gpr.setHyperParameters(1.0, 1.27, 0.03);
 
     d.sleep();
 

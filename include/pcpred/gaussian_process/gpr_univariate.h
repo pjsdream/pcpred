@@ -1,5 +1,5 @@
-#ifndef GPR_H
-#define GPR_H
+#ifndef GPR_UNIVARIATE_H
+#define GPR_UNIVARIATE_H
 
 
 #include <Eigen/Dense>
@@ -12,11 +12,11 @@
 namespace pcpred
 {
 
-class GaussianProcessRegression
+class GprUnivariate
 {
 public:
 
-    GaussianProcessRegression();
+    GprUnivariate();
 
     void setVisualizerTopic(const std::string& topic);
 
@@ -46,4 +46,4 @@ private:
 }
 
 
-#endif // GPR_H
+#endif // GPR_UNIVARIATE_H

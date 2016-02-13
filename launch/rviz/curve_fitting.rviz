@@ -5,8 +5,7 @@ Panels:
     Property Tree Widget:
       Expanded:
         - /Global Options1
-        - /MarkerArray1
-        - /MarkerArray1/Namespaces1
+        - /curve1/Namespaces1
       Splitter Ratio: 0.515444
     Tree Height: 576
   - Class: rviz/Selection
@@ -59,8 +58,8 @@ Visualization Manager:
     - Alpha: 0.1
       Autocompute Intensity Bounds: true
       Autocompute Value Bounds:
-        Max Value: 1.42122
-        Min Value: -0.945059
+        Max Value: 1.43554
+        Min Value: -0.872717
         Value: true
       Axis: Z
       Channel Name: intensity
@@ -102,7 +101,7 @@ Visualization Manager:
     - Class: rviz/MarkerArray
       Enabled: true
       Marker Topic: /curve
-      Name: MarkerArray
+      Name: curve
       Namespaces:
         curve: true
       Queue Size: 100
@@ -138,15 +137,15 @@ Visualization Manager:
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 1.12337
-        Y: -0.000314348
-        Z: 0.0969708
+        X: 0.894704
+        Y: 0.115588
+        Z: 0.291069
       Name: Current View
       Near Clip Distance: 0.01
-      Pitch: 0.109797
+      Pitch: 0.0647962
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 2.80819
+      Yaw: 3.1632
     Saved: ~
 Window Geometry:
   Displays:

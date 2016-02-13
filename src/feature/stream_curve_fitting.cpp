@@ -1,4 +1,5 @@
 #include <pcpred/feature/stream_curve_fitting.h>
+#include <pcpred/util/gaussian_quadrature.h>
 
 #include <vector>
 

@@ -1,4 +1,4 @@
-#include <pcpred/gaussian_process/gpr.h>
+#include <pcpred/gaussian_process/gpr_univariate.h>
 
 #include <visualization_msgs/MarkerArray.h>
 
@@ -8,7 +8,7 @@
 using namespace pcpred;
 
 
-GaussianProcessRegression::GaussianProcessRegression()
+GprUnivariate::GprUnivariate()
 {
     setHyperParameters(1.0, 1.27, 0.3);
 
@@ -16,18 +16,18 @@ GaussianProcessRegression::GaussianProcessRegression()
 }
 
 
-void GaussianProcessRegression::setVisualizerTopic(const std::string &topic)
+void GprUnivariate::setVisualizerTopic(const std::string &topic)
 {
     ros::NodeHandle n;
     publisher_ = n.advertise<visualization_msgs::MarkerArray>(topic, 1000);
 }
 
-void GaussianProcessRegression::setObservation(const Eigen::VectorXd &X, const Eigen::VectorXd &Y)
+void GprUnivariate::setObservation(const Eigen::VectorXd &X, const Eigen::VectorXd &Y)
 {
     X_ = X;
     Y_ = Y;
 
-    // covariance matrix
+    // RBF kernel covariance matrix
     const int n = X_.rows();
     K_.resize(n, n);
     for (int i=0; i<n; i++)
@@ -46,21 +46,21 @@ void GaussianProcessRegression::setObservation(const Eigen::VectorXd &X, const E
     K_inverse_ = K_.inverse();
 }
 
-void GaussianProcessRegression::setHyperParameters(double l, double sigma_f, double sigma_n)
+void GprUnivariate::setHyperParameters(double l, double sigma_f, double sigma_n)
 {
     l_ = l;
     sigma_f_ = sigma_f;
     sigma_n_ = sigma_n;
 }
 
-void GaussianProcessRegression::print()
+void GprUnivariate::print()
 {
     std::cout << "X = [" << X_.transpose() << "]" << std::endl;
     std::cout << "Y = [" << Y_.transpose() << "]" << std::endl;
     std::cout << "K = " << std::endl << K_ << std::endl;
 }
 
-void GaussianProcessRegression::regression(const Eigen::VectorXd& X, Eigen::VectorXd& mean, Eigen::MatrixXd& variance)
+void GprUnivariate::regression(const Eigen::VectorXd& X, Eigen::VectorXd& mean, Eigen::MatrixXd& variance)
 {
     const int n = X_.rows();
     const int m = X.rows();
@@ -93,7 +93,7 @@ void GaussianProcessRegression::regression(const Eigen::VectorXd& X, Eigen::Vect
     variance = K2 - K1 * K_inverse_ * K1.transpose();
 }
 
-void GaussianProcessRegression::visualizeRegression(const Eigen::VectorXd& X)
+void GprUnivariate::visualizeRegression(const Eigen::VectorXd& X)
 {
     Eigen::VectorXd mean;
     Eigen::MatrixXd variance;
