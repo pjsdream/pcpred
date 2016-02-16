@@ -11,6 +11,9 @@ matlab/
 C*/
 bag/
 
+# custom openni joint tracker data
+J*/
+
 # figures for paper
 figures/
 log/

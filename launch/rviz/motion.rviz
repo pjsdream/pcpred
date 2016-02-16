@@ -20,8 +20,9 @@ Panels:
   - Class: rviz/Views
     Expanded:
       - /Current View1
+      - /Current View1/Focal Point1
     Name: Views
-    Splitter Ratio: 0.5
+    Splitter Ratio: 0.516729
   - Class: rviz/Time
     Experimental: false
     Name: Time
@@ -56,105 +57,19 @@ Visualization Manager:
       Reference Frame: <Fixed Frame>
       Value: false
     - Class: rviz/TF
-      Enabled: true
+      Enabled: false
       Frame Timeout: 15
       Frames:
         All Enabled: false
-        camera_depth_frame:
-          Value: true
-        camera_depth_optical_frame:
-          Value: true
-        camera_link:
-          Value: true
-        camera_rgb_frame:
-          Value: true
-        camera_rgb_optical_frame:
-          Value: true
-        head_1:
-          Value: true
-        left_elbow_1:
-          Value: true
-        left_foot_1:
-          Value: true
-        left_hand_1:
-          Value: true
-        left_hip_1:
-          Value: true
-        left_knee_1:
-          Value: true
-        left_shoulder_1:
-          Value: true
-        map:
-          Value: true
-        neck_1:
-          Value: true
-        openni_depth_frame:
-          Value: true
-        right_elbow_1:
-          Value: true
-        right_foot_1:
-          Value: true
-        right_hand_1:
-          Value: true
-        right_hip_1:
-          Value: true
-        right_knee_1:
-          Value: true
-        right_shoulder_1:
-          Value: true
-        torso_1:
-          Value: true
-        world:
-          Value: true
       Marker Scale: 0.5
       Name: TF
       Show Arrows: false
       Show Axes: true
       Show Names: true
       Tree:
-        map:
-          camera_link:
-            camera_depth_frame:
-              camera_depth_optical_frame:
-                {}
-              openni_depth_frame:
-                head_1:
-                  {}
-                left_elbow_1:
-                  {}
-                left_foot_1:
-                  {}
-                left_hand_1:
-                  {}
-                left_hip_1:
-                  {}
-                left_knee_1:
-                  {}
-                left_shoulder_1:
-                  {}
-                neck_1:
-                  {}
-                right_elbow_1:
-                  {}
-                right_foot_1:
-                  {}
-                right_hand_1:
-                  {}
-                right_hip_1:
-                  {}
-                right_knee_1:
-                  {}
-                right_shoulder_1:
-                  {}
-                torso_1:
-                  {}
-            camera_rgb_frame:
-              camera_rgb_optical_frame:
-                {}
-          world:
-            {}
+        {}
       Update Interval: 0
-      Value: true
+      Value: false
     - Alpha: 0.5
       Autocompute Intensity Bounds: true
       Autocompute Value Bounds:
@@ -220,22 +135,22 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 1.96394
+      Distance: 1
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.06
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 1.23096
-        Y: 0.0550436
-        Z: 0.111247
+        X: 1
+        Y: 0
+        Z: 0
       Name: Current View
       Near Clip Distance: 0.01
-      Pitch: 0.00979687
+      Pitch: 0
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 2.75639
+      Yaw: 3.14
     Saved: ~
 Window Geometry:
   Displays:

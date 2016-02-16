@@ -103,3 +103,9 @@ rosbuild_add_executable(test_human_motion
 src/test_human_motion.cpp
 )
 target_link_libraries(test_human_motion pcpred)
+
+# application for openni tf recorder
+rosbuild_add_executable(openni_recorder
+src/openni_recorder.cpp
+)
+target_link_libraries(openni_recorder pcpred)
