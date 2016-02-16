@@ -48,7 +48,7 @@ int main(int argc, char** argv)
         Eigen::Vector3d(2, 2, 2),
         Eigen::Vector3d(0, 3, 0),
     };
-    const double covariance = 0.01;
+    const double covariance = 0.1;
 
     Eigen::Vector3d test_mean_curve[] =
     {
@@ -63,7 +63,7 @@ int main(int argc, char** argv)
 
     const double gpr_l = 1.0;
     const double gpr_sigma_f = 10.0;
-    const double gpr_sigma_n = covariance;
+    const double gpr_sigma_n = std::sqrt(covariance);
 
     const int res = 16;
 
@@ -123,7 +123,7 @@ int main(int argc, char** argv)
             }
         }
 
-        for (int j=0; j<output_curves[i].size(); j++)
+        for (int j=1; j<output_curves[i].size(); j++)
         {
             const Eigen::Vector3d p = output_curves[i][j];
             Y[3*j + 0](i) = p(0);
@@ -356,10 +356,16 @@ int main(int argc, char** argv)
         const int r_end = num_control_points/2 - 1;
         for (int j=0; j<r_end; j++)
         {
-            const Eigen::Vector3d p0 = Eigen::Vector3d( means[(2*j+0)*3+0], means[(2*j+0)*3+1], means[(2*j+0)*3+2] );
-            const Eigen::Vector3d v0 = Eigen::Vector3d( means[(2*j+1)*3+0], means[(2*j+1)*3+1], means[(2*j+1)*3+2] );
+            Eigen::Vector3d p0 = Eigen::Vector3d( means[(2*j+0)*3+0], means[(2*j+0)*3+1], means[(2*j+0)*3+2] );
+            Eigen::Vector3d v0 = Eigen::Vector3d( means[(2*j+1)*3+0], means[(2*j+1)*3+1], means[(2*j+1)*3+2] );
             const Eigen::Vector3d p1 = Eigen::Vector3d( means[(2*j+2)*3+0], means[(2*j+2)*3+1], means[(2*j+2)*3+2] );
             const Eigen::Vector3d v1 = Eigen::Vector3d( means[(2*j+3)*3+0], means[(2*j+3)*3+1], means[(2*j+3)*3+2] );
+
+            if (j==0)
+            {
+                p0 = test_curve[ num_control_points - 2];
+                v0 = test_curve[ num_control_points - 1];
+            }
 
             geometry_msgs::Point point;
             std_msgs::ColorRGBA color;

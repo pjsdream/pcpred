@@ -18,14 +18,21 @@ CurveFitting::CurveFitting()
 void CurveFitting::setVisualizerTopic(const std::string& topic)
 {
     ros::NodeHandle n;
+    publisher_.shutdown();
     publisher_ = n.advertise<visualization_msgs::MarkerArray>(topic, 1000);
 }
 
-void CurveFitting::setCurveShape(int num_curves)
+void CurveFitting::setCurveShape(int num_pieces)
 {
-    n_ = num_curves;
+    n_ = num_pieces;
     p_.resize(n_ + 1);
     v_.resize(n_ + 1);
+
+    for (int i=0; i<=n_; i++)
+    {
+        p_[i] = Eigen::Vector3d::Zero();
+        v_[i] = Eigen::Vector3d::Zero();
+    }
 }
 
 void CurveFitting::fit(const std::vector<double> &t, const std::vector<Eigen::Vector3d> &x)
@@ -52,14 +59,13 @@ void CurveFitting::fit(const std::vector<double> &t, const std::vector<Eigen::Ve
     }
 
     const Eigen::MatrixXd AT = A.transpose();
-    const Eigen::MatrixXd ATA_inv = (AT * A).inverse();
 
     for (int c=0; c<3; c++)
     {
         for (int i=0; i<m; i++)
             b(i) = x[i](c);
 
-        Eigen::VectorXd x = ATA_inv * (AT * b);
+        Eigen::VectorXd x = A.colPivHouseholderQr().solve(b);
 
         for (int i=0; i<=n_; i++)
         {
@@ -67,6 +73,16 @@ void CurveFitting::fit(const std::vector<double> &t, const std::vector<Eigen::Ve
             v_[i](c) = x[2*i+1];
         }
     }
+}
+
+HermiteCurve CurveFitting::toHermiteCurve()
+{
+    HermiteCurve curve(n_);
+
+    for (int i=0; i<=n_; i++)
+        curve.setControlPoint(i, p_[i], v_[i]);
+
+    return curve;
 }
 
 Eigen::Vector3d CurveFitting::curve(double t)

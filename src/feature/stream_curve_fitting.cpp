@@ -20,6 +20,16 @@ void StreamCurveFitting::setVisualizerTopic(const std::string& topic)
     curve_.setVisualizerTopic(topic);
 }
 
+HermiteCurve StreamCurveFitting::toHermiteCurve()
+{
+    return curve_.toHermiteCurve();
+}
+
+void StreamCurveFitting::clear()
+{
+    data_.clear();
+}
+
 void StreamCurveFitting::push(double time, const Eigen::Vector3d& x)
 {
     Data d =
@@ -30,23 +40,20 @@ void StreamCurveFitting::push(double time, const Eigen::Vector3d& x)
 
     data_.insert(d);
 
-    while (!data_.empty() && time - data_.begin()->t > duration_)
+    while (!data_.empty() && data_.rbegin()->t - data_.begin()->t > duration_)
         data_.erase(data_.begin());
 }
 
-void StreamCurveFitting::setCurveShape(int num_curves, double duration)
+void StreamCurveFitting::setCurveShape(int num_pieces, double duration)
 {
-    n_ = num_curves;
-    curve_.setCurveShape(num_curves);
+    n_ = num_pieces;
+    curve_.setCurveShape(num_pieces);
 
     duration_ = duration;
 }
 
 void StreamCurveFitting::fit()
 {
-    if (data_.size() <= 10)
-        return;
-
     std::vector<double> tlist;
     std::vector<Eigen::Vector3d> xlist;
 

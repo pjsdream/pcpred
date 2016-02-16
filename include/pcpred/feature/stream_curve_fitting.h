@@ -5,6 +5,7 @@
 #include <Eigen/Dense>
 
 #include <pcpred/feature/curve_fitting.h>
+#include <pcpred/feature/hermite_curve.h>
 
 #include <set>
 
@@ -32,8 +33,11 @@ public:
 
     StreamCurveFitting();
 
-    void setCurveShape(int num_curves, double duration);
+    HermiteCurve toHermiteCurve();
 
+    void setCurveShape(int num_pieces, double duration);
+
+    void clear();
     void push(double time, const Eigen::Vector3d& x);
     void fit();
 
