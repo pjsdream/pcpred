@@ -85,7 +85,7 @@ int main(int argc, char** argv)
     ROS_INFO("Recording has started");
     const double start_time = ros::Time::now().toSec();
 
-    while (ros::Time::now().toSec() - start_time <= duration)
+    while (ros::ok() && ros::Time::now().toSec() - start_time <= duration)
     {
         for (int i=0; i<joints.size(); i++)
         {

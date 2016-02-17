@@ -31,25 +31,45 @@ public:
 
     HumanMotionFeature();
 
+    void setDefaultJointNames();
     void setJointNames(const std::vector<std::string>& joints);
     void setCurveShape(int num_pieces, double duration);
     void addLink(const std::string& joint1, const std::string& joint2);
 
+    inline int numJoints()
+    {
+        return joint_names_.size();
+    }
+
+    inline std::string jointName(int i)
+    {
+        return joint_names_[i];
+    }
+
+    void clear();
     void observe(const std::string& joint_name, double time, const Eigen::Vector3d& joint_position);
 
+    int featureSize(FeatureType feature_type);
     Eigen::VectorXd toFeature(FeatureType feature_type);
+
+    // output encode/decode
+    int encodingSize();
+    Eigen::VectorXd encode();
+    void decode(const Eigen::VectorXd& code);
 
     void setVisualizerTopic(const std::string& topic);
     void visualizeHumanMotion();
 
 private:
 
+    int featureSizeAbsolutePosition();
     Eigen::VectorXd toFeatureAbsolutePosition();
 
     void appendTraceMarkers(double size, const std_msgs::ColorRGBA& color0, const std_msgs::ColorRGBA& color1, visualization_msgs::MarkerArray& marker_array);
     void appendJointMarkers(double time, double size, const std_msgs::ColorRGBA& color, visualization_msgs::MarkerArray& marker_array);
     void appendSkeletonMarkers(double time, double size, const std_msgs::ColorRGBA& color, visualization_msgs::MarkerArray& marker_array);
 
+    std::vector<std::string> joint_names_;
     std::map<std::string, int> map_joint_to_index_;
     std::vector<std::pair<int, int> > links_;
 

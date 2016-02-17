@@ -22,51 +22,18 @@ int main(int argc, char** argv)
     tf::TransformListener listener;
 
     const int n = 5;
-    const double duration = 1.0;
-
-    std::vector<std::string> joints;
-    joints.push_back("head_1");
-    joints.push_back("left_elbow_1");
-    joints.push_back("left_foot_1");
-    joints.push_back("left_hand_1");
-    joints.push_back("left_hip_1");
-    joints.push_back("left_knee_1");
-    joints.push_back("left_shoulder_1");
-    joints.push_back("neck_1");
-    joints.push_back("torso_1");
-    joints.push_back("right_elbow_1");
-    joints.push_back("right_foot_1");
-    joints.push_back("right_hand_1");
-    joints.push_back("right_hip_1");
-    joints.push_back("right_knee_1");
-    joints.push_back("right_shoulder_1");
+    const double duration = 2.0;
 
     HumanMotionFeature feature;
     feature.setCurveShape(n, duration);
-    feature.setJointNames(joints);
-
-    feature.addLink("head_1", "neck_1");
-    feature.addLink("neck_1", "left_shoulder_1");
-    feature.addLink("left_shoulder_1", "left_elbow_1");
-    feature.addLink("left_elbow_1", "left_hand_1");
-    feature.addLink("neck_1", "right_shoulder_1");
-    feature.addLink("right_shoulder_1", "right_elbow_1");
-    feature.addLink("right_elbow_1", "right_hand_1");
-    feature.addLink("neck_1", "torso_1");
-    feature.addLink("torso_1", "left_hip_1");
-    feature.addLink("left_hip_1", "left_knee_1");
-    feature.addLink("left_knee_1", "left_foot_1");
-    feature.addLink("torso_1", "right_hip_1");
-    feature.addLink("right_hip_1", "right_knee_1");
-    feature.addLink("right_knee_1", "right_foot_1");
 
     d.sleep();
 
-    while (true)
+    while (ros::ok())
     {
-        for (int i=0; i<joints.size(); i++)
+        for (int i=0; i<feature.numJoints(); i++)
         {
-            const std::string joint_name = joints[i];
+            const std::string joint_name = feature.jointName(i);
 
             tf::StampedTransform transform;
             try
@@ -76,8 +43,8 @@ int main(int argc, char** argv)
             }
             catch (tf::TransformException ex)
             {
-                ROS_ERROR("%s", ex.what());
-                ros::Duration(1.0).sleep();
+                //ROS_ERROR("%s", ex.what());
+                continue;
             }
 
             tf::Vector3 tfx = transform.getOrigin();

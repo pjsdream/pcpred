@@ -10,6 +10,8 @@ HumanMotionFeature::HumanMotionFeature()
     setVisualizerTopic("human_motion");
 
     setCurveShape(5, 1.0);
+
+    setDefaultJointNames();
 }
 
 void HumanMotionFeature::setVisualizerTopic(const std::string &topic)
@@ -19,8 +21,54 @@ void HumanMotionFeature::setVisualizerTopic(const std::string &topic)
     publisher_ = nh.advertise<visualization_msgs::MarkerArray>(topic, 100);
 }
 
+void HumanMotionFeature::setDefaultJointNames()
+{
+    static std::vector<std::string> default_joints;
+    static bool default_joints_initialized = false;
+
+    if (!default_joints_initialized)
+    {
+        default_joints_initialized = true;
+
+        default_joints.push_back("head_1");
+        default_joints.push_back("left_elbow_1");
+        default_joints.push_back("left_foot_1");
+        default_joints.push_back("left_hand_1");
+        default_joints.push_back("left_hip_1");
+        default_joints.push_back("left_knee_1");
+        default_joints.push_back("left_shoulder_1");
+        default_joints.push_back("neck_1");
+        default_joints.push_back("torso_1");
+        default_joints.push_back("right_elbow_1");
+        default_joints.push_back("right_foot_1");
+        default_joints.push_back("right_hand_1");
+        default_joints.push_back("right_hip_1");
+        default_joints.push_back("right_knee_1");
+        default_joints.push_back("right_shoulder_1");
+    }
+
+    setJointNames(default_joints);
+
+    addLink("head_1", "neck_1");
+    addLink("neck_1", "left_shoulder_1");
+    addLink("left_shoulder_1", "left_elbow_1");
+    addLink("left_elbow_1", "left_hand_1");
+    addLink("neck_1", "right_shoulder_1");
+    addLink("right_shoulder_1", "right_elbow_1");
+    addLink("right_elbow_1", "right_hand_1");
+    addLink("neck_1", "torso_1");
+    addLink("torso_1", "left_hip_1");
+    addLink("left_hip_1", "left_knee_1");
+    addLink("left_knee_1", "left_foot_1");
+    addLink("torso_1", "right_hip_1");
+    addLink("right_hip_1", "right_knee_1");
+    addLink("right_knee_1", "right_foot_1");
+}
+
 void HumanMotionFeature::setJointNames(const std::vector<std::string>& joints)
 {
+    joint_names_ = joints;
+
     map_joint_to_index_.clear();
     streams_.resize(joints.size());
     curves_.resize(joints.size());
@@ -47,6 +95,14 @@ void HumanMotionFeature::setCurveShape(int num_pieces, double duration)
         streams_[i].setCurveShape(num_pieces, duration);
 }
 
+void HumanMotionFeature::clear()
+{
+    for (int i=0; i<streams_.size(); i++)
+    {
+        streams_[i].clear();
+    }
+}
+
 void HumanMotionFeature::observe(const std::string& joint_name, double time, const Eigen::Vector3d& joint_position)
 {
     if (map_joint_to_index_.find(joint_name) != map_joint_to_index_.end())
@@ -56,6 +112,20 @@ void HumanMotionFeature::observe(const std::string& joint_name, double time, con
         streams_[index].push(time, joint_position);
         streams_[index].fit();
         curves_[index] = streams_[index].toHermiteCurve();
+    }
+}
+
+int HumanMotionFeature::featureSize(FeatureType feature_type)
+{
+    switch (feature_type)
+    {
+    case FEATURE_TYPE_ABSOLUTE_POSITION:
+        return featureSizeAbsolutePosition();
+
+    default:
+        fprintf(stderr, "Error: unknown feature type\n");
+        fflush(stderr);
+        return 3;
     }
 }
 
@@ -73,6 +143,14 @@ Eigen::VectorXd HumanMotionFeature::toFeature(FeatureType feature_type)
     }
 }
 
+int HumanMotionFeature::featureSizeAbsolutePosition()
+{
+    const int num_curves = curves_.size();
+    const int feature_size = curves_[0].featureSize();
+
+    return num_curves * feature_size;
+}
+
 Eigen::VectorXd HumanMotionFeature::toFeatureAbsolutePosition()
 {
     const int num_curves = curves_.size();
@@ -84,6 +162,40 @@ Eigen::VectorXd HumanMotionFeature::toFeatureAbsolutePosition()
         x.block(i * feature_size, 0, feature_size, 1) = curves_[i].toFeature();
 
     return x;
+}
+
+int HumanMotionFeature::encodingSize()
+{
+    int size = 0;
+
+    for (int i=0; i<curves_.size(); i++)
+        size += curves_[i].encodingSize();
+
+    return size;
+}
+
+Eigen::VectorXd HumanMotionFeature::encode()
+{
+    Eigen::VectorXd y;
+
+    for (int i=0; i<curves_.size(); i++)
+    {
+        Eigen::VectorXd cy = curves_[i].encode();
+        y.resize( y.rows() + cy.rows(), 1 );
+        y.bottomRows( cy.rows() ) = cy;
+    }
+
+    return y;
+}
+
+void HumanMotionFeature::decode(const Eigen::VectorXd& code)
+{
+    int p = 0;
+    for (int i=0; i<curves_.size(); i++)
+    {
+        curves_[i].decode( code.block(p, 0, p + (num_pieces_ + 1) * 6, 1) );
+        p += (num_pieces_ + 1) * 6;
+    }
 }
 
 void HumanMotionFeature::visualizeHumanMotion()
@@ -103,8 +215,8 @@ void HumanMotionFeature::visualizeHumanMotion()
     appendTraceMarkers(0.025, white, black, marker_array);
     appendJointMarkers(0, 0.05, white, marker_array);
     appendJointMarkers(num_pieces_, 0.05, black, marker_array);
-    appendSkeletonMarkers(0, 0.025, red, marker_array);
-    appendSkeletonMarkers(num_pieces_, 0.025, green, marker_array);
+    appendSkeletonMarkers(0, 0.025, white, marker_array);
+    appendSkeletonMarkers(num_pieces_, 0.025, black, marker_array);
 
     publisher_.publish(marker_array);
 }

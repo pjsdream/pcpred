@@ -5,7 +5,8 @@ Panels:
     Property Tree Widget:
       Expanded:
         - /Global Options1
-        - /human_motion1/Namespaces1
+        - /MarkerArray1
+        - /MarkerArray2
       Splitter Ratio: 0.432584
     Tree Height: 576
   - Class: rviz/Selection
@@ -27,7 +28,7 @@ Panels:
     Experimental: false
     Name: Time
     SyncMode: 0
-    SyncSource: PointCloud2
+    SyncSource: ""
 Visualization Manager:
   Class: ""
   Displays:
@@ -57,19 +58,100 @@ Visualization Manager:
       Reference Frame: <Fixed Frame>
       Value: false
     - Class: rviz/TF
-      Enabled: false
+      Enabled: true
       Frame Timeout: 15
       Frames:
         All Enabled: false
+        camera_depth_frame:
+          Value: true
+        camera_link:
+          Value: true
+        head_1:
+          Value: true
+        left_elbow_1:
+          Value: true
+        left_foot_1:
+          Value: true
+        left_hand_1:
+          Value: true
+        left_hip_1:
+          Value: true
+        left_knee_1:
+          Value: true
+        left_shoulder_1:
+          Value: true
+        map:
+          Value: true
+        neck_1:
+          Value: true
+        openni_depth_frame:
+          Value: true
+        right_elbow_1:
+          Value: true
+        right_foot_1:
+          Value: true
+        right_hand_1:
+          Value: true
+        right_hip_1:
+          Value: true
+        right_knee_1:
+          Value: true
+        right_shoulder_1:
+          Value: true
+        torso_1:
+          Value: true
+        world:
+          Value: true
       Marker Scale: 0.5
       Name: TF
       Show Arrows: false
       Show Axes: true
       Show Names: true
       Tree:
-        {}
+        map:
+          camera_link:
+            {}
+          world:
+            head_1:
+              {}
+            left_elbow_1:
+              {}
+            left_foot_1:
+              {}
+            left_hand_1:
+              {}
+            left_hip_1:
+              {}
+            left_knee_1:
+              {}
+            left_shoulder_1:
+              {}
+            neck_1:
+              {}
+            right_elbow_1:
+              {}
+            right_foot_1:
+              {}
+            right_hand_1:
+              {}
+            right_hip_1:
+              {}
+            right_knee_1:
+              {}
+            right_shoulder_1:
+              {}
+            torso_1:
+              {}
       Update Interval: 0
-      Value: false
+      Value: true
+    - Class: rviz/MarkerArray
+      Enabled: true
+      Marker Topic: /human_motion
+      Name: human_motion
+      Namespaces:
+        {}
+      Queue Size: 100
+      Value: true
     - Alpha: 0.5
       Autocompute Intensity Bounds: true
       Autocompute Value Bounds:
@@ -101,8 +183,20 @@ Visualization Manager:
       Value: true
     - Class: rviz/MarkerArray
       Enabled: true
-      Marker Topic: /human_motion
-      Name: human_motion
+      Marker Topic: /human_motion_input
+      Name: MarkerArray
+      Namespaces:
+        joints_0.000000: true
+        joints_5.000000: true
+        skeleton_0.000000: true
+        skeleton_5.000000: true
+        trace: true
+      Queue Size: 100
+      Value: true
+    - Class: rviz/MarkerArray
+      Enabled: true
+      Marker Topic: /human_motion_output
+      Name: MarkerArray
       Namespaces:
         joints_0.000000: true
         joints_5.000000: true
@@ -135,22 +229,22 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 1
+      Distance: 2.55821
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.06
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 1
-        Y: 0
-        Z: 0
+        X: 2.62695
+        Y: -0.0688599
+        Z: 0.15699
       Name: Current View
       Near Clip Distance: 0.01
-      Pitch: 0
+      Pitch: 0.259797
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 3.14
+      Yaw: 0.925467
     Saved: ~
 Window Geometry:
   Displays:
@@ -168,5 +262,5 @@ Window Geometry:
   Views:
     collapsed: false
   Width: 1543
-  X: 156
+  X: 148
   Y: 10

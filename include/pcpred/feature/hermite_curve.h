@@ -24,8 +24,13 @@ public:
     void setControlPoint(int i, const Eigen::Vector3d& x, const Eigen::Vector3d& v);
     void makeStationaryPoint(const Eigen::Vector3d& x);
 
-    Eigen::VectorXd toFeature();
     int featureSize();
+    Eigen::VectorXd toFeature();
+
+    // output encode/decode
+    int encodingSize();
+    Eigen::VectorXd encode();
+    void decode(const Eigen::VectorXd& code);
 
     Eigen::Vector3d operator () (double t) const;
 

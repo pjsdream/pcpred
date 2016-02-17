@@ -1,6 +1,8 @@
 #include <pcpred/feature/hermite_curve.h>
 #include <pcpred/util/gaussian_quadrature.h>
 
+#include <iostream>
+
 using namespace pcpred;
 
 
@@ -32,6 +34,11 @@ void HermiteCurve::makeStationaryPoint(const Eigen::Vector3d& x)
     }
 }
 
+int HermiteCurve::featureSize()
+{
+    return num_pieces_ * 12;
+}
+
 Eigen::VectorXd HermiteCurve::toFeature()
 {
     Eigen::VectorXd x;
@@ -52,9 +59,28 @@ Eigen::VectorXd HermiteCurve::toFeature()
     return x;
 }
 
-int HermiteCurve::featureSize()
+int HermiteCurve::encodingSize()
 {
-    return num_pieces_ * 12;
+    return (num_pieces_ + 1) * 2 * 3;
+}
+
+Eigen::VectorXd HermiteCurve::encode()
+{
+    Eigen::VectorXd y( (num_pieces_ + 1) * 2 * 3 );
+
+    for (int i=0; i<=num_pieces_; i++)
+    {
+        y.block(6*i  , 0, 3, 1) = control_points_.col(2*i  );
+        y.block(6*i+3, 0, 3, 1) = control_points_.col(2*i+1);
+    }
+
+    return y;
+}
+
+void HermiteCurve::decode(const Eigen::VectorXd& code)
+{
+    for (int i=0; i<code.rows(); i+=3)
+        control_points_.col(i) = code.block(i, 0, 3, 1);
 }
 
 Eigen::Vector3d HermiteCurve::operator () (double t) const
