@@ -21,8 +21,8 @@ int main(int argc, char** argv)
 
     tf::TransformListener listener;
 
-    const int n = 5;
-    const double duration = 2.0;
+    const int n = 3;
+    const double duration = 1.0;
 
     HumanMotionFeature feature;
     feature.setCurveShape(n, duration);

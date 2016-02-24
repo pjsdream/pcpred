@@ -139,7 +139,11 @@ std::vector<int> Kmeans::cluster(const Eigen::MatrixXd& X, const std::vector<int
         for (int i=0; i<k; i++)
         {
             if (num[i] == 0)
-                c.col(i) = X.col( rand() % n );
+            {
+                int x = rand() % n;
+                c.col(i) = X.col(x);
+                result_[x] = i;
+            }
             else
                 c.col(i) /= num[i];
         }

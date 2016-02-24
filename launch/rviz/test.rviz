@@ -273,7 +273,7 @@ Visualization Manager:
       Value: true
   Enabled: true
   Global Options:
-    Background Color: 48; 48; 48
+    Background Color: 127; 127; 127
     Fixed Frame: map
     Frame Rate: 30
   Name: root
@@ -328,5 +328,5 @@ Window Geometry:
   Views:
     collapsed: false
   Width: 1543
-  X: 186
-  Y: 35
+  X: 178
+  Y: 27

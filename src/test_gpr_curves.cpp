@@ -33,7 +33,7 @@ int main(int argc, char** argv)
 
     d.sleep();
 
-    const int num_curves = 10;
+    const int num_curves = 20;
     const int num_control_points = 4;
     Eigen::Vector3d mean_curve[] =
     {

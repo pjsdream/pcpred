@@ -175,6 +175,9 @@ void LearningMotion::learn()
         kmeans.setVerbose(verbose_);
         kmeans.setSizeLimit( options_.max_cluster_size );
         kmeans.setK( options_.kmeans_k );
+        kmeans.setTerminationCondition(100000);
+
+        printf("starting hierarchical K-means clustering\n");
         kmeans.clusterSizeConstraint(X);
     }
 }
