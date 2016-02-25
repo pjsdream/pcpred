@@ -61,24 +61,6 @@ ${HEADER_FILES}
 
 
 
-# application for openni tf recorder
-rosbuild_add_executable(openni_recorder
-src/openni_recorder.cpp
-)
-target_link_libraries(openni_recorder pcpred)
-
-# application for learning
-rosbuild_add_executable(learn_motion
-src/learn_motion.cpp
-)
-target_link_libraries(learn_motion pcpred)
-
-# application for openni recorded tf publisher
-rosbuild_add_executable(playback
-src/playback.cpp
-)
-target_link_libraries(playback pcpred)
-
 
 
 # test application for openni raw image subscriber

@@ -6,7 +6,9 @@ Panels:
       Expanded:
         - /Global Options1
         - /Grid1
-        - /MotionPlanning1/Scene Geometry1
+        - /TF1/Tree1
+        - /visual1/Namespaces1
+        - /MotionPlanning1/Planned Path1
         - /human_motion1/Namespaces1
       Splitter Ratio: 0.516049
     Tree Height: 576
@@ -24,7 +26,7 @@ Panels:
       - /Current View1
       - /Current View1/Focal Point1
     Name: Views
-    Splitter Ratio: 0.516729
+    Splitter Ratio: 0.416667
   - Class: rviz/Time
     Experimental: false
     Name: Time
@@ -37,7 +39,7 @@ Visualization Manager:
       Cell Size: 0.1
       Class: rviz/Grid
       Color: 160; 160; 164
-      Enabled: true
+      Enabled: false
       Line Style:
         Line Width: 0.03
         Value: Lines
@@ -46,167 +48,40 @@ Visualization Manager:
       Offset:
         X: 0
         Y: 0
-        Z: -0.7
+        Z: 0.05
       Plane: XY
       Plane Cell Count: 100
       Reference Frame: <Fixed Frame>
-      Value: true
+      Value: false
     - Class: rviz/Axes
-      Enabled: true
+      Enabled: false
       Length: 1
       Name: Axes
       Radius: 0.01
       Reference Frame: <Fixed Frame>
-      Value: true
+      Value: false
     - Class: rviz/TF
-      Enabled: true
+      Enabled: false
       Frame Timeout: 15
       Frames:
         All Enabled: false
-        camera_depth_frame:
-          Value: true
-        camera_depth_optical_frame:
-          Value: true
-        camera_link:
-          Value: true
-        camera_rgb_frame:
-          Value: true
-        camera_rgb_optical_frame:
-          Value: true
-        head_1:
-          Value: true
-        left_elbow_1:
-          Value: true
-        left_foot_1:
-          Value: true
-        left_hand_1:
-          Value: true
-        left_hip_1:
-          Value: true
-        left_knee_1:
-          Value: true
-        left_shoulder_1:
-          Value: true
-        map:
-          Value: true
-        neck_1:
-          Value: true
-        odom_combined:
-          Value: true
-        openni_depth_frame:
-          Value: true
-        revetting_tcp:
-          Value: true
-        revetting_tool:
-          Value: true
-        revetting_tool_1:
-          Value: true
-        revetting_tool_2:
-          Value: true
-        revetting_tool_3:
-          Value: true
-        revetting_tool_4:
-          Value: true
-        right_elbow_1:
-          Value: true
-        right_foot_1:
-          Value: true
-        right_hand_1:
-          Value: true
-        right_hip_1:
-          Value: true
-        right_knee_1:
-          Value: true
-        right_shoulder_1:
-          Value: true
-        segment_0:
-          Value: true
-        segment_1:
-          Value: true
-        segment_2:
-          Value: true
-        segment_3:
-          Value: true
-        segment_4:
-          Value: true
-        segment_5:
-          Value: true
-        segment_6:
-          Value: true
-        segment_7:
-          Value: true
-        torso_1:
-          Value: true
-        world:
-          Value: true
       Marker Scale: 0.5
       Name: TF
       Show Arrows: false
       Show Axes: true
       Show Names: true
       Tree:
-        map:
-          camera_link:
-            camera_depth_frame:
-              camera_depth_optical_frame:
-                {}
-            camera_rgb_frame:
-              camera_rgb_optical_frame:
-                {}
-            openni_depth_frame:
-              head_1:
-                {}
-              left_elbow_1:
-                {}
-              left_foot_1:
-                {}
-              left_hand_1:
-                {}
-              left_hip_1:
-                {}
-              left_knee_1:
-                {}
-              left_shoulder_1:
-                {}
-              neck_1:
-                {}
-              right_elbow_1:
-                {}
-              right_foot_1:
-                {}
-              right_hand_1:
-                {}
-              right_hip_1:
-                {}
-              right_knee_1:
-                {}
-              right_shoulder_1:
-                {}
-              torso_1:
-                {}
-          odom_combined:
-            segment_0:
-              segment_1:
-                segment_2:
-                  segment_3:
-                    segment_4:
-                      segment_5:
-                        segment_6:
-                          segment_7:
-                            revetting_tool:
-                              revetting_tcp:
-                                {}
-                              revetting_tool_1:
-                                {}
-                              revetting_tool_2:
-                                {}
-                              revetting_tool_3:
-                                {}
-                              revetting_tool_4:
-                                {}
-          world:
-            {}
+        {}
       Update Interval: 0
+      Value: false
+    - Class: rviz/MarkerArray
+      Enabled: true
+      Marker Topic: /move_itomp/visual
+      Name: visual
+      Namespaces:
+        action: true
+        indoor: true
+      Queue Size: 100
       Value: true
     - Class: moveit_rviz_plugin/MotionPlanning
       Enabled: true
@@ -243,27 +118,22 @@ Visualization Manager:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-            Value: true
           revetting_tool_1:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-            Value: true
           revetting_tool_2:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-            Value: true
           revetting_tool_3:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-            Value: true
           revetting_tool_4:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-            Value: true
           segment_0:
             Alpha: 1
             Show Axes: false
@@ -309,7 +179,7 @@ Visualization Manager:
         Show Robot Collision: false
         Show Robot Visual: true
         Show Trail: false
-        State Display Time: 0.05 s
+        State Display Time: 0.005
         Trajectory Topic: /move_group/display_planned_path
       Planning Metrics:
         Payload: 1
@@ -334,7 +204,7 @@ Visualization Manager:
       Robot Description: robot_description
       Scene Geometry:
         Scene Alpha: 1
-        Scene Color: 50; 230; 50
+        Scene Color: 130; 86; 64
         Scene Display Time: 0.2
         Show Scene Geometry: true
         Voxel Coloring: Z-Axis
@@ -355,27 +225,22 @@ Visualization Manager:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-            Value: true
           revetting_tool_1:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-            Value: true
           revetting_tool_2:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-            Value: true
           revetting_tool_3:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-            Value: true
           revetting_tool_4:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-            Value: true
           segment_0:
             Alpha: 1
             Show Axes: false
@@ -473,9 +338,173 @@ Visualization Manager:
         {}
       Queue Size: 100
       Value: false
+    - Attached Body Color: 150; 50; 150
+      Class: moveit_rviz_plugin/RobotState
+      Collision Enabled: false
+      Enabled: false
+      Links:
+        All Links Enabled: true
+        Expand Joint Details: false
+        Expand Link Details: false
+        Expand Tree: false
+        Link Tree Style: Links in Alphabetic Order
+        revetting_tcp:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        revetting_tool:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        revetting_tool_1:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        revetting_tool_2:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        revetting_tool_3:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        revetting_tool_4:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        segment_0:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        segment_1:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        segment_2:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        segment_3:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        segment_4:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        segment_5:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        segment_6:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        segment_7:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+      Name: RobotState
+      Robot Alpha: 1
+      Robot Description: robot_description
+      Robot State Topic: /move_itomp/display_start_state
+      Show All Links: true
+      Show Highlights: true
+      Value: false
+      Visual Enabled: true
+    - Attached Body Color: 150; 50; 150
+      Class: moveit_rviz_plugin/RobotState
+      Collision Enabled: false
+      Enabled: false
+      Links:
+        All Links Enabled: true
+        Expand Joint Details: false
+        Expand Link Details: false
+        Expand Tree: false
+        Link Tree Style: Links in Alphabetic Order
+        revetting_tcp:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        revetting_tool:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        revetting_tool_1:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        revetting_tool_2:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        revetting_tool_3:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        revetting_tool_4:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        segment_0:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        segment_1:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        segment_2:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        segment_3:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        segment_4:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        segment_5:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        segment_6:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        segment_7:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+      Name: RobotState
+      Robot Alpha: 1
+      Robot Description: robot_description
+      Robot State Topic: /move_itomp/display_goal_state
+      Show All Links: true
+      Show Highlights: true
+      Value: false
+      Visual Enabled: true
   Enabled: true
   Global Options:
-    Background Color: 127; 127; 127
+    Background Color: 77; 77; 77
     Fixed Frame: map
     Frame Rate: 30
   Name: root
@@ -497,22 +526,22 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 2.33238
+      Distance: 2.03843
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.06
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 1.40446
-        Y: -0.249864
-        Z: -0.0242778
+        X: 0.53587
+        Y: 0.0014186
+        Z: 0.0720263
       Name: Current View
       Near Clip Distance: 0.01
-      Pitch: 0.404797
+      Pitch: 1.3298
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 1.90542
+      Yaw: 4.35055
     Saved: ~
 Window Geometry:
   Displays:
@@ -532,5 +561,5 @@ Window Geometry:
   Views:
     collapsed: false
   Width: 1543
-  X: 321
+  X: 233
   Y: 10

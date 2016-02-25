@@ -1,0 +1,19 @@
+9
+head_1
+left_elbow_1
+left_hand_1
+left_shoulder_1
+neck_1
+torso_1
+right_elbow_1
+right_hand_1
+right_shoulder_1
+8
+head_1	neck_1
+neck_1	left_shoulder_1
+left_shoulder_1	left_elbow_1
+left_elbow_1	left_hand_1
+neck_1	right_shoulder_1
+right_shoulder_1	right_elbow_1
+right_elbow_1	right_hand_1
+neck_1	torso_1
