@@ -101,6 +101,7 @@ void LearningMotion::parseData(const char *filename)
 
 void LearningMotion::learn()
 {
+    /*
     const HumanMotionFeature::FeatureType feature_type = HumanMotionFeature::FEATURE_TYPE_ABSOLUTE_POSITION;
     const double last_time = stream_.rbegin()->t;
 
@@ -180,4 +181,5 @@ void LearningMotion::learn()
         printf("starting hierarchical K-means clustering\n");
         kmeans.clusterSizeConstraint(X);
     }
+    */
 }

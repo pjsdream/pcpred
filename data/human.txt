@@ -1,0 +1,31 @@
+15
+head_1
+left_elbow_1
+left_foot_1
+left_hand_1
+left_hip_1
+left_knee_1
+left_shoulder_1
+neck_1
+torso_1
+right_elbow_1
+right_foot_1
+right_hand_1
+right_hip_1
+right_knee_1
+right_shoulder_1
+14
+head_1	neck_1
+neck_1	left_shoulder_1
+left_shoulder_1	left_elbow_1
+left_elbow_1	left_hand_1
+neck_1	right_shoulder_1
+right_shoulder_1	right_elbow_1
+right_elbow_1	right_hand_1
+neck_1	torso_1
+torso_1	left_hip_1
+left_hip_1	left_knee_1
+left_knee_1	left_foot_1
+torso_1	right_hip_1
+right_hip_1	right_knee_1
+right_knee_1	right_foot_1
