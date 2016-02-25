@@ -79,6 +79,18 @@ src/playback.cpp
 )
 target_link_libraries(playback pcpred)
 
+# application for Q-learning task planner
+rosbuild_add_executable(task_planner
+src/task_planner.cpp
+)
+target_link_libraries(task_planner pcpred)
+
+# application for motion planner
+rosbuild_add_executable(motion_planner
+src/motion_planner.cpp
+)
+target_link_libraries(motion_planner pcpred)
+
 
 
 # test application for openni raw image subscriber
