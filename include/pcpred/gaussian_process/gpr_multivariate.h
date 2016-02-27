@@ -20,7 +20,9 @@ public:
 
     void setVisualizerTopic(const std::string& topic);
 
-    void setObservation(const Eigen::MatrixXd& X, const Eigen::VectorXd& Y);
+    void setObservation(const Eigen::MatrixXd &X, const Eigen::MatrixXd& Y);
+    void setObservationInput(const Eigen::MatrixXd& X);
+    void setObservationOutput(const Eigen::VectorXd &Y);
     void setHyperParameters(double l, double sigma_f, double sigma_n);
 
     void print();

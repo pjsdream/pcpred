@@ -12,13 +12,11 @@ using namespace pcpred;
 
 LearningMotionOptions::LearningMotionOptions()
 {
-    input_duration = 1.0;
-    input_num_pieces = 5;
-    output_duration = 1.0;
-    output_num_pieces = 5;
+    input_frames = 15;
+    output_frames = 15;
     num_samples = 100000;
     max_cluster_size = 100;
-    kmeans_k = 2;
+    kmeans_k = 3;
 }
 
 void LearningMotionOptions::parse(const char* filename)
@@ -30,17 +28,11 @@ void LearningMotionOptions::parse(const char* filename)
     char param[128];
     while (fscanf(fp, "%s", param) == 1)
     {
-        if (!strcmp(param, "input_duration:"))
-            fscanf(fp, "%lf", &input_duration);
+        if (!strcmp(param, "input_frames:"))
+            fscanf(fp, "%lf", &input_frames);
 
-        else if (!strcmp(param, "output_duration:"))
-            fscanf(fp, "%lf", &output_duration);
-
-        else if (!strcmp(param, "input_num_pieces:"))
-            fscanf(fp, "%d", &input_num_pieces);
-
-        else if (!strcmp(param, "output_num_pieces:"))
-            fscanf(fp, "%d", &output_num_pieces);
+        else if (!strcmp(param, "output_frames:"))
+            fscanf(fp, "%lf", &output_frames);
 
         else if (!strcmp(param, "num_samples:"))
             fscanf(fp, "%d", &num_samples);
@@ -57,8 +49,7 @@ void LearningMotionOptions::parse(const char* filename)
 
 void LearningMotionOptions::print()
 {
-    printf("duration         = %lfs(input), %lfs(output)\n", input_duration, output_duration);
-    printf("# curve pieces   = %d(input)  %d(output)\n", input_num_pieces, output_num_pieces);
+    printf("# frames         = %d(input)  %d(output)\n", input_frames, output_frames);
     printf("# samples        = %d\n", num_samples);
     printf("max cluster size = %d\n", max_cluster_size);
     printf("k (k-means)      = %d\n", kmeans_k);
@@ -79,95 +70,102 @@ void LearningMotion::setOptions(const LearningMotionOptions& options)
     options_ = options;
 }
 
-void LearningMotion::parseData(const char *filename)
+void LearningMotion::setHumanModelFilename(const std::string& filename)
 {
-    FILE* fp = fopen(filename, "r");
-    if (fp == NULL)
-        return;
-
-    char name[128];
-    double t, x, y, z;
-    while (fscanf(fp, "%s%lf%lf%lf%lf", name, &t, &x, &y, &z) == 5)
-    {
-        Stream s;
-        s.joint_name = name;
-        s.t = t;
-        s.position = Eigen::Vector3d(x, y, z);
-        stream_.push_back(s);
-    }
-
-    fclose(fp);
+    human_model_filename_ = filename;
 }
 
-void LearningMotion::learn()
+void LearningMotion::parseData(const char *directory)
 {
-    /*
-    const HumanMotionFeature::FeatureType feature_type = HumanMotionFeature::FEATURE_TYPE_ABSOLUTE_POSITION;
-    const double last_time = stream_.rbegin()->t;
+    int e = 0;
+    while (true)
+    {
+        char filename[128];
+        sprintf(filename, "%s/sequence%03d.txt", directory, e);
 
+        FILE* fp = fopen(filename, "r");
+        if (fp == NULL)
+            return;
+
+        int r, c;
+        fscanf(fp, "%d%d", &r, &c);
+
+        Eigen::MatrixXd ksi;
+        for (int i=0; i<r; i++)
+        {
+            for (int j=0; j<c; j++)
+                fscanf(fp, "%lf", &ksi(i,j));
+        }
+        ksi_.push_back(ksi);
+
+        Eigen::VectorXi actions;
+        Eigen::VectorXi progress_states;
+        actions.resize(c);
+        progress_states.resize(c);
+        for (int i=0; i<c; i++)
+        {
+            fscanf(fp, "%lf", &actions(i));
+
+            progress_states(i) = 1 << actions(i);
+            if (i)
+                progress_states(i) |= progress_states(i-1);
+        }
+        actions_.push_back(actions);
+        progress_states_.push_back(progress_states);
+
+        fclose(fp);
+    }
+}
+
+void LearningMotion::learn(const char *directory)
+{
     HumanMotionFeature input_feature;
-    input_feature.setCurveShape(options_.input_num_pieces, options_.input_duration);
+    input_feature.loadHumanJoints(human_model_filename_);
 
     HumanMotionFeature output_feature;
-    output_feature.setCurveShape(options_.output_num_pieces, options_.output_duration);
+    output_feature.loadHumanJoints(human_model_filename_);
 
-    Eigen::MatrixXd X(1, options_.num_samples);
-    Eigen::MatrixXd input_encoding(1, options_.num_samples);
-    Eigen::MatrixXd output_encoding(1, options_.num_samples);
+    Eigen::MatrixXd X(input_feature.columnFeatureSize(), options_.num_samples);
+    Eigen::MatrixXd Y(output_feature.columnFeatureSize(), options_.num_samples);
+
+    if (verbose_)
+    {
+        printf("input feature dimension = %d\n", input_feature.columnFeatureSize());
+        fflush(stdout);
+    }
 
 
-    int input_feature_feature_size;
-    int input_feature_encoding_size;
-    int output_feature_encoding_size;
+    int num_possibilities;
+    for (int i=0; i<ksi_.size(); i++)
+        num_possibilities += ksi_[i].cols();
 
-    // data sampling from video
+    // data sampling from episodes
     for (int i=0; i<options_.num_samples; i++)
     {
-        input_feature.clear();
-        output_feature.clear();
-
+        int r = rand() % num_possibilities;
+        int demo;
         int s;
-        do
+        for (int j=0; j<ksi_.size(); j++)
         {
-            s = rand() % stream_.size();
-        } while(stream_[s].t > last_time - options_.input_duration + options_.output_duration);
-
-        int p = s;
-        while (p < stream_.size() && stream_[p].t <= stream_[s].t + options_.input_duration)
-        {
-            input_feature.observe(stream_[p].joint_name, stream_[p].t, stream_[p].position);
-            p++;
-        }
-        int s_output = p;
-        while (p < stream_.size() && stream_[p].t <= stream_[s_output].t + options_.output_duration)
-        {
-            output_feature.observe(stream_[p].joint_name, stream_[p].t, stream_[p].position);
-            p++;
-        }
-
-        // size is available after the first sampling
-        if (i==0)
-        {
-            input_feature_feature_size = input_feature.featureSize(feature_type);
-            input_feature_encoding_size = input_feature.encodingSize();
-            output_feature_encoding_size = output_feature.encodingSize();
-
-            X.conservativeResize(input_feature_feature_size, Eigen::NoChange);
-            input_encoding.conservativeResize(input_feature_encoding_size, Eigen::NoChange);
-            output_encoding.conservativeResize(output_feature_encoding_size, Eigen::NoChange);
-
-            if (verbose_)
+            if (r < ksi_[i].cols() - options_.input_frames - options_.output_frames)
             {
-                printf("input  feature dimension   = %d\n", input_feature_feature_size);
-                printf("input  curve encoding size = %d\n", input_feature_encoding_size);
-                printf("output curve encoding size = %d\n", output_feature_encoding_size);
-                fflush(stdout);
+                demo = j;
+                s = options_.input_frames + r - 1;
+                break;
             }
+            r -= ksi_[i].cols() - options_.input_frames - options_.output_frames;
         }
 
-        X.col(i) = input_feature.toFeature( feature_type );
-        input_encoding.col(i) = input_feature.encode();
-        output_encoding.col(i) = output_feature.encode();
+        input_feature.clearFeature();
+        output_feature.clearFeature();
+
+        for (int j = s - options_.input_frames + 1; j <= s; j++)
+            input_feature.addFrame(ksi_[demo].col(j));
+        for (int j = s+1; j <= s + options_.output_frames; j++)
+            output_feature.addFrame(ksi_[demo].col(j));
+
+        X.col(i) = input_feature.columnFeature();
+        Y.col(i) = output_feature.columnFeature();
     }
 
     if (verbose_)
@@ -178,8 +176,34 @@ void LearningMotion::learn()
         kmeans.setK( options_.kmeans_k );
         kmeans.setTerminationCondition(100000);
 
-        printf("starting hierarchical K-means clustering\n");
-        kmeans.clusterSizeConstraint(X);
+        printf("hierarchical K-means clustering started\n"); fflush(stdout);
+        const std::vector<int> cluster = kmeans.clusterSizeConstraint(X);
+        printf("hierarchical K-means clustering finished\n"); fflush(stdout);
+
+
+        std::map<int, int> cluster_size;
+        for (int i=0; i<cluster.size(); i++)
+            cluster_size[ cluster[i] ]++;
+
+        for (int i=0; i<cluster.size(); i++)
+            cluster_centers_[ cluster[i] ] += X.col(i) / cluster_size[ cluster[i] ];
+
+        printf("GPR started\n"); fflush(stdout);
+        for (int i=0; i<cluster_size.size(); i++)
+        {
+            gprs_[i].setHyperParameters(gpr_l_, gpr_sigma_f_, gpr_sigma_n_);
+
+            Eigen::MatrixXd cX(X.cols(), cluster_size[i]);
+
+            int c = 0;
+            for (int j=0; j<cluster.size(); j++)
+            {
+                if (cluster[j] == i)
+                    cX.col(c++) = X.col(j);
+            }
+
+            gprs_[i].setObservationInput(cX);
+        }
+        printf("GPR finished\n"); fflush(stdout);
     }
-    */
 }

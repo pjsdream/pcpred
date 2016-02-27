@@ -4,6 +4,8 @@
 
 #include <pcpred/feature/human_motion_feature.h>
 
+#include <pcpred/gaussian_process/gpr_multivariate.h>
+
 #include <Eigen/Dense>
 
 #include <string>
@@ -24,10 +26,8 @@ public:
 
 public:
 
-    double input_duration;
-    int input_num_pieces;
-    double output_duration;
-    int output_num_pieces;
+    int input_frames;
+    int output_frames;
 
     int num_samples;
     int kmeans_k;
@@ -37,30 +37,34 @@ public:
 
 class LearningMotion
 {
-private:
-
-    struct Stream
-    {
-        std::string joint_name;
-        double t;
-        Eigen::Vector3d position;
-    };
-
 public:
 
     LearningMotion();
 
     void setVerbose(bool flag = true);
     void setOptions(const LearningMotionOptions& options);
+    void setHumanModelFilename(const std::string& filename);
+    void setGprHyperParameters(double l, double sigma_f, double sigma_n);
 
-    void parseData(const char* filename);
-    void learn();
+    void learn(const char *directory);
 
 private:
 
-    LearningMotionOptions options_;
+    void parseData(const char* directory);
 
-    std::vector<Stream> stream_;
+    LearningMotionOptions options_;
+    std::string human_model_filename_;
+
+    std::vector<Eigen::MatrixXd> ksi_;
+    std::vector<Eigen::VectorXi> actions_;
+    std::vector<Eigen::VectorXi> progress_states_;
+
+    std::vector<Eigen::VectorXd> cluster_centers_;
+    std::vector<GprMultivariate> gprs_;
+    std::vector<Eigen::MatrixXd> gpr_outputs_;
+    double gpr_l_;
+    double gpr_sigma_f_;
+    double gpr_sigma_n_;
 
     bool verbose_;
 };

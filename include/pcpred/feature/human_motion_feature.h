@@ -24,6 +24,9 @@ public:
 
     void loadHumanJoints(const std::string& filename);
     void clear();
+    void clearFeature();
+    void loadFeature(const std::string& filename);
+    void saveFeature(const std::string& filename);
 
     void addFrame(const Eigen::VectorXd& column);
 
@@ -38,6 +41,8 @@ public:
     }
 
     Eigen::MatrixXd feature();
+    Eigen::VectorXd columnFeature();
+    int columnFeatureSize();
 
     void setVisualizerTopic(const std::string& topic);
     void visualizeHumanMotion(const std::string& ns = "human");

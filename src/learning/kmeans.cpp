@@ -136,16 +136,32 @@ std::vector<int> Kmeans::cluster(const Eigen::MatrixXd& X, const std::vector<int
             num[result_[i]]++;
         }
 
+        bool empty_cluster = false;
         for (int i=0; i<k; i++)
         {
             if (num[i] == 0)
             {
-                int x = rand() % n;
-                c.col(i) = X.col(x);
-                result_[x] = i;
+                empty_cluster = true;
+                break;
             }
             else
                 c.col(i) /= num[i];
+        }
+
+        if (empty_cluster)
+        {
+            selected.resize(n, 0);
+            for (int i=0; i<k; i++)
+            {
+                int x;
+                do
+                {
+                    x = rand() % n;
+                } while(selected[x]);
+
+                selected[x] = true;
+                c.col(i) = X.col(x);
+            }
         }
 
         // terminate if converged

@@ -53,9 +53,57 @@ void HumanMotionFeature::clear()
     links_.clear();
 }
 
+void HumanMotionFeature::clearFeature()
+{
+    feature_.conservativeResize(Eigen::NoChange, 0);
+}
+
+void HumanMotionFeature::loadFeature(const std::string &filename)
+{
+    FILE* fp = fopen(filename.c_str(), "r");
+
+    int r, c;
+    fscanf(fp, "%d%d", &r, &c);
+    feature_.resize(r, c);
+
+    for (int i=0; i<r; i++)
+    {
+        for (int j=0; j<c; j++)
+            fscanf(fp, "%lf", &feature_(i,j));
+    }
+
+    fclose(fp);
+}
+
+void HumanMotionFeature::saveFeature(const std::string &filename)
+{
+    FILE* fp = fopen(filename.c_str(), "w");
+
+    fprintf(fp, "%d %d\n", feature_.rows(), feature_.cols());
+
+    for (int i=0; i<feature_.rows(); i++)
+    {
+        for (int j=0; j<feature_.cols(); j++)
+            fprintf(fp, "%lf ", feature_(i,j));
+        fprintf(fp, "\n");
+    }
+
+    fclose(fp);
+}
+
 Eigen::MatrixXd HumanMotionFeature::feature()
 {
     return feature_;
+}
+
+Eigen::VectorXd HumanMotionFeature::columnFeature()
+{
+    return Eigen::Map<Eigen::VectorXd>(feature_.data(), feature_.cols() * feature_.rows());
+}
+
+int HumanMotionFeature::columnFeatureSize()
+{
+    return feature_.cols() * feature_.rows();
 }
 
 void HumanMotionFeature::addFrame(const Eigen::VectorXd& column)

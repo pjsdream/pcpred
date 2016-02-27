@@ -27,10 +27,15 @@ double GprMultivariate::kernel(const Eigen::VectorXd& x1, const Eigen::VectorXd&
     return sigma_f_ * sigma_f_ * std::exp( -(x1-x2).dot(x1-x2) / (2. * l_ * l_));
 }
 
-void GprMultivariate::setObservation(const Eigen::MatrixXd &X, const Eigen::VectorXd &Y)
+void GprMultivariate::setObservation(const Eigen::MatrixXd &X, const Eigen::MatrixXd& Y)
+{
+    setObservationInput(X);
+    setObservationOutput(Y);
+}
+
+void GprMultivariate::setObservationInput(const Eigen::MatrixXd &X)
 {
     X_ = X;
-    Y_ = Y;
 
     // covariance matrix
     const int n = X_.cols();
@@ -49,6 +54,11 @@ void GprMultivariate::setObservation(const Eigen::MatrixXd &X, const Eigen::Vect
     }
 
     K_inverse_ = K_.inverse();
+}
+
+void GprMultivariate::setObservationOutput(const Eigen::VectorXd &Y)
+{
+    Y_ = Y;
 }
 
 void GprMultivariate::setHyperParameters(double l, double sigma_f, double sigma_n)

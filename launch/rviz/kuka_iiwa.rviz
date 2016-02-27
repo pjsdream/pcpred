@@ -9,7 +9,7 @@ Panels:
         - /TF1/Tree1
         - /visual1/Namespaces1
         - /MotionPlanning1/Planned Path1
-        - /human_motion1/Namespaces1
+        - /result1/Namespaces1
       Splitter Ratio: 0.516049
     Tree Height: 576
   - Class: rviz/Selection
@@ -54,12 +54,12 @@ Visualization Manager:
       Reference Frame: <Fixed Frame>
       Value: false
     - Class: rviz/Axes
-      Enabled: false
+      Enabled: true
       Length: 1
       Name: Axes
       Radius: 0.01
       Reference Frame: <Fixed Frame>
-      Value: false
+      Value: true
     - Class: rviz/TF
       Enabled: false
       Frame Timeout: 15
@@ -174,7 +174,7 @@ Visualization Manager:
             Show Axes: false
             Show Trail: false
             Value: true
-        Loop Animation: true
+        Loop Animation: false
         Robot Alpha: 0.5
         Show Robot Collision: false
         Show Robot Visual: true
@@ -315,21 +315,21 @@ Visualization Manager:
       Use rainbow: true
       Value: true
     - Class: rviz/MarkerArray
-      Enabled: true
+      Enabled: false
       Marker Topic: human_motion
       Name: human_motion
       Namespaces:
         {}
       Queue Size: 100
-      Value: true
+      Value: false
     - Class: rviz/MarkerArray
-      Enabled: true
+      Enabled: false
       Marker Topic: result_video
       Name: result_video
       Namespaces:
         {}
       Queue Size: 100
-      Value: true
+      Value: false
     - Class: rviz/MarkerArray
       Enabled: false
       Marker Topic: result
@@ -526,22 +526,22 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 2.03843
+      Distance: 1.28407
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.06
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 0.53587
-        Y: 0.0014186
-        Z: 0.0720263
+        X: 0.858129
+        Y: 0.0159827
+        Z: 0.0254083
       Name: Current View
       Near Clip Distance: 0.01
-      Pitch: 1.3298
+      Pitch: 0.579795
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 4.35055
+      Yaw: 2.04147
     Saved: ~
 Window Geometry:
   Displays:
@@ -561,5 +561,5 @@ Window Geometry:
   Views:
     collapsed: false
   Width: 1543
-  X: 233
+  X: 225
   Y: 10
