@@ -2,6 +2,8 @@
 #define LEARNING_MOTION_H
 
 
+#include <pcpred/util/logger.h>
+
 #include <pcpred/feature/human_motion_feature.h>
 
 #include <pcpred/gaussian_process/gpr_multivariate.h>
@@ -32,21 +34,26 @@ public:
     int num_samples;
     int kmeans_k;
     int max_cluster_size;
+
+    double gpr_l;
+    double gpr_sigma_f;
+    double gpr_sigma_n;
 };
 
 
-class LearningMotion
+class LearningMotion : public Logger
 {
 public:
 
     LearningMotion();
 
-    void setVerbose(bool flag = true);
     void setOptions(const LearningMotionOptions& options);
     void setHumanModelFilename(const std::string& filename);
-    void setGprHyperParameters(double l, double sigma_f, double sigma_n);
 
     void learn(const char *directory);
+
+    void loadTrainedData(const std::string& filename);
+    void saveTrainedData(const std::string& filename);
 
 private:
 
@@ -61,12 +68,7 @@ private:
 
     std::vector<Eigen::VectorXd> cluster_centers_;
     std::vector<GprMultivariate> gprs_;
-    std::vector<Eigen::MatrixXd> gpr_outputs_;
-    double gpr_l_;
-    double gpr_sigma_f_;
-    double gpr_sigma_n_;
-
-    bool verbose_;
+    std::vector<Eigen::MatrixXd> gpr_outputs_;  // [cluster](row:data, column:channel)
 };
 
 }

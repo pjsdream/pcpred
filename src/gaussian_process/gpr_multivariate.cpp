@@ -73,6 +73,12 @@ void GprMultivariate::print()
     std::cout << "K = " << std::endl << K_ << std::endl;
 }
 
+void GprMultivariate::loadTrainedData(const Eigen::MatrixXd& X, const Eigen::MatrixXd& K_inverse)
+{
+    X_ = X;
+    K_inverse_ = K_inverse;
+}
+
 void GprMultivariate::regression(const Eigen::MatrixXd& X, Eigen::VectorXd& mean, Eigen::MatrixXd& variance)
 {
     const int n = X_.cols();
@@ -106,6 +112,12 @@ void GprMultivariate::regression(const Eigen::MatrixXd& X, Eigen::VectorXd& mean
     variance = K2 - K1 * K_inverse_ * K1.transpose();
 }
 
+void GprMultivariate::regression(const Eigen::VectorXd& Y, const Eigen::MatrixXd& X, Eigen::VectorXd& mean, Eigen::MatrixXd& variance)
+{
+    setObservationOutput(Y);
+    regression(X, mean, variance);
+}
+
 void GprMultivariate::regression(const Eigen::VectorXd& x, double& mean, double& variance)
 {
     const int n = X_.cols();
@@ -137,6 +149,12 @@ void GprMultivariate::regression(const Eigen::VectorXd& x, double& mean, double&
 
     mean = (K1 * (K_inverse_ * Y_))(0,0);
     variance = (K2 - K1 * K_inverse_ * K1.transpose())(0,0);
+}
+
+void GprMultivariate::regression(const Eigen::VectorXd& Y, const Eigen::VectorXd& x, double& mean, double& variance)
+{
+    setObservationOutput(Y);
+    regression(x, mean, variance);
 }
 
 void GprMultivariate::visualizeRegression(const Eigen::MatrixXd& X)

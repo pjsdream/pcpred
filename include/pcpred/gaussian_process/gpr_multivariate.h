@@ -27,17 +27,24 @@ public:
 
     void print();
 
+    inline Eigen::MatrixXd getX() { return X_; }
+    inline Eigen::MatrixXd getKInverse() { return K_inverse_; }
+    inline double getL() { return l_; }
+    inline double getSigmaF() { return sigma_f_; }
+    inline double getSigmaN() { return sigma_n_; }
+
+    void loadTrainedData(const Eigen::MatrixXd& X, const Eigen::MatrixXd& K_inverse);
+
     void regression(const Eigen::MatrixXd& X, Eigen::VectorXd& mean, Eigen::MatrixXd& variance);
+    void regression(const Eigen::VectorXd& Y, const Eigen::MatrixXd& X, Eigen::VectorXd& mean, Eigen::MatrixXd& variance);
     void regression(const Eigen::VectorXd& x, double& mean, double& variance);
+    void regression(const Eigen::VectorXd& Y, const Eigen::VectorXd& x, double& mean, double& variance);
     void visualizeInput();
     void visualizeRegression(const Eigen::MatrixXd& X);
 
 private:
 
     double kernel(const Eigen::VectorXd& x1, const Eigen::VectorXd& x2);
-
-    // output dimension
-    int D_;
 
     double l_;
     double sigma_f_;

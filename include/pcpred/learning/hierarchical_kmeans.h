@@ -2,6 +2,8 @@
 #define HIERARCHICAL_KMEANS_H
 
 
+#include <pcpred/util/logger.h>
+
 #include <vector>
 
 #include <Eigen/Dense>
@@ -12,7 +14,7 @@
 namespace pcpred
 {
 
-class HierarchicalKmeans
+class HierarchicalKmeans : public Logger
 {
 public:
 
@@ -22,8 +24,6 @@ public:
     void setSizeLimit(int size_limit);
     void setTerminationCondition(int max_iterations);
 
-    void setVerbose(bool flag = true);
-
     std::vector<int> clusterSizeConstraint(const Eigen::MatrixXd& X);
     std::vector<int> clusterSizeConstraint(const Eigen::MatrixXd& X, const std::vector<int>& indices);
 
@@ -32,8 +32,6 @@ private:
     int k_;
     int size_limit_;
     Kmeans kmeans_;
-
-    bool verbose_;
 };
 
 }

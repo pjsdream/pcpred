@@ -2,6 +2,8 @@
 
 #include <stdio.h>
 
+#include <map>
+
 using namespace pcpred;
 
 
@@ -11,7 +13,6 @@ HierarchicalKmeans::HierarchicalKmeans()
 
     setK(2);
     setSizeLimit(100);
-    setVerbose(false);
 }
 
 void HierarchicalKmeans::setK(int k)
@@ -27,11 +28,6 @@ void HierarchicalKmeans::setSizeLimit(int size_limit)
 void HierarchicalKmeans::setTerminationCondition(int max_iterations)
 {
     kmeans_.setTerminationCondition(max_iterations);
-}
-
-void HierarchicalKmeans::setVerbose(bool flag)
-{
-    verbose_ = flag;
 }
 
 std::vector<int> HierarchicalKmeans::clusterSizeConstraint(const Eigen::MatrixXd &X)
@@ -63,10 +59,9 @@ std::vector<int> HierarchicalKmeans::clusterSizeConstraint(const Eigen::MatrixXd
 
     if (verbose_)
     {
-        printf("hierarchical k-means: [ %d ] -> [ ", indices.size());
-        for (int i=0; i<k_; i++) printf("%d ", children_indices[i].size());
-        printf("]\n");
-        fflush(stdout);
+        LOG("hierarchical k-means: [ %d ] -> [ ", indices.size());
+        for (int i=0; i<k_; i++) LOG("%d ", children_indices[i].size());
+        LOG("]\n");
     }
 
 
@@ -75,16 +70,20 @@ std::vector<int> HierarchicalKmeans::clusterSizeConstraint(const Eigen::MatrixXd
     {
         std::vector<int> hierarchical_cluster_result = clusterSizeConstraint(X, children_indices[i]);
 
-        int max_children_cluster = 0;
+        std::map<int, int> remap;
+
         for (int j=0; j<hierarchical_cluster_result.size(); j++)
         {
-            result[ children_array_indices[i][j] ] = num_clusters + hierarchical_cluster_result[j];
+            if (remap.find( hierarchical_cluster_result[j] ) == remap.end())
+            {
+                const int size = remap.size();
+                remap[ hierarchical_cluster_result[j] ] = size;
+            }
 
-            if (max_children_cluster < hierarchical_cluster_result[j])
-                max_children_cluster = hierarchical_cluster_result[j];
+            result[ children_array_indices[i][j] ] = num_clusters + remap[ hierarchical_cluster_result[j] ];
         }
 
-        num_clusters += max_children_cluster + 1;
+        num_clusters += remap.size();
     }
 
     return result;

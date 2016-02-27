@@ -43,6 +43,7 @@ public:
     Eigen::MatrixXd feature();
     Eigen::VectorXd columnFeature();
     int columnFeatureSize();
+    int frameSize();
 
     void setVisualizerTopic(const std::string& topic);
     void visualizeHumanMotion(const std::string& ns = "human");

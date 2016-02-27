@@ -106,6 +106,11 @@ int HumanMotionFeature::columnFeatureSize()
     return feature_.cols() * feature_.rows();
 }
 
+int HumanMotionFeature::frameSize()
+{
+    return joint_names_.size() * 3;
+}
+
 void HumanMotionFeature::addFrame(const Eigen::VectorXd& column)
 {
     feature_.conservativeResize(Eigen::NoChange, feature_.cols() + 1);
