@@ -7,5 +7,5 @@ build/
 include/Eigen/
 
 # QtCreator files
-CMakeLists.txt.user
+CMakeLists.txt.user*
 

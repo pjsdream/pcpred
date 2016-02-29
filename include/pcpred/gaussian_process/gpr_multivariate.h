@@ -44,7 +44,7 @@ public:
 
 private:
 
-    double kernel(const Eigen::VectorXd& x1, const Eigen::VectorXd& x2);
+    double kernel(const Eigen::VectorXd& x1, const Eigen::VectorXd& x2) const;
 
     double l_;
     double sigma_f_;

@@ -69,6 +69,8 @@ void LearningMotionOptions::print()
 
 LearningMotion::LearningMotion()
 {
+    visualizer_ = 0;
+    setVisualizerTopic("motion_inference");
 }
 
 void LearningMotion::setOptions(const LearningMotionOptions& options)
@@ -79,6 +81,7 @@ void LearningMotion::setOptions(const LearningMotionOptions& options)
 void LearningMotion::setHumanModelFilename(const std::string& filename)
 {
     human_model_filename_ = filename;
+    feature_template_.loadHumanJoints(filename);
 }
 
 void LearningMotion::parseData(const char *directory)
@@ -131,10 +134,10 @@ void LearningMotion::learn(const char *directory)
     parseData(directory);
 
     HumanMotionFeature input_feature;
-    input_feature.loadHumanJoints(human_model_filename_);
+    input_feature = feature_template_;
 
     HumanMotionFeature output_feature;
-    output_feature.loadHumanJoints(human_model_filename_);
+    output_feature = feature_template_;
 
     Eigen::MatrixXd X(ksi_[0].rows() * options_.input_frames, options_.num_samples);
     Eigen::MatrixXd Y(ksi_[0].rows() * options_.output_frames, options_.num_samples);
@@ -230,6 +233,29 @@ void LearningMotion::learn(const char *directory)
         gpr_outputs_[i] = cY;
     }
     LOG("GPR finished\n");
+
+    means_.resize( gpr_outputs_[0].cols() );
+    variances_.resize( gpr_outputs_[0].cols() );
+}
+
+void LearningMotion::infer(const Eigen::VectorXd &feature, int state)
+{
+    int cluster_index = 0;
+    double min_diff = (feature - cluster_centers_[0]).squaredNorm();
+    for (int i=1; i<cluster_centers_.size(); i++)
+    {
+        const double diff = (feature - cluster_centers_[i]).squaredNorm();
+        if (min_diff > diff)
+        {
+            min_diff = diff;
+            cluster_index = i;
+        }
+    }
+
+    GprMultivariate& gpr = gprs_[cluster_index];
+    const Eigen::MatrixXd& gpr_output = gpr_outputs_[cluster_index];
+    for (int i=0; i<gpr_output.cols(); i++)
+        gpr.regression(gpr_output.col(i), feature, means_(i), variances_(i));
 }
 
 void LearningMotion::loadTrainedData(const std::string& filename)
@@ -326,6 +352,9 @@ void LearningMotion::loadTrainedData(const std::string& filename)
     }
 
     fclose(fp);
+
+    means_.resize( gpr_outputs_[0].cols() );
+    variances_.resize( gpr_outputs_[0].cols() );
 }
 
 void LearningMotion::saveTrainedData(const std::string& filename)
@@ -390,4 +419,39 @@ void LearningMotion::saveTrainedData(const std::string& filename)
     fprintf(fp, "]\n");
 
     fclose(fp);
+}
+
+void LearningMotion::setVisualizerTopic(const std::string &topic)
+{
+    if (visualizer_ != 0)
+        delete visualizer_;
+
+    visualizer_ = new MarkerArrayVisualizer(topic.c_str());
+}
+
+void LearningMotion::visualizeInferenceResult()
+{
+    const int num_joints = feature_template_.numJoints();
+
+    int ptr = 0;
+
+    for (int i=0; i<options_.output_frames; i++)
+    {
+        const std::string ns = "prediction_" + std::to_string(i);
+
+        std::vector<Eigen::Vector3d> mu(num_joints);
+        std::vector<Eigen::Matrix3d> sigma(num_joints);
+        std::vector<double> offset(num_joints);
+
+        for (int j=0; j<num_joints; j++)
+        {
+            mu[j] = means_.block(ptr, 0, 3, 1);
+            sigma[j] = variances_.block(ptr, 0, 3, 1).asDiagonal();
+            offset[j] = 0.05;
+
+            ptr += 3;
+        }
+
+        visualizer_->drawGaussianDistributions(ns.c_str(), mu, sigma, 0.95, offset);
+    }
 }

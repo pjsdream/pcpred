@@ -117,6 +117,12 @@ void HumanMotionFeature::addFrame(const Eigen::VectorXd& column)
     feature_.col( feature_.cols() - 1 ) = column;
 }
 
+void HumanMotionFeature::retainLastFrames(int count)
+{
+    if (feature_.cols() > count)
+        feature_ = feature_.block(0, feature_.cols() - count, feature_.rows(), count);
+}
+
 void HumanMotionFeature::setVisualizerTopic(const std::string& topic)
 {
     ros::NodeHandle nh;

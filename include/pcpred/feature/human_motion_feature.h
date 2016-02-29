@@ -29,6 +29,12 @@ public:
     void saveFeature(const std::string& filename);
 
     void addFrame(const Eigen::VectorXd& column);
+    void retainLastFrames(int count);
+
+    inline int numFrames()
+    {
+        return feature_.cols();
+    }
 
     inline int numJoints()
     {

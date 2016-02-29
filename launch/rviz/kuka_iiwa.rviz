@@ -9,6 +9,8 @@ Panels:
         - /TF1/Tree1
         - /visual1/Namespaces1
         - /MotionPlanning1/Planned Path1
+        - /motion_inference1
+        - /motion_inference1/Namespaces1
         - /result1/Namespaces1
       Splitter Ratio: 0.516049
     Tree Height: 576
@@ -31,7 +33,7 @@ Panels:
     Experimental: false
     Name: Time
     SyncMode: 0
-    SyncSource: PointCloud2
+    SyncSource: ""
 Visualization Manager:
   Class: ""
   Displays:
@@ -61,19 +63,79 @@ Visualization Manager:
       Reference Frame: <Fixed Frame>
       Value: true
     - Class: rviz/TF
-      Enabled: false
+      Enabled: true
       Frame Timeout: 15
       Frames:
         All Enabled: false
+        camera_link:
+          Value: true
+        map:
+          Value: true
+        openni_depth_frame:
+          Value: true
+        revetting_tcp:
+          Value: true
+        revetting_tool:
+          Value: true
+        revetting_tool_1:
+          Value: true
+        revetting_tool_2:
+          Value: true
+        revetting_tool_3:
+          Value: true
+        revetting_tool_4:
+          Value: true
+        segment_0:
+          Value: true
+        segment_1:
+          Value: true
+        segment_2:
+          Value: true
+        segment_3:
+          Value: true
+        segment_4:
+          Value: true
+        segment_5:
+          Value: true
+        segment_6:
+          Value: true
+        segment_7:
+          Value: true
+        world:
+          Value: true
       Marker Scale: 0.5
       Name: TF
       Show Arrows: false
       Show Axes: true
       Show Names: true
       Tree:
-        {}
+        map:
+          camera_link:
+            openni_depth_frame:
+              {}
+          segment_0:
+            segment_1:
+              segment_2:
+                segment_3:
+                  segment_4:
+                    segment_5:
+                      segment_6:
+                        segment_7:
+                          revetting_tool:
+                            revetting_tcp:
+                              {}
+                            revetting_tool_1:
+                              {}
+                            revetting_tool_2:
+                              {}
+                            revetting_tool_3:
+                              {}
+                            revetting_tool_4:
+                              {}
+          world:
+            {}
       Update Interval: 0
-      Value: false
+      Value: true
     - Class: rviz/MarkerArray
       Enabled: true
       Marker Topic: /move_itomp/visual
@@ -315,13 +377,35 @@ Visualization Manager:
       Use rainbow: true
       Value: true
     - Class: rviz/MarkerArray
-      Enabled: false
+      Enabled: true
       Marker Topic: human_motion
       Name: human_motion
       Namespaces:
-        {}
+        human: true
       Queue Size: 100
-      Value: false
+      Value: true
+    - Class: rviz/MarkerArray
+      Enabled: true
+      Marker Topic: /motion_inference
+      Name: motion_inference
+      Namespaces:
+        prediction_0: false
+        prediction_1: false
+        prediction_10: false
+        prediction_11: false
+        prediction_12: false
+        prediction_13: false
+        prediction_14: true
+        prediction_2: false
+        prediction_3: false
+        prediction_4: false
+        prediction_5: false
+        prediction_6: false
+        prediction_7: false
+        prediction_8: false
+        prediction_9: false
+      Queue Size: 100
+      Value: true
     - Class: rviz/MarkerArray
       Enabled: false
       Marker Topic: result_video
@@ -526,22 +610,22 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 1.28407
+      Distance: 1.55756
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.06
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 0.858129
-        Y: 0.0159827
-        Z: 0.0254083
+        X: 0.669249
+        Y: 0.497361
+        Z: 0.465946
       Name: Current View
       Near Clip Distance: 0.01
-      Pitch: 0.579795
+      Pitch: 0.924796
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 2.04147
+      Yaw: 1.55421
     Saved: ~
 Window Geometry:
   Displays:
@@ -561,5 +645,5 @@ Window Geometry:
   Views:
     collapsed: false
   Width: 1543
-  X: 225
+  X: 77
   Y: 10

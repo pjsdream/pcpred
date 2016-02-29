@@ -22,9 +22,9 @@ void GprMultivariate::setVisualizerTopic(const std::string &topic)
     publisher_ = n.advertise<visualization_msgs::MarkerArray>(topic, 1000);
 }
 
-double GprMultivariate::kernel(const Eigen::VectorXd& x1, const Eigen::VectorXd& x2)
+double GprMultivariate::kernel(const Eigen::VectorXd& x1, const Eigen::VectorXd& x2) const
 {
-    return sigma_f_ * sigma_f_ * std::exp( -(x1-x2).dot(x1-x2) / (2. * l_ * l_));
+    return sigma_f_ * sigma_f_ * std::exp( -(x1-x2).squaredNorm() / (2. * l_ * l_));
 }
 
 void GprMultivariate::setObservation(const Eigen::MatrixXd &X, const Eigen::MatrixXd& Y)

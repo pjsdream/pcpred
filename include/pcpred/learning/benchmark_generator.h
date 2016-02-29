@@ -40,6 +40,10 @@ public:
     void loadScenario(const std::string& filename);
     void generate(const std::string& directory);
 
+    void generateValidationMatrix(const std::string& directory);
+    inline Eigen::MatrixXd getEpisodeMatrix() { return episode_matrix_; }
+    inline Eigen::VectorXi getEpisodeActions() { return episode_actions_; }
+
 private:
 
     int num_episodes_;
@@ -47,6 +51,9 @@ private:
     std::vector<int> num_sequences_;
 
     std::map<int, std::vector<Edge> > graph_;
+
+    Eigen::MatrixXd episode_matrix_;
+    Eigen::VectorXi episode_actions_;
 };
 
 }

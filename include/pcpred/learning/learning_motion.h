@@ -3,10 +3,10 @@
 
 
 #include <pcpred/util/logger.h>
-
 #include <pcpred/feature/human_motion_feature.h>
-
 #include <pcpred/gaussian_process/gpr_multivariate.h>
+
+#include <pcpred/visualization/marker_array_visualizer.h>
 
 #include <Eigen/Dense>
 
@@ -51,9 +51,13 @@ public:
     void setHumanModelFilename(const std::string& filename);
 
     void learn(const char *directory);
+    void infer(const Eigen::VectorXd& feature, int state);
 
     void loadTrainedData(const std::string& filename);
     void saveTrainedData(const std::string& filename);
+
+    void setVisualizerTopic(const std::string& topic);
+    void visualizeInferenceResult();
 
 private:
 
@@ -61,6 +65,7 @@ private:
 
     LearningMotionOptions options_;
     std::string human_model_filename_;
+    HumanMotionFeature feature_template_;
 
     std::vector<Eigen::MatrixXd> ksi_;
     std::vector<Eigen::VectorXi> actions_;
@@ -68,7 +73,12 @@ private:
 
     std::vector<Eigen::VectorXd> cluster_centers_;
     std::vector<GprMultivariate> gprs_;
-    std::vector<Eigen::MatrixXd> gpr_outputs_;  // [cluster](row:data, column:channel)
+    std::vector<Eigen::MatrixXd> gpr_outputs_;  // [cluster](row:channel, column:data)
+
+    Eigen::VectorXd means_;
+    Eigen::VectorXd variances_;
+
+    MarkerArrayVisualizer* visualizer_;
 };
 
 }

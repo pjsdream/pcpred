@@ -150,3 +150,80 @@ void BenchmarkGenerator::generate(const std::string& directory)
         fclose(fp);
     }
 }
+
+void BenchmarkGenerator::generateValidationMatrix(const std::string& directory)
+{
+    num_sequences_.resize(NUM_ACTIONS);
+    for (int i=0; i<NUM_ACTIONS; i++)
+    {
+        if (action_set_ & (1<<i))
+        {
+            int n = 0;
+            while (true)
+            {
+                char filename[128];
+                sprintf(filename, "%s/../V%02d/sequence%03d.txt", directory.c_str(), i, n);
+                FILE* fp = fopen(filename, "r");
+                if (fp == NULL)
+                {
+                    num_sequences_[i] = n-1;
+                    break;
+                }
+                fclose(fp);
+
+                n++;
+            }
+        }
+    }
+
+    Eigen::MatrixXd episode;
+    Eigen::VectorXi episode_actions;
+
+    int state = 0;
+    while (state != -1)
+    {
+        int action = 0;
+        int next_state = 0;
+
+        double p = (double)rand() / RAND_MAX;
+        for (int i=0; i<graph_[state].size(); i++)
+        {
+            const double prob = graph_[state][i].prob;
+            if (p <= prob)
+            {
+                action = graph_[state][i].action;
+                next_state = graph_[state][i].state;
+                break;
+            }
+            else p -= prob;
+        }
+
+        if (action == -1)
+            break;
+
+        state = next_state;
+
+        const int sequence = rand() % num_sequences_[action];
+        char sequence_filename[128];
+        sprintf(sequence_filename, "%s/../J%02d/sequence%03d.txt", directory.c_str(), action, sequence);
+
+        FILE* ifp = fopen(sequence_filename, "r");
+        int r, c;
+        fscanf(ifp, "%d%d", &r, &c);
+        Eigen::MatrixXd motion(r, c);
+        for (int i=0; i<r; i++)
+        {
+            for (int j=0; j<c; j++)
+                fscanf(ifp, "%lf", &motion(i,j));
+        }
+
+        episode.conservativeResize(r, episode.cols() + c);
+        episode.block(0, episode.cols() - c, r, c) = motion;
+        episode_actions.conservativeResize(episode_actions.rows() + c);
+        for (int i=0; i<c; i++)
+            episode_actions( episode_actions.rows()-c+i ) = action;
+    }
+
+    episode_matrix_ = episode;
+    episode_actions_ = episode_actions;
+}
