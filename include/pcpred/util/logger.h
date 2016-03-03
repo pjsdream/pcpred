@@ -31,6 +31,15 @@ protected:
         }
     }
 
+    void LOG_ERROR(const char* format, ...)
+    {
+        va_list a_list;
+        va_start(a_list, format);
+        vfprintf(stderr, format, a_list);
+        va_end(a_list);
+        fflush(stderr);
+    }
+
     bool verbose_;
 };
 

@@ -46,7 +46,7 @@ void BenchmarkGenerator::loadScenario(const std::string &filename)
 
                 graph_[state].push_back( Edge(action == -1 ? -1 : (state | (1 << action)), action, prob) );
 
-                action_set_ |= action;
+                action_set_ |= 1 << action;
             }
         }
     }
@@ -131,6 +131,8 @@ void BenchmarkGenerator::generate(const std::string& directory)
 
             episode.conservativeResize(r, episode.cols() + c);
             episode.block(0, episode.cols() - c, r, c) = motion;
+            blendMotion(episode, episode.cols() - c, motion_blend_frames_);
+
             episode_actions.conservativeResize(episode_actions.rows() + c);
             for (int i=0; i<c; i++)
                 episode_actions( episode_actions.rows()-c+i ) = action;
@@ -219,6 +221,8 @@ void BenchmarkGenerator::generateValidationMatrix(const std::string& directory)
 
         episode.conservativeResize(r, episode.cols() + c);
         episode.block(0, episode.cols() - c, r, c) = motion;
+        blendMotion(episode, episode.cols() - c, motion_blend_frames_);
+
         episode_actions.conservativeResize(episode_actions.rows() + c);
         for (int i=0; i<c; i++)
             episode_actions( episode_actions.rows()-c+i ) = action;
@@ -226,4 +230,110 @@ void BenchmarkGenerator::generateValidationMatrix(const std::string& directory)
 
     episode_matrix_ = episode;
     episode_actions_ = episode_actions;
+}
+
+void BenchmarkGenerator::blendMotion(Eigen::MatrixXd& motion, int frame, int motion_blend_frames)
+{
+    const int s = frame - motion_blend_frames + 1;
+    const int e = frame + motion_blend_frames;
+    if (s < 0 || e >= motion.cols())
+        return;
+
+    const double alpha = 0.5;
+
+    Eigen::MatrixXd block(motion.rows(), motion_blend_frames*2);
+
+    for (int i=0; i<motion_blend_frames * 2; i++)
+    {
+        const double t = (double)i / motion_blend_frames / 2.;
+        block.col(i) = (1-alpha) * ((1-t) * motion.col(s) + t * motion.col(e)) + alpha * motion.col(s+i);
+    }
+
+    motion.block(0, s, motion.rows(), motion_blend_frames*2) = block;
+}
+
+void BenchmarkGenerator::getNumSequences()
+{
+    num_sequences_.resize(NUM_ACTIONS);
+    for (int i=0; i<NUM_ACTIONS; i++)
+    {
+        if (action_set_ & (1<<i))
+        {
+            int n = 0;
+            while (true)
+            {
+                char filename[128];
+                sprintf(filename, "%s/../J%02d/sequence%03d.txt", directory_.c_str(), i, n);
+                FILE* fp = fopen(filename, "r");
+                if (fp == NULL)
+                {
+                    num_sequences_[i] = n-1;
+                    break;
+                }
+                fclose(fp);
+
+                n++;
+            }
+        }
+    }
+}
+
+
+void BenchmarkGenerator::setDirectory(const std::string& directory)
+{
+    directory_ = directory;
+
+    getNumSequences();
+}
+
+void BenchmarkGenerator::clear()
+{
+    episode_matrix_.conservativeResize(Eigen::NoChange, 0);
+    episode_actions_.conservativeResize(0);
+}
+
+void BenchmarkGenerator::appendAction(int action)
+{
+    const int sequence = rand() % num_sequences_[action];
+    appendAction(action, sequence);
+}
+
+void BenchmarkGenerator::appendAction(int action, int sequence)
+{
+    appendActionLastFrames(action, sequence);
+}
+
+void BenchmarkGenerator::appendActionLastFrames(int action, int sequence, int last_frames, bool is_idle)
+{
+    char sequence_filename[128];
+    sprintf(sequence_filename, "%s/../J%02d/sequence%03d.txt", directory_.c_str(), action, sequence);
+
+    FILE* ifp = fopen(sequence_filename, "r");
+    int r, c;
+    fscanf(ifp, "%d%d", &r, &c);
+    Eigen::MatrixXd motion(r, c);
+    for (int i=0; i<r; i++)
+    {
+        for (int j=0; j<c; j++)
+            fscanf(ifp, "%lf", &motion(i,j));
+    }
+
+    if (last_frames == -1)
+        last_frames = c;
+
+    episode_matrix_.conservativeResize(r, episode_matrix_.cols() + last_frames);
+    episode_matrix_.block(0,  episode_matrix_.cols() - last_frames, r, last_frames) = motion.block( 0, motion.cols() - last_frames, motion.rows(), last_frames);
+    blendMotion(episode_matrix_, episode_matrix_.cols() - last_frames, motion_blend_frames_);
+
+    episode_actions_.conservativeResize(episode_actions_.rows() + last_frames);
+    for (int i=c - last_frames; i<c; i++)
+        episode_actions_( episode_actions_.rows()-c+i ) = is_idle ? -1 : action;
+}
+
+void BenchmarkGenerator::appendIdle()
+{
+    const int action = rand() % NUM_ACTIONS;
+    const int sequence = rand() % num_sequences_[action];
+
+    appendActionLastFrames(action, sequence, 15, true);
 }

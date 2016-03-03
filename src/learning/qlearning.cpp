@@ -9,7 +9,7 @@ using namespace pcpred;
 
 QLearningOptions::QLearningOptions()
 {
-    alpha = 0.1;
+    omega = 0.1;
     gamma = 0.5;
     epsilon = 0.1;
 }
@@ -21,9 +21,9 @@ void QLearningOptions::parse(const std::string& filename)
     char variable[128];
     while (fscanf(fp, "%s", variable) == 1)
     {
-        if (!strcmp(variable, "alpha:"))
+        if (!strcmp(variable, "omega:"))
         {
-            fscanf(fp, "%lf", &alpha);
+            fscanf(fp, "%lf", &omega);
         }
         else if (!strcmp(variable, "gamma:"))
         {
@@ -40,7 +40,7 @@ void QLearningOptions::parse(const std::string& filename)
 
 void QLearningOptions::print()
 {
-    printf("Q-learning alpha   = %lf\n", alpha);
+    printf("Q-learning omega   = %lf\n", omega);
     printf("Q-learning gamma   = %lf\n", gamma);
     printf("Q-learning epsilon = %lf\n", epsilon);
 }
@@ -52,6 +52,12 @@ QLearning::QLearning()
     planning_request_publisher_ = nh.advertise<std_msgs::Int32>("planning_request", 100);
     planning_time_subscriber_ = nh.subscribe<std_msgs::Float64>("planning_time", 100, &QLearning::callbackPlanningTime, this);
     ros::Duration(1.0).sleep();
+
+    timestep_ = 0;
+
+    setState(0);
+
+    completion_time_ = 0;
 }
 
 void QLearning::setOptions(const QLearningOptions &options)
@@ -142,34 +148,56 @@ double QLearning::computeReward(int state, int action)
     std_msgs::Int32 planning_action;
     planning_action.data = action;
     ROS_INFO("Planning request %d", planning_action.data);
+    fflush(stdout);
     planning_request_publisher_.publish(planning_action);
 
     ROS_INFO("Waiting for planning time");
+    fflush(stdout);
     while (ros::ok() && planning_time_queue_.empty()) ros::spinOnce();
     const double planning_time = planning_time_queue_.front();
     planning_time_queue_.pop();
     ROS_INFO("Planning time %lf", planning_time);
+    fflush(stdout);
+
     r -= planning_time;
+    completion_time_ += planning_time;
 
     return r;
 }
 
-void QLearning::reinforcementLearn()
+int QLearning::reinforcementLearn()
 {
-    reinforcementLearn( rand() % num_states_ );
+    state_ = reinforcementLearn( state_ );
 }
 
-void QLearning::reinforcementLearn(int state)
+int QLearning::reinforcementLearn(int state)
 {
     int action;
 
     const double x = (double)rand() / RAND_MAX;
     if (x <= options_.epsilon)
     {
-        action = rand() % num_actions_;
+        if (transition_.row(state).maxCoeff() == -1)
+        {
+            last_action_ = -1;
+            completion_time_ = 0.;
+            return -1;
+        }
+
+        do
+        {
+            action = rand() % num_actions_;
+        } while (transition_(state, action) == -1);
     }
     else
     {
+        if (transition_.row(state).maxCoeff() == -1)
+        {
+            last_action_ = -1;
+            completion_time_ = 0.;
+            return -1;
+        }
+
         action = 0;
         for (int i=1; i<num_actions_; i++)
         {
@@ -178,17 +206,28 @@ void QLearning::reinforcementLearn(int state)
         }
     }
 
-    reinforcementLearn(state, action);
+    return reinforcementLearn(state, action);
 }
 
-void QLearning::reinforcementLearn(int state, int action)
+int QLearning::reinforcementLearn(int state, int action)
 {
+    last_action_ = action;
+
     if (transition_(state, action) == -1)
-        return;
+    {
+        last_action_ = -1;
+        completion_time_ = 0.;
+        return -1;
+    }
 
     const double r = computeReward(state, action);
+    const double alpha = std::pow(1. / (1. + timestep_), options_.omega);
 
-    q_table_(state, action) += options_.alpha * (r + options_.gamma * q_table_.row( transition_(state, action) ).maxCoeff() - q_table_(state, action));
+    q_table_(state, action) += alpha * (r + options_.gamma * q_table_.row( transition_(state, action) ).maxCoeff() - q_table_(state, action));
+
+    timestep_++;
+
+    return transition_(state, action);
 }
 
 void QLearning::callbackPlanningTime(const std_msgs::Float64::ConstPtr& msg)

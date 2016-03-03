@@ -24,7 +24,7 @@ void GprMultivariate::setVisualizerTopic(const std::string &topic)
 
 double GprMultivariate::kernel(const Eigen::VectorXd& x1, const Eigen::VectorXd& x2) const
 {
-    return sigma_f_ * sigma_f_ * std::exp( -(x1-x2).squaredNorm() / (2. * l_ * l_));
+    return sigma_f_ * sigma_f_ / l_ * std::exp( -(x1-x2).squaredNorm() / (2. * l_ * l_));
 }
 
 void GprMultivariate::setObservation(const Eigen::MatrixXd &X, const Eigen::MatrixXd& Y)
@@ -77,6 +77,31 @@ void GprMultivariate::loadTrainedData(const Eigen::MatrixXd& X, const Eigen::Mat
 {
     X_ = X;
     K_inverse_ = K_inverse;
+}
+
+double GprMultivariate::getSimilarity(const Eigen::VectorXd& feature)
+{
+    double res = 0.;
+
+    const double l = l_;
+    l_ = 1.0;
+
+    for (int i=0; i<X_.cols(); i++)
+        res += kernel(X_.col(i), feature);
+
+    l_ = l;
+
+    /*
+    Eigen::VectorXd diff(feature.rows());
+    diff.setZero();
+    for (int i=0; i<X_.cols(); i++)
+        diff += X_.col(i);
+    diff = feature - diff / X_.cols();
+    printf("squared norm to mean: %lf\n", diff.squaredNorm());
+    fflush(stdout);
+    */
+
+    return res / X_.cols();
 }
 
 void GprMultivariate::regression(const Eigen::MatrixXd& X, Eigen::VectorXd& mean, Eigen::MatrixXd& variance)

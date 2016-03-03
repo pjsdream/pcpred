@@ -34,6 +34,9 @@ public:
     void drawLineStrip(const char* ns, const std::vector<Eigen::Vector3d>& endpoints);
     void drawLineList(const char* ns, const std::vector<Eigen::Vector3d>& endpoints);
     void drawGaussianDistributions(const char* ns, const std::vector<Eigen::Vector3d>& mu, const std::vector<Eigen::Matrix3d>& sigma, double probability, const std::vector<double>& offset);
+    void drawCubes(const char* ns, const Eigen::Vector3d& scale, const std::vector<Eigen::Vector3d>& positions, const std::vector<std_msgs::ColorRGBA>& colors);
+
+    void deleteIds(const char* ns, int n);
 
 private:
 

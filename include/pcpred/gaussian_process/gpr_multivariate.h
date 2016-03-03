@@ -33,6 +33,8 @@ public:
     inline double getSigmaF() { return sigma_f_; }
     inline double getSigmaN() { return sigma_n_; }
 
+    double getSimilarity(const Eigen::VectorXd& feature);
+
     void loadTrainedData(const Eigen::MatrixXd& X, const Eigen::MatrixXd& K_inverse);
 
     void regression(const Eigen::MatrixXd& X, Eigen::VectorXd& mean, Eigen::MatrixXd& variance);

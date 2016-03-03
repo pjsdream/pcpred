@@ -366,3 +366,64 @@ void MarkerArrayVisualizer::drawLineList(const char* ns, const std::vector<Eigen
     marker_array.markers.push_back(marker);
     publish(marker_array);
 }
+
+void MarkerArrayVisualizer::deleteIds(const char *ns, int n)
+{
+    visualization_msgs::MarkerArray marker_array;
+
+    visualization_msgs::Marker marker;
+
+    marker.header.frame_id = "/world";
+    marker.header.stamp = ros::Time::now();
+
+    marker.ns = ns;
+    marker.action = visualization_msgs::Marker::DELETE;
+
+    for (int i=0; i<n; i++)
+    {
+        marker.id = i;
+        marker_array.markers.push_back(marker);
+    }
+
+    publish(marker_array);
+}
+
+void MarkerArrayVisualizer::drawCubes(const char* ns, const Eigen::Vector3d& scale, const std::vector<Eigen::Vector3d>& positions, const std::vector<std_msgs::ColorRGBA>& colors)
+{
+    visualization_msgs::MarkerArray marker_array;
+
+    visualization_msgs::Marker marker;
+
+    marker.header.frame_id = "/world";
+    marker.header.stamp = ros::Time::now();
+
+    marker.ns = ns;
+    marker.id = 0;
+    marker.type = visualization_msgs::Marker::CUBE_LIST;
+    marker.action = visualization_msgs::Marker::ADD;
+
+    marker.pose.position.x = 0.0;
+    marker.pose.position.y = 0.0;
+    marker.pose.position.z = 0.0;
+    marker.pose.orientation.x = 0.0;
+    marker.pose.orientation.y = 0.0;
+    marker.pose.orientation.z = 0.0;
+    marker.pose.orientation.w = 1.0;
+
+    marker.scale.x = scale(0);
+    marker.scale.y = scale(1);
+    marker.scale.z = scale(2);
+
+    for (int i=0; i<positions.size(); i++)
+    {
+        geometry_msgs::Point point;
+        point.x = positions[i](0);
+        point.y = positions[i](1);
+        point.z = positions[i](2);
+        marker.points.push_back(point);
+        marker.colors.push_back(colors[i]);
+    }
+
+    marker_array.markers.push_back(marker);
+    publish(marker_array);
+}

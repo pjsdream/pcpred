@@ -20,6 +20,7 @@ class BenchmarkGenerator
 private:
 
     static const int NUM_ACTIONS = 8;
+    static const int motion_blend_frames_ = 7;
 
     struct Edge
     {
@@ -44,7 +45,21 @@ public:
     inline Eigen::MatrixXd getEpisodeMatrix() { return episode_matrix_; }
     inline Eigen::VectorXi getEpisodeActions() { return episode_actions_; }
 
+    void setDirectory(const std::string& directory);
+    void clear();
+    void appendAction(int action);
+    void appendAction(int action, int sequence);
+    void appendIdle();
+
 private:
+
+    void appendActionLastFrames(int action, int sequence, int last_frames = -1, bool is_idle = false);
+
+    void blendMotion(Eigen::MatrixXd& motion, int frame, int motion_blend_frames);
+
+    void getNumSequences();
+
+    std::string directory_;
 
     int num_episodes_;
     int action_set_;

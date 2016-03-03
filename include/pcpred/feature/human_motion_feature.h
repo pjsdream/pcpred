@@ -36,15 +36,11 @@ public:
         return feature_.cols();
     }
 
-    inline int numJoints()
-    {
-        return joint_names_.size();
-    }
+    inline int numJoints() { return joint_names_.size(); }
+    inline int numLinks() { return links_.size(); }
 
-    inline std::string jointName(int i)
-    {
-        return joint_names_[i];
-    }
+    inline std::string jointName(int i) { return joint_names_[i]; }
+    inline std::pair<int, int> linkIds(int i) { return links_[i]; }
 
     Eigen::MatrixXd feature();
     Eigen::VectorXd columnFeature();
@@ -52,6 +48,7 @@ public:
     int frameSize();
 
     void setVisualizerTopic(const std::string& topic);
+    void visualizeCurrentHumanMotion(const std::string& ns = "human");
     void visualizeHumanMotion(const std::string& ns = "human");
     void visualizeHumanMotion(int start, int end, const std::string& ns = "human");
 

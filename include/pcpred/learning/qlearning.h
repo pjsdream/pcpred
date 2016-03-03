@@ -16,7 +16,7 @@ namespace pcpred
 
 struct QLearningOptions
 {
-    double alpha;   // learning rate
+    double omega;   // learning rate
     double gamma;   // discount factor
     double epsilon; // action selection strategy (default probability among all actions)
 
@@ -34,12 +34,16 @@ public:
 
     void setOptions(const QLearningOptions& options);
 
+    inline void setState(int state) { state_ = state; }
+    inline int getLastAction() { return last_action_; }
+    inline double getCompletionTime() { return completion_time_; }
+
     void loadData(const std::string& filename);
     void saveData(const std::string& filename);
 
-    void reinforcementLearn();
-    void reinforcementLearn(int state);
-    void reinforcementLearn(int state, int action);
+    int reinforcementLearn();
+    int reinforcementLearn(int state);
+    int reinforcementLearn(int state, int action);
 
     double computeReward(int state, int action);
 
@@ -52,14 +56,21 @@ private:
     int num_states_;
     int num_actions_;
 
-    Eigen::VectorXi transition_;
+    double completion_time_;
 
-    Eigen::VectorXd q_table_;
-    Eigen::VectorXd h_table_;
+    int state_;
+    int last_action_;
+
+    Eigen::MatrixXi transition_;
+
+    Eigen::MatrixXd q_table_;
+    Eigen::MatrixXd h_table_;
 
     ros::Publisher planning_request_publisher_;
     ros::Subscriber planning_time_subscriber_;
-    std::queue<int> planning_time_queue_;
+    std::queue<double> planning_time_queue_;
+
+    int timestep_;
 };
 
 }

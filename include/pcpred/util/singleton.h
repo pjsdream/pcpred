@@ -41,7 +41,8 @@ T* Singleton<T>::getInstance()
 template<class T>
 void Singleton<T>::destroy()
 {
-    delete instance_;
+    if (instance_ != 0)
+        delete instance_;
     instance_ = 0;
 }
 

@@ -51,10 +51,11 @@ public:
     void setHumanModelFilename(const std::string& filename);
 
     void learn(const char *directory);
-    void infer(const Eigen::VectorXd& feature, int state);
+    void infer(const Eigen::VectorXd& feature, int state, int last_action);
 
     void loadTrainedData(const std::string& filename);
     void saveTrainedData(const std::string& filename);
+    void saveFutureMotion(const std::string& filename);
 
     void setVisualizerTopic(const std::string& topic);
     void visualizeInferenceResult();
@@ -63,20 +64,25 @@ private:
 
     void parseData(const char* directory);
 
+    void appendColumn(Eigen::MatrixXd& m, const Eigen::VectorXd& x);
+
     LearningMotionOptions options_;
     std::string human_model_filename_;
     HumanMotionFeature feature_template_;
 
+    // input episodes
     std::vector<Eigen::MatrixXd> ksi_;
     std::vector<Eigen::VectorXi> actions_;
     std::vector<Eigen::VectorXi> progress_states_;
+    int num_action_types_;
 
-    std::vector<Eigen::VectorXd> cluster_centers_;
-    std::vector<GprMultivariate> gprs_;
-    std::vector<Eigen::MatrixXd> gpr_outputs_;  // [cluster](row:channel, column:data)
+    std::vector<std::vector<Eigen::VectorXd> > cluster_centers_;   // [progress_state][cluster_id](vector_index)
+    std::vector<std::vector<GprMultivariate> > gprs_;
+    std::vector<std::vector<Eigen::MatrixXd> > gpr_outputs_;  // [cluster](row:channel, column:data)
 
-    Eigen::VectorXd means_;
-    Eigen::VectorXd variances_;
+    std::vector<double> current_action_prob_; // [state]
+    std::vector<Eigen::VectorXd> means_;      // [action](channel)
+    std::vector<Eigen::VectorXd> variances_;
 
     MarkerArrayVisualizer* visualizer_;
 };
