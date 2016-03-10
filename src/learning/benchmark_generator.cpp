@@ -69,7 +69,7 @@ void BenchmarkGenerator::generate(const std::string& directory)
                 FILE* fp = fopen(filename, "r");
                 if (fp == NULL)
                 {
-                    num_sequences_[i] = n-1;
+                    num_sequences_[i] = n;
                     break;
                 }
                 fclose(fp);

@@ -249,9 +249,9 @@ void MarkerArrayVisualizer::drawSphereList(const char* ns, const std::vector<Eig
     marker.scale.y = 2. * radius;
     marker.scale.z = 2. * radius;
 
-    marker.color.r = 1.0f;
+    marker.color.r = 0.0f;
     marker.color.g = 0.0f;
-    marker.color.b = 0.0f;
+    marker.color.b = 1.0f;
     marker.color.a = 1.0;
 
     marker.lifetime = ros::Duration();

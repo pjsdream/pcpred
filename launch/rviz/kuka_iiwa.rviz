@@ -5,12 +5,20 @@ Panels:
     Property Tree Widget:
       Expanded:
         - /Global Options1
+        - /visual1
         - /visual1/Namespaces1
+        - /MotionPlanning1
+        - /MotionPlanning1/Scene Robot1
+        - /MotionPlanning1/Scene Robot1/Links1
         - /MotionPlanning1/Planned Path1
+        - /human_motion1/Namespaces1
+        - /motion_inference1
         - /motion_inference1/Namespaces1
         - /result1/Namespaces1
+        - /realtime_result1
+        - /realtime_result1/Namespaces1
       Splitter Ratio: 0.663842
-    Tree Height: 546
+    Tree Height: 972
   - Class: rviz/Selection
     Name: Selection
   - Class: rviz/Tool Properties
@@ -77,7 +85,7 @@ Visualization Manager:
       Marker Topic: /move_itomp/visual
       Name: visual
       Namespaces:
-        action: true
+        action: false
         indoor: true
       Queue Size: 100
       Value: true
@@ -210,7 +218,7 @@ Visualization Manager:
       Scene Robot:
         Attached Body Color: 150; 50; 150
         Links:
-          All Links Enabled: true
+          All Links Enabled: false
           Expand Joint Details: false
           Expand Link Details: false
           Expand Tree: false
@@ -248,40 +256,40 @@ Visualization Manager:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-            Value: true
+            Value: false
           segment_2:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-            Value: true
+            Value: false
           segment_3:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-            Value: true
+            Value: false
           segment_4:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-            Value: true
+            Value: false
           segment_5:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-            Value: true
+            Value: false
           segment_6:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-            Value: true
+            Value: false
           segment_7:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-            Value: true
+            Value: false
         Robot Alpha: 1
         Show Robot Collision: false
-        Show Robot Visual: false
+        Show Robot Visual: true
       Value: true
     - Alpha: 0.4
       Autocompute Intensity Bounds: true
@@ -325,22 +333,38 @@ Visualization Manager:
       Marker Topic: /motion_inference
       Name: motion_inference
       Namespaces:
-        positions: true
-        prediction_frame0: true
-        prediction_frame1: true
-        prediction_frame10: true
-        prediction_frame11: true
-        prediction_frame12: true
-        prediction_frame13: true
+        desire_0: true
+        desire_1: true
+        desire_2: true
+        desire_3: true
+        desire_4: false
+        desire_5: false
+        desire_6: false
+        desire_7: false
+        human: true
+        prediction_frame0: false
+        prediction_frame1: false
+        prediction_frame10: false
+        prediction_frame11: false
+        prediction_frame12: false
+        prediction_frame13: false
         prediction_frame14: true
-        prediction_frame2: true
-        prediction_frame3: true
-        prediction_frame4: true
-        prediction_frame5: true
-        prediction_frame6: true
-        prediction_frame7: true
-        prediction_frame8: true
-        prediction_frame9: true
+        prediction_frame2: false
+        prediction_frame3: false
+        prediction_frame4: false
+        prediction_frame5: false
+        prediction_frame6: false
+        prediction_frame7: false
+        prediction_frame8: false
+        prediction_frame9: false
+        target_0: false
+        target_1: false
+        target_2: false
+        target_3: false
+        target_4: false
+        target_5: false
+        target_6: false
+        target_7: false
       Queue Size: 100
       Value: true
     - Class: rviz/MarkerArray
@@ -352,34 +376,38 @@ Visualization Manager:
       Queue Size: 100
       Value: false
     - Class: rviz/MarkerArray
-      Enabled: true
+      Enabled: false
       Marker Topic: result
       Name: result
       Namespaces:
-        path0: true
-        path1: true
-        path_0_0: true
-        path_0_10: true
-        path_0_100: true
-        path_0_20: true
-        path_0_30: true
-        path_0_40: true
-        path_0_50: true
-        path_0_60: true
-        path_0_70: true
-        path_0_80: true
-        path_0_90: true
-        path_1_0: true
-        path_1_10: true
-        path_1_100: true
-        path_1_20: true
-        path_1_30: true
-        path_1_40: true
-        path_1_50: true
-        path_1_60: true
-        path_1_70: true
-        path_1_80: true
-        path_1_90: true
+        {}
+      Queue Size: 100
+      Value: false
+    - Class: rviz/MarkerArray
+      Enabled: true
+      Marker Topic: /pomp_planner/visualization_marker_array
+      Name: realtime_result
+      Namespaces:
+        global_spheres_0: false
+        global_spheres_10: false
+        global_spheres_100: false
+        global_spheres_20: false
+        global_spheres_30: false
+        global_spheres_40: false
+        global_spheres_50: false
+        global_spheres_60: false
+        global_spheres_70: false
+        global_spheres_80: false
+        global_spheres_90: false
+        itomp_best_endeffector: false
+        itomp_best_endeffector_path: true
+        itomp_endeffector: false
+        itomp_endeffector_path: false
+        tan0: false
+        tan1: false
+        tan2: false
+        vel: false
+        wp_0: true
       Queue Size: 100
       Value: true
     - Attached Body Color: 150; 50; 150
@@ -570,22 +598,22 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 2.38935
+      Distance: 2.43976
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.06
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 0.601232
-        Y: 0.0716762
-        Z: 0.403584
+        X: 0.447926
+        Y: 0.225309
+        Z: 0.20544
       Name: Current View
       Near Clip Distance: 0.01
-      Pitch: 0.509796
+      Pitch: 0.374796
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 1.90994
+      Yaw: 0.798734
     Saved:
       - Class: rviz/Orbit
         Distance: 1.32298
@@ -638,15 +666,66 @@ Visualization Manager:
         Target Frame: <Fixed Frame>
         Value: Orbit (rviz)
         Yaw: 2.17993
+      - Class: rviz/Orbit
+        Distance: 1.86444
+        Enable Stereo Rendering:
+          Stereo Eye Separation: 0.06
+          Stereo Focal Distance: 1
+          Swap Stereo Eyes: false
+          Value: false
+        Focal Point:
+          X: 0.425166
+          Y: 0.205657
+          Z: 0.34756
+        Name: Orbit
+        Near Clip Distance: 0.01
+        Pitch: 0.674797
+        Target Frame: <Fixed Frame>
+        Value: Orbit (rviz)
+        Yaw: 5.10374
+      - Class: rviz/Orbit
+        Distance: 2.43976
+        Enable Stereo Rendering:
+          Stereo Eye Separation: 0.06
+          Stereo Focal Distance: 1
+          Swap Stereo Eyes: false
+          Value: false
+        Focal Point:
+          X: 0.447926
+          Y: 0.225309
+          Z: 0.20544
+        Name: video_planning
+        Near Clip Distance: 0.01
+        Pitch: 0.374796
+        Target Frame: <Fixed Frame>
+        Value: Orbit (rviz)
+        Yaw: 0.798734
+      - Class: rviz/Orbit
+        Distance: 1.76239
+        Enable Stereo Rendering:
+          Stereo Eye Separation: 0.06
+          Stereo Focal Distance: 1
+          Swap Stereo Eyes: false
+          Value: false
+        Focal Point:
+          X: 0.920903
+          Y: -0.101132
+          Z: 0.178322
+        Name: video_tasks
+        Near Clip Distance: 0.01
+        Pitch: 0.404796
+        Target Frame: <Fixed Frame>
+        Value: Orbit (rviz)
+        Yaw: 2.38374
 Window Geometry:
   Displays:
     collapsed: false
-  Height: 756
+  Height: 1182
   Hide Left Dock: false
   Hide Right Dock: false
   Motion Planning:
     collapsed: false
-  QMainWindow State: 000000ff00000000fd000000040000000000000174000002b1fc0200000009fb0000001200530065006c0065006300740069006f006e00000000280000009b0000006400fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c0061007900730100000028000002b1000000dd00fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261fb0000001e004d006f00740069006f006e00200050006c0061006e006e0069006e006700000001590000019e0000019300ffffff0000000100000122000002b1fc0200000003fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a005600690065007700730100000028000002b1000000b000fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e10000019700000003000005e50000003efc0100000002fb0000000800540069006d00650000000000000005e50000026100fffffffb0000000800540069006d0065010000000000000450000000000000000000000283000002b100000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  QMainWindow State: 000000ff00000000fd0000000400000000000001740000045bfc0200000009fb0000001200530065006c0065006300740069006f006e00000000280000009b0000006400fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afb000000100044006900730070006c00610079007301000000280000045b000000dd00fffffffb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261fb0000001e004d006f00740069006f006e00200050006c0061006e006e0069006e006700000001590000019e0000019300ffffff00000001000001220000045bfc0200000003fb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000000a0056006900650077007301000000280000045b000000b000fffffffb0000001200530065006c0065006300740069006f006e010000025a000000b200000000000000000000000200000490000000a9fc0100000001fb0000000a00560069006500770073030000004e00000080000002e10000019700000003000005e50000003efc0100000002fb0000000800540069006d00650000000000000005e50000026100fffffffb0000000800540069006d00650100000000000004500000000000000000000004ad0000045b00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
   Selection:
     collapsed: false
   Time:
@@ -655,6 +734,6 @@ Window Geometry:
     collapsed: false
   Views:
     collapsed: false
-  Width: 1317
-  X: 293
-  Y: 48
+  Width: 1871
+  X: 49
+  Y: 18
